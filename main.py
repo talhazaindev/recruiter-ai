@@ -32,7 +32,7 @@ def get_file_type(file_path):
     else:
         return None
 
-file_path = "cv6.pdf"  # Replace with the actual path to your CV file
+file_path = "cvs_test/cv3_v5.pdf"  # Replace with the actual path to your CV file
 file_type = get_file_type(file_path)
 
 if file_type == "docx":
@@ -41,5 +41,20 @@ if file_type == "docx":
 else:
     cv_text = parse_cv(file_path)
 
-print("/////////////////////////////")
-print(cv_text)
+""" for i in range(1, 22):
+    file_path = f"cvs/cvs/cv{i}.pdf"
+    
+    # Check if file exists before processing
+    if os.path.exists(file_path):
+        file_type = get_file_type(file_path)
+        
+        if file_type == "docx":
+            pdf_path = docx_to_pdf(file_path)
+            cv_text = parse_cv(pdf_path)
+        else:
+            cv_text = parse_cv(file_path)
+        
+        print(f"Processed cv{i}.pdf")
+    else:
+        print(f"File not found: {file_path}")
+ """

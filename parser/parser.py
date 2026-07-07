@@ -1,3 +1,4 @@
+from pydoc import doc
 import re
 import fitz
 import json
@@ -56,6 +57,12 @@ HEADING_MAP = {
     "technologies": "skills",
     "programming languages": "skills",
     "technical proficiencies": "skills",
+    "tech stack": "skills",
+    "techstack": "skills",
+    "strength": "skills",
+"strengths": "skills",
+"core competencies": "skills",
+"technical strengths": "skills",
 
     # =========================
     # PROJECTS
@@ -103,6 +110,9 @@ HEADING_MAP = {
     "professional objective": "summary",
     "personal statement": "summary",
     "career overview": "summary",
+    "career highlights": "summary",
+    "career highlight": "summary",
+
 
     #==============================
     #certificates
@@ -136,6 +146,37 @@ HEADING_MAP = {
 "professional development": "certifications",
 "continuing education": "certifications",
 "certification and training": "certifications",
+
+
+
+    # =========================
+# RESEARCH
+# =========================
+"research": "research",
+"research experience": "research",
+"research work": "research",
+"research projects": "research",
+"research interests": "research",
+"academic research": "research",
+"scientific research": "research",
+"publications": "research",
+"publication": "research",
+"published work": "research",
+"research publications": "research",
+"journal publications": "research",
+"conference publications": "research",
+"conference papers": "research",
+"journal papers": "research",
+"research papers": "research",
+"research paper": "research",
+"papers": "research",
+"peer-reviewed publications": "research",
+"peer reviewed publications": "research",
+"selected publications": "research",
+"articles": "research",
+"technical papers": "research",
+"thesis": "research",
+"dissertation": "research",
 }
 
 def column_boxes(page, footer_margin=50, header_margin=50, no_image_text=True):
@@ -442,6 +483,7 @@ def extract_spans(pdf_path):
     doc.close()
     #for i in all_spans:
      #   print(i["text"])
+    #print(all_spans)
     return all_spans
 
 def extract_spans_from_bbox(page, bbox, page_num):
@@ -504,7 +546,8 @@ def extract_page_spans(pdf_path):
     #print(spans)
     return spans
 
-def is_heading(span, current_font_size=None):
+#v2
+""" def is_heading(span, current_font_size=None):
     text = span["text"].strip()
     font = span["font"]
     #flags = span["flags"]
@@ -524,6 +567,27 @@ def is_heading(span, current_font_size=None):
         return True
      
     return False
+ """
+#isheading v1
+def is_heading(span, current_font_size=None):
+    print(span)
+    text = span["text"].strip()
+    font = span["font"]
+    bold_flag = span["bold"]
+    bold = ("Bold" in font) or (bold_flag)
+    
+    normalized = normalize_heading(text)
+    
+    # Primary check: must be in HEADING_MAP and bold
+    if normalized in HEADING_MAP and bold:
+        return True
+    
+    # Secondary check: only if it's in HEADING_MAP but not bold,
+    # and matches the current font size (might be a heading without bold formatting)
+    if normalized in HEADING_MAP and current_font_size is not None and span["size"] >= current_font_size:
+        return True
+    
+    return False
 
 def normalize_heading(text: str) -> str:
 
@@ -541,6 +605,7 @@ def normalize_heading(text: str) -> str:
     #print("Normalized heading:", text)
     return text
 
+#v2
 def build_sections(spans, current_font_size=None):
     sections = {}
     current_heading = None
@@ -578,7 +643,8 @@ def build_sections(spans, current_font_size=None):
                 current_content.append({
                     "text": text,
                     "bold": "Bold" in span["font"],
-                    "flags": span["flags"]
+                    "flags": span["flags"],
+                    "size": span["size"],
                 })
 
     # Save last section if it has content
@@ -589,65 +655,68 @@ def build_sections(spans, current_font_size=None):
 
     return sections
 
-# def build_sections(spans, current_font_size=None):
+#v1
+""" def build_sections(spans, current_font_size=None):
 
-#     sections = {}
+    sections = {}
 
-#     current_heading = None
-#     current_content = []
+    current_heading = None
+    current_content = []
 
-#     for span in spans:
+    for span in spans:
 
-#         text = span["text"].strip()
-#         font = span["font"]
-#         #flags = span["flags"]
-#         if not text:
-#             continue
+        text = span["text"].strip()
+        font = span["font"]
+        #flags = span["flags"]
+        if not text:
+            continue
 
-#         span["text"] = text
-#         if is_heading(span,current_font_size):
+        span["text"] = text
+        if is_heading(span,current_font_size):
             
-#             # Save previous section
-#             if current_heading is not None:
-#                 if current_heading == "miscellaneous" and current_heading in sections:
-#                     sections[current_heading].extend(current_content)
-#                 else:
-#                     sections[current_heading] = current_content
+            # Save previous section
+            if current_heading is not None:
+                if current_heading == "miscellaneous" and current_heading in sections:
+                    sections[current_heading].extend(current_content)
+                else:
+                    sections[current_heading] = current_content
         
 
-#             normalized = normalize_heading(text)
+            normalized = normalize_heading(text)
 
-#             if normalized in HEADING_MAP:
-#                 current_heading = HEADING_MAP[normalized]
-#                 current_font_size = span["size"]
+            if normalized in HEADING_MAP:
+                current_heading = HEADING_MAP[normalized]
+                current_font_size = span["size"]
                 
-#             else:
-#                 #########
-#                 current_heading="miscellaneous"
-#                 #print(current_content)
-#                 current_font_size = span["size"]
-#             current_content = []
+            else:
+                #########
+                current_heading="miscellaneous"
+                #print(current_content)
+                current_font_size = span["size"]
+            current_content = []
                 
                 
-#         else:
-#             if current_heading=="miscellaneous":
-#                 print(current_content)
-#             if current_heading is not None:
-#                 current_content.append({"text": text,"bold":("Bold" in span["font"]),"flags": span["flags"]})
+        else:
+            if current_heading=="miscellaneous":
+                print(current_content)
+            if current_heading is not None:
+                current_content.append({"text": text,"bold":("Bold" in span["font"]),"flags": span["flags"]})
 
-#     # Save last section
-#     if current_heading is not None:
-#         if current_heading == "miscellaneous" and current_heading in sections:
-#             sections[current_heading].extend(current_content)
-#         else:
-#             sections[current_heading] = current_content
-#         #sections[current_heading] = current_content
-#     #print(sections)
-#     return sections
+    # Save last section
+    if current_heading is not None:
+        if current_heading == "miscellaneous" and current_heading in sections:
+            sections[current_heading].extend(current_content)
+        else:
+            sections[current_heading] = current_content
+        #sections[current_heading] = current_content
+    #print(sections)
+    return sections
+ """
 
 def find_headers(path):
     #spans = extract_spans(path)
     spans=extract_spans(path)
+    #print(spans)
     font_sizes = []
 
     # Find all unique font sizes
@@ -657,9 +726,9 @@ def find_headers(path):
     font_sizes = list(set(font_sizes))
     font_sizes.sort(reverse=True)
 
-    sections = build_sections(spans,font_sizes[1])
-
-    return sections
+    sections = build_sections(spans,font_sizes[0])
+    #print(sections)
+    return sections,font_sizes[-1]
    
     """ print("Sections found:")
     for heading, content in sections.items():
@@ -669,7 +738,7 @@ def find_headers(path):
         print("-" * 40)
      """
 
-def group_section(items):
+def group_section(items,min_font):
     grouped = {}
 
     current_key = None
@@ -678,8 +747,16 @@ def group_section(items):
         text = item["text"].strip()
 
         #print(item)
-        if item["bold"]or item["flags"] >= 16:  # Assuming bold text or flagged text indicates a new key
+        if (item["bold"]or item["flags"] >= 16) and item["size"] > min_font:  # Assuming bold text or flagged text indicates a new key
             current_key = text
+
+            if current_key in grouped:
+                i = 2
+                while f"{current_key}_{i}" in grouped:
+                    i += 1
+                current_key = f"{current_key}_{i}"
+
+
             grouped[current_key] = []
 
         elif current_key is not None:
@@ -711,6 +788,21 @@ def form_json(sections):
     with open("output.json", "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
 
+""" def form_json(sections, filename):
+    # Create result folder if it doesn't exist
+    os.makedirs("result", exist_ok=True)
+    
+    # Extract just the base filename from the path
+    base_name = os.path.basename(filename)
+    base_name = os.path.splitext(base_name)[0] + '.json'
+
+    
+    # Save in result folder
+    filepath = os.path.join("result", base_name)
+    
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(sections, f, indent=4, ensure_ascii=False)
+ """
 def merge_empty_keys(data):
     """
     Merges consecutive keys with empty values into the next key
@@ -768,13 +860,14 @@ def merge_empty_keys(data):
 def parse_cv(path):
     print("Parsing CV from path:", path)
     raw_text = extract_raw_text(path)
-    sections = find_headers(path)
+    sections,min_font = find_headers(path)
     #print(sections)
     for section_name, items in sections.items():
-        sections[section_name] = group_section(items)
+        sections[section_name] = group_section(items,min_font)
     sections["raw_text"] = raw_text
     merged_sections = merge_lists(sections)
     merged_sections = merge_empty_keys(merged_sections)
+    #form_json(merged_sections,path)
     form_json(merged_sections)
-    #return raw_text
+
     
