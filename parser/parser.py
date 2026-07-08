@@ -63,6 +63,9 @@ HEADING_MAP = {
 "strengths": "skills",
 "core competencies": "skills",
 "technical strengths": "skills",
+"technicalskills":"skills",
+"coreskills":"skills",
+
 
     # =========================
     # PROJECTS
@@ -97,6 +100,8 @@ HEADING_MAP = {
     # =========================
     "summary": "summary",
     "professional summary": "summary",
+    "professionalsummary":"summary",
+    "aboutme":"summary",
     "career summary": "summary",
     "profile": "summary",
     "professional profile": "summary",
@@ -471,7 +476,7 @@ def extract_spans(pdf_path):
         
         if len(columns) <= 1:
             # Single column - extract normally
-            page_spans = extract_page_spans(pdf_path)
+            page_spans = extract_page_spans(page, page_num)
             all_spans.extend(page_spans)
         else:
             # Multi-column - extract per column in reading order
@@ -511,38 +516,35 @@ def extract_spans_from_bbox(page, bbox, page_num):
                 })
     return spans
 
-def extract_page_spans(pdf_path):
+def extract_page_spans(page, page_num):
 
-    doc = fitz.open(pdf_path)
 
     spans = []
 
-    for page_num, page in enumerate(doc, start=1):
 
-        text_dict = page.get_text("dict",sort=True)
+    text_dict = page.get_text("dict",sort=True)
 
-        for block in text_dict["blocks"]:
+    for block in text_dict["blocks"]:
 
-            if block["type"] != 0:
-                continue
+        if block["type"] != 0:
+            continue
 
-            for line in block["lines"]:
-                #print(len(line["spans"]))
-                
-                for span in line["spans"]:
+        for line in block["lines"]:
+            #print(len(line["spans"]))
+            
+            for span in line["spans"]:
 
-                    spans.append({
-                        "text": span["text"],
-                        "font": span["font"],
-                        "size": span["size"],
-                        "flags": span["flags"],
-                        "bbox": span["bbox"],
-                        "page": page_num,
-                        "bold": span["flags"] >= 16,
+                spans.append({
+                    "text": span["text"],
+                    "font": span["font"],
+                    "size": span["size"],
+                    "flags": span["flags"],
+                    "bbox": span["bbox"],
+                    "page": page_num,
+                    "bold": span["flags"] >= 16,
 
-                    })
+                })
 
-    doc.close()
     #print(spans)
     return spans
 
@@ -569,28 +571,81 @@ def extract_page_spans(pdf_path):
     return False
  """
 #isheading v1
-def is_heading(span, current_font_size=None):
-    print(span)
+def is_heading(span, next_span, current_font_size=None):
+    #print(span)
     text = span["text"].strip()
     font = span["font"]
     bold_flag = span["bold"]
     bold = ("Bold" in font) or (bold_flag)
     
     normalized = normalize_heading(text)
-    
+    #print("Checking heading:", text, "Normalized:", normalized, "Bold:", bold, "Current font size:", current_font_size)
     # Primary check: must be in HEADING_MAP and bold
     if normalized in HEADING_MAP and bold:
-        return True
+        
+        if abs(span["bbox"][1] - next_span["bbox"][1]) <= 1 and next_span["text"] !=" ":  # Allow a small size difference
+            return False
+        else:
+            return True
     
     # Secondary check: only if it's in HEADING_MAP but not bold,
     # and matches the current font size (might be a heading without bold formatting)
     if normalized in HEADING_MAP and current_font_size is not None and span["size"] >= current_font_size:
-        return True
+        if abs(span["bbox"][1] - next_span["bbox"][1]) <= 1:
+            pass
+        else:   
+            return True
     
     return False
 
-def normalize_heading(text: str) -> str:
 
+#isheading v3
+""" def is_heading(span, next_span, current_font_size=None):
+    text = span["text"].strip()
+    font = span["font"]
+    bold = ("Bold" in font) or span["bold"]
+
+    score = 0
+
+    # Empty text cannot be a heading
+    if not text:
+        return False
+
+    # Reject if next span is on the same line
+    SAME_LINE_TOLERANCE = 1.0
+    if abs(span["bbox"][1] - next_span["bbox"][1]) <= SAME_LINE_TOLERANCE:
+        return False
+    else: 
+        score+=1
+
+    normalized = normalize_heading(text)
+
+
+    # Strong signal: known heading
+    if normalized in HEADING_MAP:
+        score += 3
+
+    # Bold text
+    if bold:
+        score += 1
+
+    # Font size comparable to current section heading
+    if current_font_size is None or span["size"] >= current_font_size:
+        score += 1
+
+    # Headings are usually short
+    if len(text.split()) <= 5:
+        score += 1
+
+    # Accept if score is high enough
+    return score >= 3
+ """
+
+def normalize_heading(text: str) -> str:
+    xd=text
+    if text=="T E C H N I C A L S K I L L S":
+        
+        print("Normalizing heading:", text)
     #print("Normalizing heading:", text)
     text=text.lower().strip()
     text = text.replace("&", "and")
@@ -603,6 +658,8 @@ def normalize_heading(text: str) -> str:
     
     text = re.sub(r"\s+", " ", text)
     #print("Normalized heading:", text)
+    if xd=="T E C H N I C A L S K I L L S":
+        print("Normalized heading:", text)
     return text
 
 #v2
@@ -611,7 +668,15 @@ def build_sections(spans, current_font_size=None):
     current_heading = None
     current_content = []
 
-    for span in spans:
+    total_spans = len(spans)
+
+    for i,span in enumerate(spans):
+        if i<total_spans-1:
+            next_span=spans[i+1]
+        else:
+            next_span=span
+
+
         text = span["text"].strip()
         font = span["font"]
         if not text:
@@ -619,7 +684,7 @@ def build_sections(spans, current_font_size=None):
 
         span["text"] = text
         
-        if is_heading(span, current_font_size):
+        if is_heading(span,next_span, current_font_size):
             # Save previous section if it has content
             if current_heading is not None and current_content:
                 if current_heading not in sections:
@@ -716,7 +781,7 @@ def build_sections(spans, current_font_size=None):
 def find_headers(path):
     #spans = extract_spans(path)
     spans=extract_spans(path)
-    #print(spans)
+    print(spans)
     font_sizes = []
 
     # Find all unique font sizes
@@ -726,7 +791,7 @@ def find_headers(path):
     font_sizes = list(set(font_sizes))
     font_sizes.sort(reverse=True)
 
-    sections = build_sections(spans,font_sizes[0])
+    sections = build_sections(spans,font_sizes[1])
     #print(sections)
     return sections,font_sizes[-1]
    
@@ -788,9 +853,10 @@ def form_json(sections):
     with open("output.json", "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
 
+
 """ def form_json(sections, filename):
     # Create result folder if it doesn't exist
-    os.makedirs("result", exist_ok=True)
+    os.makedirs("result2", exist_ok=True)
     
     # Extract just the base filename from the path
     base_name = os.path.basename(filename)
@@ -798,11 +864,11 @@ def form_json(sections):
 
     
     # Save in result folder
-    filepath = os.path.join("result", base_name)
+    filepath = os.path.join("result2", base_name)
     
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
- """
+  """
 def merge_empty_keys(data):
     """
     Merges consecutive keys with empty values into the next key

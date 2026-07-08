@@ -1,48 +1,67 @@
 {
+    "summary": {
+        "content": [
+            "Computer Engineering graduate (FAST-NUCES, 2026 — CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed projects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardware– software integration (UART, I2C, SPI), and Python-based LLM application development. Seeking an entry-level Embedded Systems Engineer or AI Engineer role."
+        ]
+    },
     "education": {
-        "National University of Computer And Emerging Sciences, Chiniot Faisalabad Campus": [
-            "Bachelor of Science, Computer Science - 2026 (3.59  /  4)"
+        "B.S. Computer Engineering": [
+            "FAST National University of Computer & Emerging Sciences (FAST-NUCES), Lahore CGPA: 3.25 / 4.0"
         ],
-        "Nixor College Karachi": [
-            "Alevels - Computer Science - 2022 4A*"
+        "Intermediate — FSc Pre-Engineering": [
+            "Aspire Group of Colleges, Lahore"
+        ],
+        "Matriculation (Science)": [
+            "LDA Model High School, Lahore"
+        ]
+    },
+    "experience": {
+        "content": [
+            "Aug 2022 – 2026 Aug 2019 – Mar 2021 Mar 2017 – Apr 2019"
+        ],
+        "Software Engineering Intern": [
+            "• Malind Tech Aug 2025 – Dec 2025"
+        ],
+        "n": [
+            "• Malind Tech Aug 2025 – Dec 2025 Developed and deployed an AI chatbot using Python and LLM APIs, automating customer query handling across 3+ business workflows Integrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% Applied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries"
+        ],
+        "Embedded Systems Design Intern": [
+            "Jul 2025 – Aug 2025 • Punjab Information Technology Board (PITB) – – – Developed and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems Implemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing Conducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices"
+        ],
+        "Electrical Engineering Intern": [
+            "• Packages Real Estate Pvt. Ltd. (PREPL) Jul 2024 – Aug 2024 AnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis – – Configured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance improvements"
         ]
     },
     "projects": {
-        "SoccerVision": [
-            "• Developed an end-to-end AI system for automated football match highlight generation • Implemented computer vision models to detect key events (goals, penalties, freekicks etc.) • Generated multiple highlight types (full match, event-based, match summaries) from raw footage • Integrated APIs for payments, authentication and social media sharing."
+        "content": [
+            "| Python, LLM | Python, Ja | ESP32, Embe"
         ],
-        "QLoRA Fine-Tuning of Vision Language Models": [
-            "• Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to Markdown conversion. • Applied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient accumulation, and GPU-based training on Kaggle."
+        "AI Business Automation System": [
+            "manual handling across 3 businessprocesses"
         ],
-        "Masked Auto Encoder (MAE)": [
-            "• Built a self-supervised MAE using ViT (Base + Small) for image reconstruction • Applied 75% patch masking and asymmetric encoder–decoder design • Optimized training with mixed precision on dual T4 GPUs (Kaggle)"
+        "Custom AI Chatbot for Websites": [
+            "under 30 minutes via web integration"
         ],
-        "Custom Diffusion Model for Image Generation": [
-            "• Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture for high-resolution image generation and reconstruction from noisy inputs. • Developed the complete forward and reverse diffusion pipeline, including noise scheduling, timestep embeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri"
+        "Fare Validator for Electric Bus": [
+            "software integration for transitautomation | Python, LLM APIs, REST APIs"
         ],
-        "Image Captioning System": [
-            "• Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq) • Extracted and cached 2048-d image features to optimize training"
-        ],
-        "Traffic Sign Detection & Classification": [
-            "• Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks • Fine Tuned models on traffic signs dataset"
-        ],
-        "Activites, Honour and Awards": [
-            "6x Deans List, FAST NUCES Chiniot-Faisalabad AI & Computer Network TA, FAST NUCES Chiniot-Faisalabad 99.3 Percentile in NSCT TEST, NUCES, HEC 3 rd Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad"
+        "m": [
+            "— Automated customer responses and multi-step workflows; reduced | Python, JavaScript, LLM APIs — Domain-specific NLP chatbot with FAQ handling; deployable in | ESP32, Embedded C/C++, IoT — Real-time embedded ticket verification system with hardware–"
         ]
     },
     "skills": {
-        "Languages:": [
-            "Python, C++, SQL"
+        "Programming Languages:": [
+            "Python, Embedded C, C++, JavaScript, Git, REST APIs"
         ],
-        "Frameworks & Libraries:": [
-            "PyTorch, NumPy, FastAPI, Scikit-learn, LangChain"
+        "Embedded Systems & IoT:": [
+            "STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware–Software Integration, Real-Time Systems, Microcontrollers"
+        ],
+        "AI & Automation:": [
+            "LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), Machine Learning"
         ],
         "Tools & Platforms:": [
-            "Git, Docker, AWS, Ollama, Kaggle, Firebase"
-        ],
-        "Interests & Hobbies": [
-            "GeoPolitics, History, Sports"
+            "Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics"
         ]
     },
-    "raw_text": " \nMuhammad Arham \nma.muhammadarham@gmail.com  | https://github.com/Arhamfsd \nhttps://www.linkedin.com/in/muhammad-arham-8392b7285/  |  03362278223 \n \nEDUCATION \nNational University of Computer And Emerging Sciences, Chiniot Faisalabad Campus \nBachelor of Science, Computer Science - 2026   \n  \n (3.59  /  4) \nNixor College Karachi \n       \nAlevels - Computer Science - 2022                                                                          \n    4A* \n \nPROJECTS \nSoccerVision  \n• Developed an end-to-end AI system for automated football match highlight generation  \n• Implemented computer vision models to detect key events (goals, penalties, freekicks etc.)  \n• Generated multiple highlight types (full match, event-based, match summaries) from raw footage  \n• Integrated APIs for payments, authentication and social media sharing. \n \nQLoRA Fine-Tuning of Vision Language Models  \n• Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to \nMarkdown conversion.  \n• Applied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient \naccumulation, and GPU-based training on Kaggle.    \n \nMasked Auto Encoder (MAE) \n• Built a self-supervised MAE using ViT (Base + Small) for image reconstruction  \n• Applied 75% patch masking and asymmetric encoder–decoder design  \n• Optimized training with mixed precision on dual T4 GPUs (Kaggle)  \n \nCustom Diffusion Model for Image Generation  \n• Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture \nfor high-resolution image generation and reconstruction from noisy inputs.  \n• Developed the complete forward and reverse diffusion pipeline, including noise scheduling, timestep \nembeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri \n \nImage Captioning System \n• Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq)  \n• Extracted and cached 2048-d image features to optimize training \n \nTraffic Sign Detection & Classification \n• Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks  \n• Fine Tuned models on traffic signs dataset \n \nActivites, Honour and Awards \n6x Deans List, FAST NUCES Chiniot-Faisalabad \nAI & Computer Network TA, FAST NUCES Chiniot-Faisalabad \n99.3 Percentile in NSCT TEST, NUCES, HEC \n3rd Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad \n \nTECHNICAL EXPERTISE \nLanguages:  Python, C++, SQL \nFrameworks & Libraries:  PyTorch, NumPy, FastAPI, Scikit-learn, LangChain \nTools & Platforms:  Git, Docker, AWS, Ollama, Kaggle, Firebase \n \nInterests & Hobbies \nGeoPolitics, History, Sports \n"
+    "raw_text": "Soban Gull \nEmbedded Systems Engineer|AI&Automation Engineer \nLahore, Pakistan | +92-321-4063925 |\n | Python, LLM APIs, REST APIs\n \n| Python, JavaScript, LLM APIs\n \n| ESP32, Embedded C/C++, IoT \nsobangull64@gmail.com |\n \nFAST National University of Computer & Emerging Sciences (FAST-NUCES), Lahore \nCGPA: 3.25 / 4.0 \nIntermediate — FSc Pre-Engineering\nAspire Group of Colleges, Lahore \nMatriculation (Science)\nLDA Model High School, Lahore\nE X P E R I E N C E \nlinkedin.com/in/soban-gull-501321282 \nAug 2019 – Mar 2021 \nMar 2017 – Apr 2019 \nAug 2022 – 2026 \nP R O J E C T S \nE D U C A T I O N \nT E C H N I C A L S K I L L S \nB.S. Computer Engineering\nElectrical Engineering Intern\n \nSoftware Engineering Intern\nEmbedded Systems Design Intern\nP R O F E S S I O N A L S U M M A R Y \nAI Business Automation System\nmanual handling across 3 businessprocesses\nCustom AI Chatbot for Websites\nunder 30 minutes via web integration\nFare Validator for Electric Bus\nsoftware integration for transitautomation\nProgramming Languages: Python, Embedded C, C++, JavaScript, Git, REST APIs \nEmbedded Systems & IoT: STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware–Software\nIntegration, Real-Time Systems, Microcontrollers \nAI & Automation: LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), \nMachine Learning \nTools & Platforms: Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics \n • Malind Tech \nAug 2025 – Dec 2025 \nDeveloped and deployed an AI chatbot using Python and LLM APIs, automating customer query handling across 3+ business\nworkflows \nIntegrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% \nApplied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries \n                                                                                                                                                                                                                   Jul 2025 – Aug 2025 \n• Punjab Information Technology Board (PITB) \nDeveloped and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems\nImplemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing\nConducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices \n• Packages Real Estate Pvt. Ltd. (PREPL) \nJul 2024 – Aug 2024 \nAnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis \nConfigured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance\nimprovements \n — Automated customer responses and multi-step workflows; reduced \n— Domain-specific NLP chatbot with FAQ handling; deployable in \n— Real-time embedded ticket verification system with hardware–\nComputer Engineering graduate (FAST-NUCES, 2026 — CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed\nprojects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardware–\nsoftware integration (UART, I2C, SPI), and Python-based LLM application development. Seeking an entry-level Embedded Systems\nEngineer or AI Engineer role. \n–\n–\n–\n–\n–\n–\n–\n–\n"
 }
