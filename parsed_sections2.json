@@ -1,0 +1,38 @@
+{
+    "experience": [
+        {
+            "company": "Crymzee Networks",
+            "designation": "Business Development Executive",
+            "start_date": "2024",
+            "end_date": "Present",
+            "description": "Managed and optimized company profiles on Upwork, Fiverr, LinkedIn, Dribbble, and Behance to attract high-quality leads. Conducted targeted outreach and proposal writing on Fiverr and Upwork to win projects across multiple freelance platforms. Oversaw end-to-end project management for won contracts, ensuring on-time delivery and client satisfaction. Coordinated with cross-functional teams to align project scope, timelines, and deliverables."
+        },
+        {
+            "company": "CaptenAmz (Agency)",
+            "designation": "Business Development Executive",
+            "start_date": "10/2025",
+            "end_date": "03/2026",
+            "description": "Remote | Managed and maintained Upwork profiles to maximize visibility and conversion rates. Executed targeted outreach campaigns using Close CRM and Apollo to nurture prospective clients. Managed and tracked leads throughout the sales pipeline using Close CRM and Apollo, improving follow-up efficiency. Contributed to agency revenue growth by identifying and pursuing new business opportunities."
+        }
+    ],
+    "education": [
+        {
+            "degree": "BS Biotechnology",
+            "institution": "Lahore College for Women University (LCWU)",
+            "cgpa": "3.65",
+            "graduation_date": "2021 \u2013 2025"
+        },
+        {
+            "degree": "FSc (Pre-Medical)",
+            "institution": "Punjab College, Okara",
+            "cgpa": "",
+            "graduation_date": "2018 \u2013 2020"
+        },
+        {
+            "degree": "Matriculation (Science)",
+            "institution": "Falcon Public School, Okara",
+            "cgpa": "",
+            "graduation_date": "2016 \u2013 2018"
+        }
+    ]
+}

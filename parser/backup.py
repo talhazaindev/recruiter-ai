@@ -284,7 +284,7 @@ def extract_docx_spans(docx_path):
                 "page": None
             })
 
-    print(spans)
+    #print(spans)
     return spans
 # def extract_docx_spans(docx_path):
 #     """

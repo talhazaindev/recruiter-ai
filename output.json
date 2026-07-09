@@ -1,67 +1,331 @@
 {
     "summary": {
         "content": [
-            "Computer Engineering graduate (FAST-NUCES, 2026 — CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed projects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardware– software integration (UART, I2C, SPI), and Python-based LLM application development. Seeking an entry-level Embedded Systems Engineer or AI Engineer role."
-        ]
-    },
-    "education": {
-        "B.S. Computer Engineering": [
-            "FAST National University of Computer & Emerging Sciences (FAST-NUCES), Lahore CGPA: 3.25 / 4.0"
+            "Results-driven"
         ],
-        "Intermediate — FSc Pre-Engineering": [
-            "Aspire Group of Colleges, Lahore"
+        "AI/ML Engineer": [
+            "with almost"
         ],
-        "Matriculation (Science)": [
-            "LDA Model High School, Lahore"
-        ]
-    },
-    "experience": {
-        "content": [
-            "Aug 2022 – 2026 Aug 2019 – Mar 2021 Mar 2017 – Apr 2019"
+        "4 years of experience": [
+            "building"
         ],
-        "Software Engineering Intern": [
-            "• Malind Tech Aug 2025 – Dec 2025"
+        "production-grade machine learning systems": [
+            ","
         ],
-        "n": [
-            "• Malind Tech Aug 2025 – Dec 2025 Developed and deployed an AI chatbot using Python and LLM APIs, automating customer query handling across 3+ business workflows Integrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% Applied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries"
+        "agentic AI applications": [
+            ", and"
         ],
-        "Embedded Systems Design Intern": [
-            "Jul 2025 – Aug 2025 • Punjab Information Technology Board (PITB) – – – Developed and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems Implemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing Conducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices"
+        "cloud-native data pipelines": [
+            "at scale. Strong track record of designing systems"
         ],
-        "Electrical Engineering Intern": [
-            "• Packages Real Estate Pvt. Ltd. (PREPL) Jul 2024 – Aug 2024 AnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis – – Configured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance improvements"
-        ]
-    },
-    "projects": {
-        "content": [
-            "| Python, LLM | Python, Ja | ESP32, Embe"
+        "end-to-end": [
+            "from"
         ],
-        "AI Business Automation System": [
-            "manual handling across 3 businessprocesses"
+        "data_2 engineering and feature stores": [
+            "through"
         ],
-        "Custom AI Chatbot for Websites": [
-            "under 30 minutes via web integration"
+        "model training, evaluation, deployment, and observability": [
+            "across"
         ],
-        "Fare Validator for Electric Bus": [
-            "software integration for transitautomation | Python, LLM APIs, REST APIs"
+        "AWS, GCP, and Azure": [
+            ". Deep expertise in"
         ],
-        "m": [
-            "— Automated customer responses and multi-step workflows; reduced | Python, JavaScript, LLM APIs — Domain-specific NLP chatbot with FAQ handling; deployable in | ESP32, Embedded C/C++, IoT — Real-time embedded ticket verification system with hardware–"
+        "LLM orchestration, multi-agent workflows, RAG pipelines_2": [
+            ", and"
+        ],
+        "real-time AI systems": [
+            ". Comfortable across the stack:"
+        ],
+        "backend APIs, distributed pipelines, ML infrastructure": [
+            ", and"
+        ],
+        "lightweight frontend work": [
+            ". Passionate about shipping"
+        ],
+        "intelligent systems_2 that solve real problems": [
+            "and obsessed with"
+        ],
+        "performance, reliability, and clean architecture": [
+            "."
         ]
     },
     "skills": {
-        "Programming Languages:": [
-            "Python, Embedded C, C++, JavaScript, Git, REST APIs"
+        "Programming AI / ML LLMs & GenAI": [
+            "Python, SQL, Bash, C++, C# TensorFlow, PyTorch, Scikit-learn, XGBoost, GPT, Gemini, Claude, Llama, DeepSeek Deep Learning, Computer Vision, NLP RAG, GAG, LoRA/QLoRA, Fine-tuning"
         ],
-        "Embedded Systems & IoT:": [
-            "STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware–Software Integration, Real-Time Systems, Microcontrollers"
+        "Agentic AI Observability & MLOps Computer Vision": [
+            "LangChain, LangGraph, CrewAI, AutoGen LangSmith, LangFuse, Arize Phoenix YOLO, Pose Estimation, Object Detection Google ADK, MCP, n8n, make, zapier ClearML, MLflow, Prometheus, Grafana OCR, OpenCV, Emotion Detection"
         ],
-        "AI & Automation:": [
-            "LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), Machine Learning"
+        "Data Engineering Backend & APIs Cloud & Infra": [
+            "Spark, Kafka, Airflow, Prefect, dbt FastAPI, Flask, REST, GraphQL AWS, GCP, Azure, Railway, Vercel Airbyte, Databricks, AWS Glue WebSockets, gRPC, Microservices CI/CD (GitHub Actions, Jenkins), Docker, K8s, Terraform"
         ],
-        "Tools & Platforms:": [
-            "Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics"
+        "DBs & Warehouses Frontend & Visualization": [
+            "PostgreSQL, MongoDB, MySQL, Redis Power BI, Tableau, Matplotlib, Seaborn Client Communication, Stakeholder Snowflake, Clickhouse, Vector DBs Plotly, Streamlit, React Presentations, Agile, Team Leadership"
         ]
     },
-    "raw_text": "Soban Gull \nEmbedded Systems Engineer|AI&Automation Engineer \nLahore, Pakistan | +92-321-4063925 |\n | Python, LLM APIs, REST APIs\n \n| Python, JavaScript, LLM APIs\n \n| ESP32, Embedded C/C++, IoT \nsobangull64@gmail.com |\n \nFAST National University of Computer & Emerging Sciences (FAST-NUCES), Lahore \nCGPA: 3.25 / 4.0 \nIntermediate — FSc Pre-Engineering\nAspire Group of Colleges, Lahore \nMatriculation (Science)\nLDA Model High School, Lahore\nE X P E R I E N C E \nlinkedin.com/in/soban-gull-501321282 \nAug 2019 – Mar 2021 \nMar 2017 – Apr 2019 \nAug 2022 – 2026 \nP R O J E C T S \nE D U C A T I O N \nT E C H N I C A L S K I L L S \nB.S. Computer Engineering\nElectrical Engineering Intern\n \nSoftware Engineering Intern\nEmbedded Systems Design Intern\nP R O F E S S I O N A L S U M M A R Y \nAI Business Automation System\nmanual handling across 3 businessprocesses\nCustom AI Chatbot for Websites\nunder 30 minutes via web integration\nFare Validator for Electric Bus\nsoftware integration for transitautomation\nProgramming Languages: Python, Embedded C, C++, JavaScript, Git, REST APIs \nEmbedded Systems & IoT: STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware–Software\nIntegration, Real-Time Systems, Microcontrollers \nAI & Automation: LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), \nMachine Learning \nTools & Platforms: Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics \n • Malind Tech \nAug 2025 – Dec 2025 \nDeveloped and deployed an AI chatbot using Python and LLM APIs, automating customer query handling across 3+ business\nworkflows \nIntegrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% \nApplied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries \n                                                                                                                                                                                                                   Jul 2025 – Aug 2025 \n• Punjab Information Technology Board (PITB) \nDeveloped and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems\nImplemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing\nConducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices \n• Packages Real Estate Pvt. Ltd. (PREPL) \nJul 2024 – Aug 2024 \nAnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis \nConfigured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance\nimprovements \n — Automated customer responses and multi-step workflows; reduced \n— Domain-specific NLP chatbot with FAQ handling; deployable in \n— Real-time embedded ticket verification system with hardware–\nComputer Engineering graduate (FAST-NUCES, 2026 — CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed\nprojects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardware–\nsoftware integration (UART, I2C, SPI), and Python-based LLM application development. Seeking an entry-level Embedded Systems\nEngineer or AI Engineer role. \n–\n–\n–\n–\n–\n–\n–\n–\n"
+    "experience": {
+        "Devsinc": [
+            "Nov. 2025 – Present Applied AI / ML Engineer Lahore, Pakistan • Architected an"
+        ],
+        "end-to-end AI-driven ICP generation and B2B lead scoring platform": [
+            "using OpenAI GPT for automatic schema discovery and normalization of raw transactional datasets, powering sales intelligence for enterprise clients • Built"
+        ],
+        "identity resolution and multi-source enrichment pipelines": [
+            "fusing demographics, financial, behavioral, and geolocation data from external APIs, improving lead match accuracy by"
+        ],
+        "~35%": [
+            "• Developed a"
+        ],
+        "LangGraph-powered conversational AI assistant": [
+            "for natural-language querying of leads, personas, and analytics; deployed across a"
+        ],
+        "web dashboard and Slack bot": [
+            "serving multiple enterprise clients simultaneously • Designed and deployed"
+        ],
+        "multi-agent orchestration systems using LangGraph": [
+            "with parallel reasoning, dynamic state manage- ment, tool use, and human-in-the-loop checkpoints; integrated"
+        ],
+        "LangSmith and LangFuse": [
+            "for end-to-end LLM observability, tracing, and prompt regression testing • Built production-ready agentic systems with"
+        ],
+        "Google Agent Development Kit (ADK)": [
+            ", delivering structured tool orchestration with reliable execution guarantees, retry logic, and rollback handling for enterprise-grade reliability • Instrumented"
+        ],
+        "Arize Phoenix": [
+            "for LLM evaluation and hallucination monitoring across production agents, enabling data-driven prompt iteration and model quality assurance at scale • Developed an"
+        ],
+        "AI-powered workflow automation system": [
+            "using n8n and LangGraph for scheduled data enrichment, lead pipeline triggers, and Slack notification workflows, reducing manual ops overhead by"
+        ],
+        "~50%": [
+            "• Delivered a full"
+        ],
+        "Next.js (React 19) frontend dashboard": [
+            "with AG Grid, Recharts, AI chat, and Enterprise SSO via Clerk; owned the complete AI backend, data layer, enrichment pipelines, and system architecture end-to-end • Led"
+        ],
+        "client communications, requirements gathering, and_2 technical stakeholder presentations": [
+            ", translating complex AI capa- bilities into roadmap decisions and measurable business outcomes"
+        ],
+        "InvoZone": [
+            "Aug. 2025 – Nov. 2025 Machine Learning Engineer Lahore, Pakistan • Designed and built"
+        ],
+        "Leah + Aura": [
+            ", a two-agent AI system for natural-language control of Windows machines: Leah (cloud LLM orchestrator) reasons and plans; Aura (local execution agent) carries out OS-level commands via a"
+        ],
+        "ReAct workflow on LangGraph": [
+            "with"
+        ],
+        "WebSocket-based real-time communication": [
+            "between the Electron frontend, cloud agent, and local executor • Developed a"
+        ],
+        "CLI-based automation layer": [
+            "using Windows Package Manager enabling reliable software installation, updates, diag- nostics, app management, and performance monitoring via natural language commands • Engineered a"
+        ],
+        "multi-layer safety architecture": [
+            "with prompt-level guardrails, command whitelisting, and execution-time validation, reducing unsafe command execution risk by"
+        ],
+        "~90%": [
+            "in adversarial testing • Packaged Aura as a"
+        ],
+        "persistent Python background service": [
+            "via PyInstaller for zero-install Windows deployment, with auto- recovery, proactive system health monitoring, and seamless restart on reboot • Built a"
+        ],
+        "computer vision activity recognition system": [
+            "using YOLO pose estimation and XGBoost for real-time idle vs. working state classification, achieving"
+        ],
+        "sub-50ms inference latency": [
+            "at"
+        ],
+        "~92% accuracy": [
+            "with a feature pipeline over joint angles, movement velocity, and temporal behavior patterns • Extended the CV pipeline to"
+        ],
+        "retail theft detection and_3 healthcare patient inactivity monitoring": [
+            ", adapting skeletal keypoint fea- tures to domain-specific anomaly patterns with minimal retraining cost"
+        ],
+        "i10 Studios": [
+            "Oct. 2023 – Aug. 2025 AI / ML Engineer Lahore, Pakistan • Designed, built, and shipped"
+        ],
+        "10+ GenAI and_4 agentic AI solutions": [
+            "for enterprise clients using CrewAI, AutoGen, LangGraph, and LangChain; benchmarked GPT, Gemini, Claude, Mistral, and DeepSeek per use case, reducing inference costs by"
+        ],
+        "~40%": [
+            "vs. default model selections • Developed"
+        ],
+        "ML inference APIs": [
+            "using FastAPI and Flask, containerized with Docker and orchestrated on"
+        ],
+        "AWS EKS and GCP Cloud Run": [
+            ", scaling to"
+        ],
+        "100k+ requests/day": [
+            "with"
+        ],
+        "99.5%+ uptime": [
+            "and auto-scaling policies • Built and deployed"
+        ],
+        "OCR pipelines": [
+            "for clinical document processing; scanned PDFs and images were ingested, text extracted via OCR, and structured insights surfaced through downstream NLP classification and entity recognition pipelines • Built"
+        ],
+        "real-time computer vision pipelines": [
+            "for pose estimation, emotion detection, and drowsiness monitoring, achieving"
+        ],
+        "sub-50ms inference latency_2": [
+            "at production scale for safety-critical industrial and automotive clients • Architected"
+        ],
+        "RAG pipelines_2": [
+            "with Chroma, pgvector, Weaviate, and Pinecone featuring hybrid search and reranking; engineered Airbyte-based"
+        ],
+        "data ingestion pipelines": [
+            "improving data availability by"
+        ],
+        "~80%": [
+            "and cutting pipeline failures by"
+        ],
+        "~60%": [
+            "• Developed"
+        ],
+        "forecasting models": [
+            "using Prophet, ARIMA, and SARIMA for time-series prediction alongside XGBoost-based models, delivering demand and trend forecasts for multiple client verticals • Integrated"
+        ],
+        "Pydantic output guardrails": [
+            "across agentic systems for structured, validated LLM responses; built"
+        ],
+        "automation work- flows": [
+            "with n8n and Zapier; served production data via PostgreSQL and MongoDB with connection pooling and replication •"
+        ],
+        "Collaborated directly with Google_2 Cloud’s engineering team": [
+            "to design and demonstrate GenAI use cases for partner confer- ences and product demos, representing joint AI solution capabilities • Conducted"
+        ],
+        "ML model training, evaluation, and_5 hyperparameter optimization": [
+            "with production-grade accuracy and latency tar- gets; fine-tuned LLMs for domain-specific tasks using LoRA/QLoRA"
+        ],
+        "Vu360 Solutions": [
+            "Oct. 2023 – May 2025 AI / ML / Cloud Engineer Lahore, Pakistan • Developed, deployed, and optimized ML models across"
+        ],
+        "GCP, AWS, and Azure": [
+            "; managed cloud infrastructure on"
+        ],
+        "AWS (EC2, ECR, RDS, DMS, EKS, Glue)": [
+            "and GCP for multi-region production ML workloads • Configured"
+        ],
+        "AWS DMS for zero-downtime data migration": [
+            "into RDS warehouses; built"
+        ],
+        "ETL/ELT pipelines": [
+            "for structured and semi- structured data supporting analytics and downstream ML feature pipelines • Built"
+        ],
+        "NLP pipelines": [
+            "using transformer and LLM models for text classification, summarization, and named entity extraction; developed conversational AI with"
+        ],
+        "Dialogflow CX and Google Gemini": [
+            "handling"
+        ],
+        "thousands of daily interactions": [
+            "• Deployed and served ML models on"
+        ],
+        "Vertex AI_2": [
+            "; applied advanced prompt engineering and"
+        ],
+        "fine-tuning": [
+            "to improve task-specific accuracy by"
+        ],
+        "~20%": [
+            "over base model baselines; built multimodal AI solutions integrating vision and structured data • Containerized ML applications with"
+        ],
+        "Docker and_6 Kubernetes": [
+            "; implemented"
+        ],
+        "CI/CD pipelines_3": [
+            "via GitHub Actions for automated model deployment, testing, and environment rollback across dev/staging/prod • Generated"
+        ],
+        "synthetic datasets using_2 generative AI_3": [
+            "to address class imbalance, improving minority-class recall by"
+        ],
+        "~25%": [
+            "; built"
+        ],
+        "Grafana dashboards": [
+            "integrated with ServiceNow for real-time operational monitoring and alerting • Managed production"
+        ],
+        "disaster recovery and_7 backups": [
+            "using Veeam across on-prem servers and EC2 instances; enforced data integrity and compliance with automated retention and tiered storage policies • Led"
+        ],
+        "client meetings and technical presentations": [
+            "to align ML/AI solutions with business goals; contributed to requirement defini- tion, solution scoping, and iterative delivery cycles"
+        ],
+        "NaviDoc": [
+            "Apr. 2023 – Sep. 2023 Software Developer Denmark (Remote) • Developed and integrated"
+        ],
+        "ML_2 models for medical document processing": [
+            "in a healthcare SaaS product, contributing to data preprocessing, model training, evaluation pipelines, and iterative performance improvement • Set up and maintained"
+        ],
+        "OCR_2 pipelines_4": [
+            "to extract structured text from clinical PDFs and scanned images, enabling downstream document classification and analytics workflows • Redesigned"
+        ],
+        "core UI/UX flows_2": [
+            "based on clinician feedback, reducing key task completion time by"
+        ],
+        "~30%": [
+            "across the primary docu- ment management interface • Managed"
+        ],
+        "PostgreSQL database performance tuning": [
+            ", index optimization, query analysis, and backup/recovery operations for a regulated healthcare platform serving users across multiple European regions • Contributed to"
+        ],
+        "REST API development and_8 server reliability": [
+            ", ensuring uptime and stability for a platform operating under strict healthcare availability SLAs and data privacy requirements"
+        ],
+        "Caretek Corporation": [
+            "Dec. 2022 – Feb. 2023 Machine Learning Intern Lahore, Pakistan • Performed end-to-end"
+        ],
+        "NLP workflows": [
+            "including text preprocessing, tokenization, feature extraction, classification, and sentiment analysis on real-world clinical and operational datasets • Explored structured and unstructured datasets to surface data quality issues and patterns; benchmarked multiple"
+        ],
+        "ML_3 classifiers": [
+            "(Logistic Regression, SVM, Random Forest) with systematic performance evaluation • Assisted in"
+        ],
+        "model_2 hyperparameter_2 tuning_2 and_9 fine-tuning_2": [
+            ", contributing to measurable improvements in classification accuracy and reduction of false positive rates across target medical datasets • Documented experiments, tracked metrics in structured logs, and produced"
+        ],
+        "model evaluation reports": [
+            "for senior engineers, building foundations in reproducible ML research and collaborative development"
+        ]
+    },
+    "projects": {
+        "ICP & Lead Scoring Platform": [
+            "| B2B AI Sales Intelligence LangGraph, GPT, Google ADK, FastAPI, Next.js • LLM-driven schema discovery, identity resolution across 5+ data sources, AI-driven buyer persona generation, and a lead scoring engine; multi-agent orchestration via LangGraph and Google ADK with LangSmith + Phoenix observability • Conversational AI assistant deployed via web dashboard and Slack bot; Next.js frontend with AG Grid, Recharts, Clerk SSO; n8n automation for pipeline triggers and notifications"
+        ],
+        "Leah + Aura": [
+            "| Windows AI Agent System LangGraph, ReAct, WebSockets, Electron, PyInstaller • Two-agent system: Leah (cloud LLM) reasons and plans; Aura (local agent) executes OS-level Windows commands via ReAct on LangGraph with real-time WebSocket sync, CLI automation via Windows Package Manager, and persistent PyInstaller service with auto-recovery"
+        ],
+        "Vision-Based Activity Recognition": [
+            "| Pose + ML Pipeline YOLO, XGBoost, OpenCV • YOLO pose estimation extracts skeletal keypoints; XGBoost classifier on joint angles, velocity, and temporal features; sub-50ms latency at ~92% accuracy; extended to retail theft and patient inactivity detection"
+        ],
+        "RAG Q&A System": [
+            "| Enterprise Document AI LangChain, Chroma, pgvector, FastAPI • Hybrid search RAG with dense + sparse retrieval, cross-encoder reranking, and streaming responses; served via FastAPI with Docker deployment and configurable chunk strategies per document type"
+        ],
+        "Intelligent Chatbot": [
+            "| Conversational AI Gemini, Dialogflow CX, GCP, Webhooks • Production multi-turn enterprise chatbot integrating Google Gemini with Dialogflow CX; deployed on GCP with webhook integrations, session management, and real-time analytics dashboards"
+        ],
+        "Other Projects": [
+            "• AI Tutor (LangGraph + AutoGen), Smart Bin trash classifier (CV/object detection), Emotion & Drowsiness Detection (YOLOv7), Em- ployee Activity Tracking (pose), Handwritten OCR Pipeline, Log Anomaly Detection (VAE), NLP Summarization, Covid-19 Analysis Dashboard, Pixelair photo editor"
+        ]
+    },
+    "education": {
+        "University of Management and Technology (UMT)": [
+            "2023 – 2025 MS in Artificial Intelligence Lahore, Pakistan"
+        ],
+        "Lahore Garrison University (LGU)": [
+            "2018 – 2022 BS in Software Engineering Lahore, Pakistan"
+        ],
+        "LANGUAGES": [
+            "English · Urdu · Punjabi · Arabic"
+        ],
+        "INTERESTS & HOBBIES": [
+            "MMA · BJJ · Football · Cricket · Tennis · Chess · Gym · Cycling · Hiking · Photography · Painting · Music · Movies & Series · Travel · Reading · Gaming · AI Research · Startups · Streetwear · Food · Random Hacks · Late Night Rabbit Holes · Good Memes · Coffee Runs"
+        ]
+    },
+    "email": "basimakram10@gmail.com",
+    "phone": "+92 300 0323989",
+    "name": "Basim Akram",
+    "raw_text": "Basim Akram\nAI/ML Engineer\n|\nAgentic Systems\n|\nData Engineering\n|\nCloud & Backend\n +92 300 0323989 | # basimakram10@gmail.com | ï basimakram | § basim-akram | + Lahore, Pakistan\nSUMMARY\nResults-driven AI/ML Engineer with almost 4 years of experience building production-grade machine learning systems, agentic AI\napplications, and cloud-native data pipelines at scale. Strong track record of designing systems end-to-end from data engineering\nand feature stores through model training, evaluation, deployment, and observability across AWS, GCP, and Azure. Deep expertise\nin LLM orchestration, multi-agent workflows, RAG pipelines, and real-time AI systems. Comfortable across the stack: backend\nAPIs, distributed pipelines, ML infrastructure, and lightweight frontend work. Passionate about shipping intelligent systems that\nsolve real problems and obsessed with performance, reliability, and clean architecture.\nSKILLS\nProgramming\nAI / ML\nLLMs & GenAI\nPython, SQL, Bash, C++, C#\nTensorFlow, PyTorch, Scikit-learn, XGBoost, GPT, Gemini, Claude, Llama, DeepSeek\nDeep Learning, Computer Vision, NLP\nRAG, GAG, LoRA/QLoRA, Fine-tuning\nAgentic AI\nObservability & MLOps\nComputer Vision\nLangChain, LangGraph, CrewAI, AutoGen\nLangSmith, LangFuse, Arize Phoenix\nYOLO, Pose Estimation, Object Detection\nGoogle ADK, MCP, n8n, make, zapier\nClearML, MLflow, Prometheus, Grafana\nOCR, OpenCV, Emotion Detection\nData Engineering\nBackend & APIs\nCloud & Infra\nSpark, Kafka, Airflow, Prefect, dbt\nFastAPI, Flask, REST, GraphQL\nAWS, GCP, Azure, Railway, Vercel\nAirbyte, Databricks, AWS Glue\nWebSockets, gRPC, Microservices\nCI/CD (GitHub Actions,\nJenkins), Docker,\nK8s, Terraform\nDBs & Warehouses\nFrontend & Visualization\nSoft Skills\nPostgreSQL, MongoDB, MySQL, Redis\nPower BI, Tableau, Matplotlib, Seaborn\nClient Communication, Stakeholder\nSnowflake, Clickhouse, Vector DBs\nPlotly, Streamlit, React\nPresentations, Agile, Team Leadership\nEXPERIENCE\nDevsinc\nNov. 2025 – Present\nApplied AI / ML Engineer\nLahore, Pakistan\n• Architected an end-to-end AI-driven ICP generation and B2B lead scoring platform using OpenAI GPT for automatic schema\ndiscovery and normalization of raw transactional datasets, powering sales intelligence for enterprise clients\n• Built identity resolution and multi-source enrichment pipelines fusing demographics, financial, behavioral, and geolocation data\nfrom external APIs, improving lead match accuracy by ~35%\n• Developed a LangGraph-powered conversational AI assistant for natural-language querying of leads, personas, and analytics;\ndeployed across a web dashboard and Slack bot serving multiple enterprise clients simultaneously\n• Designed and deployed multi-agent orchestration systems using LangGraph with parallel reasoning, dynamic state manage-\nment, tool use, and human-in-the-loop checkpoints; integrated LangSmith and LangFuse for end-to-end LLM observability, tracing,\nand prompt regression testing\n• Built production-ready agentic systems with Google Agent Development Kit (ADK), delivering structured tool orchestration with\nreliable execution guarantees, retry logic, and rollback handling for enterprise-grade reliability\n• Instrumented Arize Phoenix for LLM evaluation and hallucination monitoring across production agents, enabling data-driven prompt\niteration and model quality assurance at scale\n• Developed an AI-powered workflow automation system using n8n and LangGraph for scheduled data enrichment, lead pipeline\ntriggers, and Slack notification workflows, reducing manual ops overhead by ~50%\n• Delivered a full Next.js (React 19) frontend dashboard with AG Grid, Recharts, AI chat, and Enterprise SSO via Clerk; owned the\ncomplete AI backend, data layer, enrichment pipelines, and system architecture end-to-end\n• Led client communications, requirements gathering, and technical stakeholder presentations, translating complex AI capa-\nbilities into roadmap decisions and measurable business outcomes\nInvoZone\nAug. 2025 – Nov. 2025\nMachine Learning Engineer\nLahore, Pakistan\n• Designed and built Leah + Aura, a two-agent AI system for natural-language control of Windows machines: Leah (cloud LLM\norchestrator) reasons and plans; Aura (local execution agent) carries out OS-level commands via a ReAct workflow on LangGraph\nwith WebSocket-based real-time communication between the Electron frontend, cloud agent, and local executor\n• Developed a CLI-based automation layer using Windows Package Manager enabling reliable software installation, updates, diag-\nnostics, app management, and performance monitoring via natural language commands\n• Engineered a multi-layer safety architecture with prompt-level guardrails, command whitelisting, and execution-time validation,\nreducing unsafe command execution risk by ~90% in adversarial testing\n• Packaged Aura as a persistent Python background service via PyInstaller for zero-install Windows deployment, with auto-\nrecovery, proactive system health monitoring, and seamless restart on reboot\n• Built a computer vision activity recognition system using YOLO pose estimation and XGBoost for real-time idle vs. working\nstate classification, achieving sub-50ms inference latency at ~92% accuracy with a feature pipeline over joint angles, movement\nvelocity, and temporal behavior patterns\n• Extended the CV pipeline to retail theft detection and healthcare patient inactivity monitoring, adapting skeletal keypoint fea-\ntures to domain-specific anomaly patterns with minimal retraining cost\ni10 Studios\nOct. 2023 – Aug. 2025\nAI / ML Engineer\nLahore, Pakistan\n• Designed, built, and shipped 10+ GenAI and agentic AI solutions for enterprise clients using CrewAI, AutoGen, LangGraph, and\nLangChain; benchmarked GPT, Gemini, Claude, Mistral, and DeepSeek per use case, reducing inference costs by ~40% vs. default\nmodel selections\n• Developed ML inference APIs using FastAPI and Flask, containerized with Docker and orchestrated on AWS EKS and GCP Cloud\nRun, scaling to 100k+ requests/day with 99.5%+ uptime and auto-scaling policies\n• Built and deployed OCR pipelines for clinical document processing; scanned PDFs and images were ingested, text extracted via\nOCR, and structured insights surfaced through downstream NLP classification and entity recognition pipelines\n• Built real-time computer vision pipelines for pose estimation, emotion detection, and drowsiness monitoring, achieving sub-50ms\ninference latency at production scale for safety-critical industrial and automotive clients\n• Architected RAG pipelines with Chroma, pgvector, Weaviate, and Pinecone featuring hybrid search and reranking; engineered\nAirbyte-based data ingestion pipelines improving data availability by ~80% and cutting pipeline failures by ~60%\n• Developed forecasting models using Prophet, ARIMA, and SARIMA for time-series prediction alongside XGBoost-based models,\ndelivering demand and trend forecasts for multiple client verticals\n• Integrated Pydantic output guardrails across agentic systems for structured, validated LLM responses; built automation work-\nflows with n8n and Zapier; served production data via PostgreSQL and MongoDB with connection pooling and replication\n• Collaborated directly with Google Cloud’s engineering team to design and demonstrate GenAI use cases for partner confer-\nences and product demos, representing joint AI solution capabilities\n• Conducted ML model training, evaluation, and hyperparameter optimization with production-grade accuracy and latency tar-\ngets; fine-tuned LLMs for domain-specific tasks using LoRA/QLoRA\nVu360 Solutions\nOct. 2023 – May 2025\nAI / ML / Cloud Engineer\nLahore, Pakistan\n• Developed, deployed, and optimized ML models across GCP, AWS, and Azure; managed cloud infrastructure on AWS (EC2, ECR,\nRDS, DMS, EKS, Glue) and GCP for multi-region production ML workloads\n• Configured AWS DMS for zero-downtime data migration into RDS warehouses; built ETL/ELT pipelines for structured and semi-\nstructured data supporting analytics and downstream ML feature pipelines\n• Built NLP pipelines using transformer and LLM models for text classification, summarization, and named entity extraction; developed\nconversational AI with Dialogflow CX and Google Gemini handling thousands of daily interactions\n• Deployed and served ML models on Vertex AI; applied advanced prompt engineering and fine-tuning to improve task-specific\naccuracy by ~20% over base model baselines; built multimodal AI solutions integrating vision and structured data\n• Containerized ML applications with Docker and Kubernetes; implemented CI/CD pipelines via GitHub Actions for automated\nmodel deployment, testing, and environment rollback across dev/staging/prod\n• Generated synthetic datasets using generative AI to address class imbalance, improving minority-class recall by ~25%; built\nGrafana dashboards integrated with ServiceNow for real-time operational monitoring and alerting\n• Managed production disaster recovery and backups using Veeam across on-prem servers and EC2 instances; enforced data\nintegrity and compliance with automated retention and tiered storage policies\n• Led client meetings and technical presentations to align ML/AI solutions with business goals; contributed to requirement defini-\ntion, solution scoping, and iterative delivery cycles\nNaviDoc\nApr. 2023 – Sep. 2023\nSoftware Developer\nDenmark (Remote)\n• Developed and integrated ML models for medical document processing in a healthcare SaaS product, contributing to data\npreprocessing, model training, evaluation pipelines, and iterative performance improvement\n• Set up and maintained OCR pipelines to extract structured text from clinical PDFs and scanned images, enabling downstream\ndocument classification and analytics workflows\n• Redesigned core UI/UX flows based on clinician feedback, reducing key task completion time by ~30% across the primary docu-\nment management interface\n• Managed PostgreSQL database performance tuning, index optimization, query analysis, and backup/recovery operations for a\nregulated healthcare platform serving users across multiple European regions\n• Contributed to REST API development and server reliability, ensuring uptime and stability for a platform operating under strict\nhealthcare availability SLAs and data privacy requirements\nCaretek Corporation\nDec. 2022 – Feb. 2023\nMachine Learning Intern\nLahore, Pakistan\n• Performed end-to-end NLP workflows including text preprocessing, tokenization, feature extraction, classification, and sentiment\nanalysis on real-world clinical and operational datasets\n• Explored structured and unstructured datasets to surface data quality issues and patterns; benchmarked multiple ML classifiers\n(Logistic Regression, SVM, Random Forest) with systematic performance evaluation\n• Assisted in model hyperparameter tuning and fine-tuning, contributing to measurable improvements in classification accuracy\nand reduction of false positive rates across target medical datasets\n• Documented experiments, tracked metrics in structured logs, and produced model evaluation reports for senior engineers, building\nfoundations in reproducible ML research and collaborative development\nPROJECTS\nICP & Lead Scoring Platform | B2B AI Sales Intelligence\nLangGraph, GPT, Google ADK, FastAPI, Next.js\n• LLM-driven schema discovery, identity resolution across 5+ data sources, AI-driven buyer persona generation, and a lead scoring\nengine; multi-agent orchestration via LangGraph and Google ADK with LangSmith + Phoenix observability\n• Conversational AI assistant deployed via web dashboard and Slack bot; Next.js frontend with AG Grid, Recharts, Clerk SSO; n8n\nautomation for pipeline triggers and notifications\nLeah + Aura | Windows AI Agent System\nLangGraph, ReAct, WebSockets, Electron, PyInstaller\n• Two-agent system: Leah (cloud LLM) reasons and plans; Aura (local agent) executes OS-level Windows commands via ReAct on\nLangGraph with real-time WebSocket sync, CLI automation via Windows Package Manager, and persistent PyInstaller service with\nauto-recovery\nVision-Based Activity Recognition | Pose + ML Pipeline\nYOLO, XGBoost, OpenCV\n• YOLO pose estimation extracts skeletal keypoints; XGBoost classifier on joint angles, velocity, and temporal features; sub-50ms\nlatency at ~92% accuracy; extended to retail theft and patient inactivity detection\nRAG Q&A System | Enterprise Document AI\nLangChain, Chroma, pgvector, FastAPI\n• Hybrid search RAG with dense + sparse retrieval, cross-encoder reranking, and streaming responses; served via FastAPI with\nDocker deployment and configurable chunk strategies per document type\nIntelligent Chatbot | Conversational AI\nGemini, Dialogflow CX, GCP, Webhooks\n• Production multi-turn enterprise chatbot integrating Google Gemini with Dialogflow CX; deployed on GCP with webhook integrations,\nsession management, and real-time analytics dashboards\nOther Projects\n• AI Tutor (LangGraph + AutoGen), Smart Bin trash classifier (CV/object detection), Emotion & Drowsiness Detection (YOLOv7), Em-\nployee Activity Tracking (pose), Handwritten OCR Pipeline, Log Anomaly Detection (VAE), NLP Summarization, Covid-19 Analysis\nDashboard, Pixelair photo editor\nEDUCATION\nUniversity of Management and Technology (UMT)\n2023 – 2025\nMS in Artificial Intelligence\nLahore, Pakistan\nLahore Garrison University (LGU)\n2018 – 2022\nBS in Software Engineering\nLahore, Pakistan\nLANGUAGES\nEnglish\n·\nUrdu\n·\nPunjabi\n·\nArabic\nINTERESTS & HOBBIES\nMMA\n·\nBJJ\n·\nFootball\n·\nCricket\n·\nTennis\n·\nChess\n·\nGym\n·\nCycling\n·\nHiking\n·\nPhotography\n·\nPainting\n·\nMusic\n·\nMovies & Series\n·\nTravel\n·\nReading\n·\nGaming\n·\nAI Research\n·\nStartups\n·\nStreetwear\n·\nFood\n·\nRandom Hacks\n·\nLate Night Rabbit Holes\n·\nGood Memes\n·\nCoffee Runs\n"
 }
