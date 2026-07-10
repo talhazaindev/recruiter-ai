@@ -42,7 +42,7 @@ if file_type == "docx":
 else:
     cv_text = parse_cv(file_path)
 
-""" for i in range(2, 22):
+""" for i in range(1, 22):
     file_path = f"cvs/cvs/cv{i}.pdf"
     
     # Check if file exists before processing
@@ -58,4 +58,4 @@ else:
         print(f"Processed cv{i}.pdf")
     else:
         print(f"File not found: {file_path}")
- """
+  """

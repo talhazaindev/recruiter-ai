@@ -644,7 +644,6 @@ def extract_spans_pymupdf4llm(pdf_path):
     # Extract spans from JSON
     return extract_spans_from_json(doc_json)
 
-
 def extract_spans(pdf_path):
     """
     Extract spans from PDF with multi-column support.
@@ -960,8 +959,6 @@ def build_sections(spans, current_font_size=None):
     return sections
  """
 
-
-
 def find_headers(path):
     #spans = extract_spans(path)
     spans=extract_spans(path)
@@ -978,7 +975,7 @@ def find_headers(path):
     #print("xd2")
     #print(font_sizes)
     name=extract_name(spans,font_sizes[0])
-    sections = build_sections(spans,font_sizes[1])
+    sections = build_sections(spans,font_sizes[2])
     #print(sections)
     return sections,font_sizes[-1],name
    
@@ -1040,7 +1037,6 @@ def form_json(sections):
     with open("output.json", "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
 
-
 """ def form_json(sections, filename):
     # Create result folder if it doesn't exist
     os.makedirs("result3", exist_ok=True)
@@ -1055,7 +1051,7 @@ def form_json(sections):
     
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
- """
+  """
 
 def merge_empty_keys(data):
     """
@@ -1153,7 +1149,6 @@ def extract_name(spans,max_size):
         return None
 
     return " ".join(name_parts)
-
 
 def extract_basic_info(raw_text):
     
