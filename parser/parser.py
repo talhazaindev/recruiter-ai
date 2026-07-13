@@ -752,6 +752,7 @@ def extract_page_spans(page, page_num):
      
     return False
  """
+
 #isheading v1
 def is_heading(span, next_span, current_font_size=None):
     #print(span)
@@ -1198,6 +1199,7 @@ def parse_cv(path):
     merged_sections = merge_lists(sections)
     #print(merged_sections)
     merged_sections = merge_empty_keys(merged_sections)
+    print(type(merged_sections))
     #form_json(merged_sections,path)
     form_json(merged_sections)
 
