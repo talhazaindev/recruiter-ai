@@ -1,0 +1,38 @@
+{
+    "summary": "Computer Engineering graduate (FAST-NUCES, 2026 - CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed projects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardwaresoftware  integration  (UART,  I2C,  SPI),  and  Python-based  LLM  application  development.  Seeking  an  entry-level  Embedded  Systems Engineer or AI Engineer role.",
+    "skills": {
+        "content": "Programming Languages:\nPython, Embedded C, C++, JavaScript, Git, REST APIs\nEmbedded Systems & IoT: STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware-Software Integration, Real-Time Systems, Microcontrollers\nAI & Automation: LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), Machine Learning\nTools & Platforms: Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics"
+    },
+    "experience": [
+        {
+            "company": "Malind Tech",
+            "designation": "Software Engineering Intern",
+            "start_date": "Aug 2025",
+            "end_date": "Dec 2025",
+            "description": "Developed  and  deployed  an  AI  chatbot  using  Python  and  LLM  APIs,  automating  customer  query  handling  across  3+  business workflows -\nIntegrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% -\nApplied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries -"
+        },
+        {
+            "company": "Punjab Information Technology Board (PITB)",
+            "designation": "Embedded Systems Design Intern",
+            "start_date": "Jul 2025",
+            "end_date": "Aug 2025",
+            "description": "Developed and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems -\nImplemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing -\nConducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices -"
+        },
+        {
+            "company": "Packages Real Estate Pvt. Ltd. (PREPL)",
+            "designation": "Electrical Engineering Intern",
+            "start_date": "Jul 2024",
+            "end_date": "Aug 2024",
+            "description": "AnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis -\nConfigured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance improvements -"
+        }
+    ],
+    "projects": {
+        "content": "| Python, LLM APIs, REST APIs AI Business Automation System manual handling across 3 businessprocesses - Automated customer responses and multi-step workflows; reduced\n| Python, JavaScript, LLM APIs Custom AI Chatbot for Websites under 30 minutes via web integration - Domain-specific NLP chatbot with FAQ handling; deployable in\n| ESP32, Embedded C/C++, IoT Fare Validator for Electric Bus software integration for transitautomation - Real-time embedded ticket verification system with hardware-"
+    },
+    "education": [],
+    "certifications": {},
+    "name": "Soban Gull",
+    "email": "sobangull64@gmail.com",
+    "phone": "+92-321-4063925",
+    "raw_text": "Soban Gull\n\nEmbedded Systems Engineer|AI&Automation Engineer\n\nLahore, Pakistan | +92-321-4063925 |\n\nsobangull64@gmail.com |\n\nlinkedin.com/in/soban-gull-501321282\n\nP R O F E S S I O N A L   S U M M A R Y\n\nComputer Engineering graduate (FAST-NUCES, 2026 - CGPA 3.25/4.0, final semester result pending) with 3 internships and 3 deployed projects across embedded firmware and AI automation. Proficient in microcontroller firmware development (STM32, ESP32), hardwaresoftware  integration  (UART,  I2C,  SPI),  and  Python-based  LLM  application  development.  Seeking  an  entry-level  Embedded  Systems Engineer or AI Engineer role.\n\nE D U C A T I O N\n\n| B.S. Computer Engineering                                                                      | Aug 2022 - 2026     |\n|------------------------------------------------------------------------------------------------|---------------------|\n| FAST National University of Computer & Emerging Sciences (FAST-NUCES), Lahore CGPA: 3.25 / 4.0 |                     |\n| Intermediate - FSc Pre-Engineering                                                             | Aug 2019 - Mar 2021 |\n| Aspire Group of Colleges, Lahore                                                               |                     |\n| Matriculation (Science)                                                                        | Mar 2017 - Apr 2019 |\n| LDA Model High School, Lahore                                                                  |                     |\n\nE X P E R I E N C E\n\nSoftware Engineering Intern · Malind Tech\n\nAug 2025 - Dec 2025\n\n- Developed  and  deployed  an  AI  chatbot  using  Python  and  LLM  APIs,  automating  customer  query  handling  across  3+  business workflows -\n- Integrated REST APIs to eliminate manual data-entry tasks, reducing repetitive processing time by an estimated 40% -\n- Applied prompt engineering to fine-tune chatbot responses, improving reply accuracy and relevance for domain-specific queries -\n\nEmbedded Systems Design Intern · Punjab Information Technology Board (PITB)\n\nJul 2025 - Aug 2025\n\n- Developed and debugged embedded C firmware for STM32 and ESP32 microcontrollers across 2+ real-time IoT subsystems -\n- Implemented UART, I2C, and SPI communication protocols for sensor integration, reducing hardware fault rate during testing -\n- Conducted end-to-end system testing and troubleshooting, applying interrupt handling and real-time firmware best practices -\n\nElectrical Engineering Intern · Packages Real Estate Pvt. Ltd. (PREPL)\n\nJul 2024 - Aug 2024\n\n- AnalysedHVAC chiller efficiency across a commercial facility using BMS software, contributing to an energy reduction analysis -\n- Configured and monitored Variable Frequency Drives (VFDs) for 4+ HVAC units, supporting operational performance improvements -\n\nP R O J E C T S\n\n| Python, LLM APIs, REST APIs AI Business Automation System manual handling across 3 businessprocesses - Automated customer responses and multi-step workflows; reduced\n\n| Python, JavaScript, LLM APIs Custom AI Chatbot for Websites under 30 minutes via web integration - Domain-specific NLP chatbot with FAQ handling; deployable in\n\n| ESP32, Embedded C/C++, IoT Fare Validator for Electric Bus software integration for transitautomation - Real-time embedded ticket verification system with hardware-\n\nT E C H N I C A L   S K I L L S\n\nProgramming Languages:\n\nPython, Embedded C, C++, JavaScript, Git, REST APIs\n\nEmbedded Systems & IoT: STM32, Arduino, ESP32, UART, I2C, SPI, Firmware Development, Interrupt Handling, Hardware-Software Integration, Real-Time Systems, Microcontrollers\n\nAI & Automation: LLM APIs, AI Chatbots, Prompt Engineering, Business Process Automation, Natural Language Processing (NLP), Machine Learning\n\nTools & Platforms: Jupyter Notebook, VS Code, MATLAB, Linux, Windows, FreeRTOS basics"
+}

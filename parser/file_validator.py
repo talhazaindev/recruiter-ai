@@ -132,4 +132,4 @@ def validate_upload( file_path: str):
 
 
 
-print(validate_upload("./server/AI_Russell_Norvig.pdf"))
+#print(validate_upload("./cvs/cvs/cv14.pdf"))

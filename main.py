@@ -1,5 +1,5 @@
 from parser.parser import parse_cv
-
+from parser.docling_parser import cv_parse_docling
 import subprocess
 import os
 
@@ -31,7 +31,7 @@ def get_file_type(file_path):
         return "doc"
     else:
         return None
-
+""" 
 file_path = "cvs_test/cv2.pdf"  # Replace with the actual path to your CV file
 #file_path="cvs/cvs/cv14.pdf"
 file_type = get_file_type(file_path)
@@ -40,9 +40,9 @@ if file_type == "docx":
     pdf_path = docx_to_pdf(file_path)
     cv_text=parse_cv(pdf_path)
 else:
-    cv_text = parse_cv(file_path)
-
-""" for i in range(1, 22):
+    #cv_text = parse_cv(file_path)
+    cv_text= cv_parse_docling(file_path) """
+for i in range(1, 22):
     file_path = f"cvs/cvs/cv{i}.pdf"
     
     # Check if file exists before processing
@@ -53,9 +53,8 @@ else:
             pdf_path = docx_to_pdf(file_path)
             cv_text = parse_cv(pdf_path)
         else:
-            cv_text = parse_cv(file_path)
-        
+            #cv_text = parse_cv(file_path)
+            cv_text=cv_parse_docling(file_path)
         print(f"Processed cv{i}.pdf")
     else:
         print(f"File not found: {file_path}")
-  """
