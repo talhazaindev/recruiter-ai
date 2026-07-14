@@ -1,0 +1,54 @@
+{
+  "raw_resume_text": "Hassan Ali\nIT Support Engineer\n\nProfessional Summary:\nIT Support Engineer with over 2 years of experience providing technical support, troubleshooting hardware and software issues, maintaining computer systems, and assisting users in enterprise environments. Familiar with basic Python scripting and SQL. Passionate about transitioning into software development.\n\nTechnical Skills:\nPython (Basic), SQL (Basic), Windows Administration, Linux (Basic), Microsoft Office, Hardware Troubleshooting, Network Troubleshooting, Active Directory, Customer Support, Git (Basic).\n\nExperience:\nIT Support Engineer | AlphaTech Solutions | March 2023 - Present\n- Provided technical support for over 300 employees.\n- Installed and configured operating systems and software.\n- Resolved hardware and network connectivity issues.\n- Managed user accounts using Active Directory.\n- Created simple Python scripts to automate repetitive administrative tasks.\n\nTechnical Support Intern | NetServe Technologies | January 2022 - February 2023\n- Assisted senior engineers in troubleshooting desktop and laptop issues.\n- Installed software applications and configured office systems.\n- Documented technical incidents and resolutions.\n\nProjects:\n1. Employee Help Desk Ticket Management System using Python.\n2. Basic Inventory Management System using SQLite.\n\nEducation:\nBachelor of Science in Information Technology\nUniversity of Central Punjab\nCGPA: 3.12/4.00\nGraduated: June 2022\n\nCertifications:\nGoogle IT Support Professional Certificate\nCompTIA A+",
+
+  "professional_summary": "IT Support Engineer with experience in technical support, system maintenance, and troubleshooting. Possesses basic knowledge of Python, SQL, Git, and Linux, and is seeking to transition into backend software engineering.",
+
+  "skills": [
+    "Python",
+    "SQL",
+    "Git",
+    "Linux",
+    "Windows Administration",
+    "Hardware Troubleshooting",
+    "Network Troubleshooting",
+    "Active Directory",
+    "Customer Support",
+    "Microsoft Office"
+  ],
+
+  "experience": [
+    {
+      "company": "AlphaTech Solutions",
+      "designation": "IT Support Engineer",
+      "start_date": "2023-03",
+      "end_date": "Present",
+      "description": "Provided technical support, installed software, configured operating systems, resolved hardware and network issues, managed Active Directory accounts, and created basic Python scripts for administrative automation."
+    },
+    {
+      "company": "NetServe Technologies",
+      "designation": "Technical Support Intern",
+      "start_date": "2022-01",
+      "end_date": "2023-02",
+      "description": "Assisted in troubleshooting desktop systems, installing applications, documenting support tickets, and maintaining office computers."
+    }
+  ],
+
+  "projects": [
+    "Help Desk Ticket Management System using Python and SQLite.",
+    "Basic Inventory Management Application using Python."
+  ],
+
+  "education": [
+    {
+      "degree": "Phd in computer science",
+      "institution": "University of Central Punjab",
+      "cgpa": "3.12",
+      "graduation_date": "2023-06"
+    }
+  ],
+
+  "certifications": [
+    "Google IT Support Professional Certificate",
+    "CompTIA A+"
+  ]
+}

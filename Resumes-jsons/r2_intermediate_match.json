@@ -1,0 +1,61 @@
+{
+  "raw_resume_text": "Ayesha Khan\nSoftware Engineer\n\nProfessional Summary:\nSoftware Engineer with over 2 years of experience developing backend applications using Python and Django. Experienced in building REST APIs, working with relational databases, writing clean and maintainable code, and collaborating with cross-functional teams. Familiar with Docker, AWS, Git, and Linux. Passionate about learning scalable backend architectures and cloud technologies.\n\nTechnical Skills:\nPython, Django, REST API, SQL, MySQL, PostgreSQL, Git, Linux, Object-Oriented Programming, Debugging, Unit Testing, Docker, AWS (Basic), HTML, CSS, JavaScript.\n\nExperience:\nSoftware Engineer | ByteFusion Technologies | August 2023 - Present\n- Developed REST APIs using Django REST Framework.\n- Designed database tables and optimized SQL queries.\n- Collaborated with frontend developers for API integration.\n- Fixed production bugs and improved application performance.\n- Wrote unit tests and participated in code reviews.\n\nJunior Software Engineer | DevSoft Labs | July 2022 - July 2023\n- Assisted in backend feature development using Python.\n- Worked with PostgreSQL databases.\n- Maintained Git repositories.\n- Supported deployment on Linux servers.\n\nProjects:\n1. Student Management System using Django.\n2. Inventory Management REST API.\n3. Online Appointment Booking System.\n\nEducation:\nBachelor of Science in Software Engineering\nCOMSATS University Islamabad\nCGPA: 3.28/4.00\nGraduated: June 2022\n\nCertifications:\nAWS Cloud Practitioner",
+
+  "professional_summary": "Software Engineer with two years of experience developing backend applications using Python and Django. Skilled in REST API development, SQL databases, Git, Linux, and software engineering best practices. Familiar with Docker and AWS while continuously improving backend development skills.",
+
+  "skills": [
+    "Python",
+    "Django",
+    "REST API",
+    "SQL",
+    "PostgreSQL",
+    "MySQL",
+    "Git",
+    "Linux",
+    "Object-Oriented Programming",
+    "Debugging",
+    "Unit Testing",
+    "Docker",
+    "AWS",
+    "HTML",
+    "CSS",
+    "JavaScript"
+  ],
+
+  "experience": [
+    {
+      "company": "ByteFusion Technologies",
+      "designation": "JAVA developer Backend",
+      "start_date": "2023-08",
+      "end_date": "Present",
+      "description": "Developed REST APIs using Django REST Framework, designed SQL database schemas, optimized queries, collaborated with frontend developers, wrote unit tests, resolved production bugs, and participated in code reviews."
+    },
+    {
+      "company": "DevSoft Labs",
+      "designation": "Junior Software Engineer",
+      "start_date": "2022-07",
+      "end_date": "2023-07",
+      "description": "Assisted in backend development using Python, maintained PostgreSQL databases, used Git for version control, supported Linux server deployments, and fixed application issues."
+    }
+  ],
+
+  "projects": [
+    "Student Management System built using Django and PostgreSQL.",
+    "Inventory Management REST API using Django REST Framework.",
+    "Online Appointment Booking System with authentication and SQL database.",
+    "Personal Expense Tracker using Python."
+  ],
+
+  "education": [
+    {
+      "degree": "Masters of Science in Software Engineering",
+      "institution": "COMSATS University Islamabad",
+      "cgpa": "3.28",
+      "graduation_date": "2022-06"
+    }
+  ],
+
+  "certifications": [
+    "AWS Certified Cloud Practitioner"
+  ]
+}
