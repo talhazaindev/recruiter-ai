@@ -1,0 +1,38 @@
+{
+  "job_title": "",
+
+  "job_summary": "",
+
+  "key_responsibilities": [],
+
+  "requirements_must_have": {
+    "education": {
+      "degree": null,
+      "discipline": null,
+      "minimum_cgpa": null,
+      "must_be_completed": null
+    },
+
+    "experience": {
+      "minimum_total_years": null
+   },
+
+    "skills": []
+  },
+
+  "minimum_relevant_years": null,
+
+  "tech_stack": [],
+
+  "preferred_skills": [],
+
+  "nice_to_have": {
+    "skills": [],
+    "certifications": [],
+    "education": [],
+    "experience": [],
+    "companies": []
+  },
+
+  "keywords": []
+} 
