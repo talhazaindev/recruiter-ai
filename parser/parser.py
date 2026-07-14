@@ -973,12 +973,14 @@ def find_headers(path):
 
     font_sizes = list(set(font_sizes))
     font_sizes.sort(reverse=True)
-    #print("xd2")
-    #print(font_sizes)
-    name=extract_name(spans,font_sizes[0])
-    sections = build_sections(spans,font_sizes[2])
+    if not font_sizes:
+        font_sizes = [12.0]
+    # Name from largest font; section headings tend to be mid-tier size
+    name = extract_name(spans, font_sizes[0])
+    heading_size = font_sizes[min(2, len(font_sizes) - 1)]
+    sections = build_sections(spans, heading_size)
     #print(sections)
-    return sections,font_sizes[-1],name
+    return sections, font_sizes[-1], name
    
     """ print("Sections found:")
     for heading, content in sections.items():
@@ -1202,5 +1204,4 @@ def parse_cv(path):
     print(type(merged_sections))
     #form_json(merged_sections,path)
     form_json(merged_sections)
-
-    
+    return merged_sections
