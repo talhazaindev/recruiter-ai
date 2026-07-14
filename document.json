@@ -1,0 +1,26 @@
+{
+  "summary": "",
+  "skills": {
+    "content": "Languages:\nPython, C++, SQL\nFrameworks & Libraries:\nPyTorch, NumPy, FastAPI, Scikit-learn, LangChain\nTools  & Platforms:\nGit, Docker, AWS, Ollama, Kaggle, Firebase",
+    "Interests & Hobbies": "GeoPolitics, History, Sports"
+  },
+  "experience": {},
+  "projects": {
+    "content": "",
+    "SoccerVision": "Developed an end-to-end AI system for automated football match highlight generation\nImplemented computer vision models to detect key events (goals, penalties, freekicks etc.)\nGenerated multiple highlight types (full match, event-based, match summaries) from raw footage\nIntegrated APIs for payments, authentication and social media sharing.",
+    "QLoRA Fine-Tuning of Vision Language Models": "Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to Markdown conversion.\nApplied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient accumulation, and GPU-based training on Kaggle.",
+    "Masked Auto Encoder (MAE)": "Built a self-supervised MAE using ViT (Base + Small) for image reconstruction\nApplied 75% patch masking and asymmetric encoder-decoder design\nOptimized training with mixed precision on dual T4 GPUs (Kaggle)",
+    "Custom Diffusion Model for Image Generation": "Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture for high-resolution image generation and reconstruction from noisy inputs.\nDeveloped the complete forward and reverse diffusion pipeline, including noise scheduling, timestep embeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri",
+    "Image Captioning System": "Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq)\nExtracted and cached 2048-d image features to optimize training",
+    "Traffic Sign Detection & Classification": "Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks\nFine Tuned models on traffic signs dataset",
+    "Activites, Honour and Awards": "6x Deans List, FAST NUCES Chiniot-Faisalabad\nAI & Computer Network TA, FAST NUCES Chiniot-Faisalabad\n99.3 Percentile in NSCT TEST, NUCES, HEC\n3 rd  Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad"
+  },
+  "education": {
+    "content": "National University of Computer And Emerging Sciences, Chiniot Faisalabad Campus\nBachelor of Science, Computer Science - 2026\n(3.59  /  4)\nNixor College Karachi\nAlevels - Computer Science - 2022\n4A*"
+  },
+  "certifications": {},
+  "name": "Muhammad Arham",
+  "email": "ma.muhammadarham@gmail.com",
+  "phone": "03362278223",
+  "raw_text": "Muhammad Arham\n\nma.muhammadarham@gmail.com  | https://github.com/Arhamfsd\n\nhttps://www.linkedin.com/in/muhammad-arham-8392b7285/  |  03362278223\n\nEDUCATION\n\nNational University of Computer And Emerging Sciences, Chiniot Faisalabad Campus\n\nBachelor of Science, Computer Science - 2026\n\n(3.59  /  4)\n\nNixor College Karachi\n\nAlevels - Computer Science - 2022\n\n4A*\n\nPROJECTS\n\nSoccerVision\n\n- Developed an end-to-end AI system for automated football match highlight generation\n- Implemented computer vision models to detect key events (goals, penalties, freekicks etc.)\n- Generated multiple highlight types (full match, event-based, match summaries) from raw footage\n- Integrated APIs for payments, authentication and social media sharing.\n\nQLoRA Fine-Tuning of Vision Language Models\n\n- Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to Markdown conversion.\n- Applied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient accumulation, and GPU-based training on Kaggle.\n\nMasked Auto Encoder (MAE)\n\n- Built a self-supervised MAE using ViT (Base + Small) for image reconstruction\n- Applied 75% patch masking and asymmetric encoder-decoder design\n- Optimized training with mixed precision on dual T4 GPUs (Kaggle)\n\nCustom Diffusion Model for Image Generation\n\n- Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture for high-resolution image generation and reconstruction from noisy inputs.\n- Developed the complete forward and reverse diffusion pipeline, including noise scheduling, timestep embeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri\n\nImage Captioning System\n\n- Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq)\n- Extracted and cached 2048-d image features to optimize training\n\nTraffic Sign Detection & Classification\n\n- Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks\n- Fine Tuned models on traffic signs dataset\n\nActivites, Honour and Awards\n\n6x Deans List, FAST NUCES Chiniot-Faisalabad\n\nAI & Computer Network TA, FAST NUCES Chiniot-Faisalabad\n\n99.3 Percentile in NSCT TEST, NUCES, HEC\n\n3 rd  Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad\n\nTECHNICAL EXPERTISE\n\nLanguages:\n\nPython, C++, SQL\n\nFrameworks & Libraries:\n\nPyTorch, NumPy, FastAPI, Scikit-learn, LangChain\n\nTools  & Platforms:\n\nGit, Docker, AWS, Ollama, Kaggle, Firebase\n\nInterests & Hobbies\n\nGeoPolitics, History, Sports"
+}
