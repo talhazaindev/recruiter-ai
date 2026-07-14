@@ -1,0 +1,31 @@
+{
+    "summary": "Final-year Computer Science student with a strong foundation in programming, data structures, algorithms, and web development. Experienced in building full-stack web applications using modern technologies. Highly motivated, detail-oriented, and eager to apply technical knowledge in a professional software development environment.",
+    "skills": {
+        "content": " Programming Languages: C++, Python, JavaScript\n Web Technologies: HTML5, CSS3, React (React-router-Dom, Redux-toolkit) Express.js, Nestjs\n Databases: SQL, MySQL, MongoDB\n Data Analysis & Libraries: NumPy, Pandas, Matplotlib, Seaborn\n Version Control & Tools: Git, GitHub, Visual Studio Code, Cursor"
+    },
+    "experience": [],
+    "projects": {
+        "content": " E-Commerce Website (Grocify) - Built a complete front-end e-commerce application using React and React Router DOM, focusing on responsive UI and smooth navigation\n Airbnb Clone - Developed a web-based clone of Airbnb using Express.js and MongoDB, implementing core features such as listings and user data handling.\n Pokémon Pokémon Search Application A React-based platform utilizing REST APIs to deliver real-time data through a responsive, card-based UI. It showcases expertise in asynchronous data fetching, state management, and modern frontend architecture\n Quick Blog Built a full-stack blog application with a React/Vite frontend and Nodejs/Express backend including admin dashboard, blog CRUD, comments, and images upload support."
+    },
+    "education": [
+        {
+            "degree": "Intermediate",
+            "institution": "Defence Degree College, Lahore",
+            "cgpa": "",
+            "graduation_date": "AUG 2021",
+            "description": "88.98%.\nJUNE2019- AUG 2021"
+        },
+        {
+            "degree": "BS Computer Science",
+            "institution": "University of Management & Technology, Lahore",
+            "cgpa": "3.7",
+            "graduation_date": "2026",
+            "description": "JUNE 2022 - ONGOING\nExpected Graduation: 2026"
+        }
+    ],
+    "certifications": {},
+    "name": "BS COMPUTER SCIENCE",
+    "email": "iamwaqass786@gmail.com",
+    "phone": null,
+    "raw_text": "MUHAMMADWAQAS\n\nBS COMPUTER SCIENCE\n\nPortfolio | Github\n\nBedian Road, Lahore | iamwaqass786@gmail.com | linkedin.com / in / muhammad-waqas\n\nSUMMARY\n\nFinal-year Computer Science student with a strong foundation in programming, data structures, algorithms, and web development. Experienced in building full-stack web applications using modern technologies. Highly motivated, detail-oriented, and eager to apply technical knowledge in a professional software development environment.\n\nTECHNICAL SKILLS\n\n-  Programming Languages: C++, Python, JavaScript\n-  Web Technologies: HTML5, CSS3, React (React-router-Dom, Redux-toolkit) Express.js, Nestjs\n-  Databases: SQL, MySQL, MongoDB\n-  Data Analysis & Libraries: NumPy, Pandas, Matplotlib, Seaborn\n-  Version Control & Tools: Git, GitHub, Visual Studio Code, Cursor\n\nEDUCATION\n\nINTERMEDIATE\n\nDefence Degree College, Lahore\n\n- 88.98%.\n\nJUNE2019- AUG 2021\n\nBSCOMPUTERSCIENCE\n\nJUNE 2022 - ONGOING\n\nUniversity of Management & Technology, Lahore\n\n- CGPA: 3.7\n\n- Expected Graduation: 2026\n\nPROJECTS\n\n-  E-Commerce Website (Grocify) - Built a complete front-end e-commerce application using React and React Router DOM, focusing on responsive UI and smooth navigation\n-  Airbnb Clone - Developed a web-based clone of Airbnb using Express.js and MongoDB, implementing core features such as listings and user data handling.\n-  Pokémon Pokémon Search Application A React-based platform utilizing REST APIs to deliver real-time data through a responsive, card-based UI. It showcases expertise in asynchronous data fetching, state management, and modern frontend architecture\n-  Quick Blog Built a full-stack blog application with a React/Vite frontend and Nodejs/Express backend including admin dashboard, blog CRUD, comments, and images upload support."
+}
