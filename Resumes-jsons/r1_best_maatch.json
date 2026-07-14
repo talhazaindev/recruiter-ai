@@ -1,0 +1,73 @@
+{
+  "skills": [
+    "Python",
+    "Deep Learning",
+    "Neural Networks",
+    "Machine Learning",
+    "TensorFlow",
+    "Keras",
+    "PyTorch",
+    "Scikit-learn",
+    "Data Visualization",
+    "Data Analysis",
+    "SQL",
+    "NLP",
+    "Finetuning",
+    "CUDA",
+    "Text Generation",
+    "Transformer Models",
+    "Language Modeling",
+    "Azure",
+    "Database Management",
+    "Data Modeling",
+    "FastAPI",
+    "VectorDBs"
+  ],
+
+  "experience": [
+    {
+      "company": "BoolMind",
+      "designation": "ML Engineer",
+      "start_date": "July 2025",
+      "end_date": "Present",
+      "description": "Designed, trained, and optimized supervised and unsupervised machine learning models including regression, classification, clustering, and recommendation systems. Built an AI-powered advertising recommendation engine using LLMs, semantic mapping, geospatial search, and weighted ranking algorithms. Performed hyperparameter tuning using Grid Search, Random Search, and Bayesian Optimization. Deployed ML models using Docker, FastAPI, Flask, AWS, GCP, Azure, and CI/CD pipelines."
+    },
+    {
+      "company": "IT Genics",
+      "designation": "Associate AI Engineer",
+      "start_date": "Jan 2024",
+      "end_date": "June 2025",
+      "description": "Designed, trained, and deployed machine learning models for predictive analytics, NLP, and computer vision. Developed intelligent chatbots for customer support and automation. Built a no-code chatbot platform that automatically generates chatbots from user inputs. Developed AI voicebots using Twilio, Llama, and NLP technologies."
+    },
+    {
+      "company": "IT Solutions World Wide",
+      "designation": "Junior AI Engineer",
+      "start_date": "Jul 2023",
+      "end_date": "Dec 2023",
+      "description": "Developed and deployed LLMs including GPT-3, Llama, BERT, and Falcon using transfer learning and fine-tuning. Built customized chatbot solutions and collaborated with cross-functional teams to design end-to-end AI pipelines using TensorFlow, PyTorch, neural networks, deep learning, and reinforcement learning."
+    }
+  ],
+
+  "projects": [
+    "AITRAX – Pulmonary Fibrosis Progression Using Deep Learning: Developed a TensorFlow and Keras-based model that predicts and tracks disease progression using CT scan data, achieving 72.56% accuracy.",
+    "Cardiovascular Risk Prognostication and Classification System: Built a machine learning model for heart disease prediction, achieving 96.82% accuracy through cross-validation."
+  ],
+
+  "education": [
+    {
+      "degree": "Bachelor of Computer Science",
+      "institution": "NUCES, FAST – Islamabad",
+      "cgpa": "",
+      "graduation_date": "Jun 2023"
+    }
+  ],
+
+  "certifications": [
+    "IBM: Tools for Data Science",
+    "Microsoft: Microsoft Azure Fundamentals (AZ-900)",
+    "IBM: Data Science Methodology",
+    "IBM: Machine Learning with Python",
+    "IBM: Databases and SQL for Data Science",
+    "IBM: Data Analysis With Python"
+  ]
+}

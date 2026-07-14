@@ -1,0 +1,26 @@
+{
+  "skills": [],
+
+  "experience": [
+    {
+      "company": "",
+      "designation": "",
+      "start_date": "",
+      "end_date": "",
+      "description": ""
+    }
+  ],
+
+  "projects": [],
+
+  "education": [
+    {
+      "degree": "",
+      "institution": "",
+      "cgpa": "",
+      "graduation_date": ""
+    }
+  ],
+  
+  "certifications": []
+}
