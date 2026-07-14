@@ -1,0 +1,31 @@
+{
+    "summary": "I'm a CS student at FAST National University who genuinely enjoys building things - whether that's a fullstack mobile app, a machine learning model, or a clean UI. I work well in teams and find that collaboration usually leads to better outcomes than going it alone. I manage my time carefully, which is how I've been able to balance university, personal projects, and self-studying Quantum Computing on the side. I'm disciplined by nature - cricket has a lot to do with that -and I bring that same consistency to my code. I take feedback well, adapt quickly, and always try to leave things better than I found them.",
+    "skills": {
+        "content": "Full-Stack Web & Mobile Dev\nREST API Design & Integration\nML Algorithms & Modeling\nUI/UX Prototyping (Figma)\nData Analysis & Visualization\nDiscipline & Consistency\nLanguages\nTypeScript, JavaScript, Python, SQL\nFrontend\nReact Native, React.js, HTML5, CSS3, Figma\nBackend\nFastAPI, Express.js, NestJS, GraphQL\nDatabases\nMongoDB, PostgreSQL, SQL\nML & Data\nScikit-learn, Predictive Modeling, Data Analysis\nExploring\nQuantum Computing\nTools\nGit, GitHub, VS Code, AI-assisted dev tools\nSoft Skills\nTeamwork, Communication, Discipline, Problem-solving",
+        "INTERESTS": "Quantum Computing (self-study)\nCricket (deep domain knowledge)"
+    },
+    "experience": {
+        "content": "",
+        "FULL STACK DEVELOPER INTERN": "",
+        "Avasoft": "2024\nGained exposure to industry workflows, code reviews, and collaborative Git practices.\nContributed to fullstack feature development across frontend and backend within a professional engineering team."
+    },
+    "projects": {
+        "content": "",
+        "Carvaan - Smart Carpooling App": "React Native · TypeScript · FastAPI · MongoDB · JWT\nWorked collaboratively with project partners to design a fullstack carpooling platform from concept to deployement.\nDesigned MongoDB schema for geolocation queries; debugged across the full stack to deliver a stable product.\nBuilt mobile UI with ride booking and real-time location; engineered RESTful APIs with ride-matching logic in FastAPI.",
+        "ML Models & Algorithms": "Python · Scikit-learn · Data Preprocessing · Predictive Modeling\nBuilt a fake screenshot detector using multiple ML algorithms; compared outputs and selected the best-performing model.\nApplied data preprocessing and feature engineering across classification and clustering tasks.",
+        "UI/UX Design Portfolio": "Figma · Wireframing · Prototyping\nDesigned wireframes, prototypes, and user flows for web and mobile products in Figma with usability-driven iterations."
+    },
+    "education": {
+        "content": "",
+        "FAST National University": "Aug 2022 - Present\nB.S. Computer Science",
+        "Adamjee Govt Science College": "2020 - 2022\nIntermediate - Pre-Engineering",
+        "Shaheen Public School": "2018 - 2020\nMatriculation"
+    },
+    "certifications": {
+        "content": "UI/UX Design Certification"
+    },
+    "name": "WORK EXPERIENCE",
+    "email": "ahmedak47qureshi@gmail.com",
+    "phone": "+92 334 3948875",
+    "raw_text": "Full Stack Engineer · UI/UX · ML\n\nCONTACT\n\n- phone +92 334 3948875\n\n- envelope ahmedak47qureshi@gmail.com\n\n- map-marker-alt Karachi, Pakistan\n\n- linkedin ahmed-qureshi-blip\n\n- github AhmedQureshi1-blip\n\nEDUCATION\n\nFAST National University\n\nAug 2022 - Present\n\nB.S. Computer Science\n\nAdamjee Govt Science College\n\n2020 - 2022\n\nIntermediate - Pre-Engineering\n\nShaheen Public School\n\n2018 - 2020\n\nMatriculation\n\nCERTIFICATIONS\n\n- UI/UX Design Certification\n\nCOMPETENCIES\n\n- Full-Stack Web & Mobile Dev\n- REST API Design & Integration\n- ML Algorithms & Modeling\n- UI/UX Prototyping (Figma)\n- Data Analysis & Visualization\n- Discipline & Consistency\n\nINTERESTS\n\n- Quantum Computing (self-study)\n- Cricket (deep domain knowledge)\n\nPROFILE\n\nI'm a CS student at FAST National University who genuinely enjoys building things - whether that's a fullstack mobile app, a machine learning model, or a clean UI. I work well in teams and find that collaboration usually leads to better outcomes than going it alone. I manage my time carefully, which is how I've been able to balance university, personal projects, and self-studying Quantum Computing on the side. I'm disciplined by nature - cricket has a lot to do with that -and I bring that same consistency to my code. I take feedback well, adapt quickly, and always try to leave things better than I found them.\n\nWORK EXPERIENCE\n\nFULL STACK DEVELOPER INTERN\n\nAvasoft\n\n2024\n\n- Gained exposure to industry workflows, code reviews, and collaborative Git practices.\n- Contributed to fullstack feature development across frontend and backend within a professional engineering team.\n\nPROJECTS\n\nCarvaan - Smart Carpooling App\n\nReact Native · TypeScript · FastAPI · MongoDB · JWT\n\n- Worked collaboratively with project partners to design a fullstack carpooling platform from concept to deployement.\n- Designed MongoDB schema for geolocation queries; debugged across the full stack to deliver a stable product.\n- Built mobile UI with ride booking and real-time location; engineered RESTful APIs with ride-matching logic in FastAPI.\n\nML Models & Algorithms\n\nPython · Scikit-learn · Data Preprocessing · Predictive Modeling\n\n- Built a fake screenshot detector using multiple ML algorithms; compared outputs and selected the best-performing model.\n- Applied data preprocessing and feature engineering across classification and clustering tasks.\n\nUI/UX Design Portfolio\n\nFigma · Wireframing · Prototyping\n\n- Designed wireframes, prototypes, and user flows for web and mobile products in Figma with usability-driven iterations.\n\nSKILLS\n\nLanguages\n\nTypeScript, JavaScript, Python, SQL\n\nFrontend\n\nReact Native, React.js, HTML5, CSS3, Figma\n\nBackend\n\nFastAPI, Express.js, NestJS, GraphQL\n\nDatabases\n\nMongoDB, PostgreSQL, SQL\n\nML & Data\n\nScikit-learn, Predictive Modeling, Data Analysis\n\nExploring\n\nQuantum Computing\n\nTools\n\nGit, GitHub, VS Code, AI-assisted dev tools\n\nSoft Skills\n\nTeamwork, Communication, Discipline, Problem-solving"
+}

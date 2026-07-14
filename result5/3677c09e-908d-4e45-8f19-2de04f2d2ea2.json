@@ -1,0 +1,66 @@
+{
+    "education": [
+        {
+            "degree": "Bachelor of Science, Computer Science",
+            "institution": "National University of Computer And Emerging Sciences, Chiniot Faisalabad Campus",
+            "cgpa": "3.59 / 4",
+            "graduation_date": "2026"
+        },
+        {
+            "degree": "Alevels - Computer Science",
+            "institution": "Nixor College Karachi",
+            "cgpa": "4A*",
+            "graduation_date": "2022"
+        }
+    ],
+    "projects": {
+        "SoccerVision": [
+            "• Developed an end-to-end AI system for automated football match highlight generation • Implemented computer vision models to detect key events (goals, penalties, freekicks etc.) • Generated multiple highlight types (full match, event-based, match summaries) from raw footage • Integrated APIs for payments, authentication and social media sharing."
+        ],
+        "QLoRA Fine-Tuning of Vision Language Models": [
+            "• Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to Markdown conversion. • Applied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient accumulation, and GPU-based training on Kaggle."
+        ],
+        "Masked Auto Encoder (MAE)": [
+            "• Built a self-supervised MAE using ViT (Base + Small) for image reconstruction • Applied 75% patch masking and asymmetric encoder–decoder design • Optimized training with mixed precision on dual T4 GPUs (Kaggle)"
+        ],
+        "Custom Diffusion Model for Image Generation": [
+            "• Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture for high-resolution image generation and reconstruction from noisy inputs. • Developed the complete forward and reverse diffusion pipeline, including noise scheduling, timestep embeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri"
+        ],
+        "Image Captioning System": [
+            "• Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq) • Extracted and cached 2048-d image features to optimize training"
+        ],
+        "Traffic Sign Detection & Classification": [
+            "• Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks • Fine Tuned models on traffic signs dataset"
+        ],
+        "Activites, Honour and Awards": [
+            "6x Deans List, FAST NUCES Chiniot-Faisalabad AI & Computer Network TA, FAST NUCES Chiniot-Faisalabad 99.3 Percentile in NSCT TEST, NUCES, HEC 3 rd Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad"
+        ]
+    },
+    "skills": {
+        "Languages:": [
+            "Python, C++, SQL"
+        ],
+        "Frameworks & Libraries:": [
+            "PyTorch, NumPy, FastAPI, Scikit-learn, LangChain"
+        ],
+        "Tools & Platforms:": [
+            "Git, Docker, AWS, Ollama, Kaggle, Firebase"
+        ],
+        "Interests & Hobbies": [
+            "GeoPolitics, History, Sports"
+        ]
+    },
+    "email": "ma.muhammadarham@gmail.com",
+    "phone": "03362278223",
+    "name": "",
+    "raw_text": " \nMuhammad Arham \nma.muhammadarham@gmail.com  | https://github.com/Arhamfsd \nhttps://www.linkedin.com/in/muhammad-arham-8392b7285/  |  03362278223 \n \nEDUCATION \nNational University of Computer And Emerging Sciences, Chiniot Faisalabad Campus \nBachelor of Science, Computer Science - 2026   \n  \n (3.59  /  4) \nNixor College Karachi \n       \nAlevels - Computer Science - 2022                                                                          \n    4A* \n \nPROJECTS \nSoccerVision  \n• Developed an end-to-end AI system for automated football match highlight generation  \n• Implemented computer vision models to detect key events (goals, penalties, freekicks etc.)  \n• Generated multiple highlight types (full match, event-based, match summaries) from raw footage  \n• Integrated APIs for payments, authentication and social media sharing. \n \nQLoRA Fine-Tuning of Vision Language Models  \n• Fine-tuned the vision-language model Qwen Qwen2-VL-2B-Instruct using QLoRA for document image to \nMarkdown conversion.  \n• Applied parameter-efficient fine-tuning techniques including 4-bit quantization, LoRA adapters, gradient \naccumulation, and GPU-based training on Kaggle.    \n \nMasked Auto Encoder (MAE) \n• Built a self-supervised MAE using ViT (Base + Small) for image reconstruction  \n• Applied 75% patch masking and asymmetric encoder–decoder design  \n• Optimized training with mixed precision on dual T4 GPUs (Kaggle)  \n \nCustom Diffusion Model for Image Generation  \n• Implemented a Denoising Diffusion Probabilistic Model (DDPM) in PyTorch using a custom U-Net architecture \nfor high-resolution image generation and reconstruction from noisy inputs.  \n• Developed the complete forward and reverse diffusion pipeline, including noise scheduling, timestep \nembeddings, mixed-precision training, and image quality evaluation using PSNR and SSIM metri \n \nImage Captioning System \n• Built a multimodal image captioning model using ResNet50 + LSTM (Seq2Seq)  \n• Extracted and cached 2048-d image features to optimize training \n \nTraffic Sign Detection & Classification \n• Built a computer vision pipeline using YOLO and CNN models for detection and classification tasks  \n• Fine Tuned models on traffic signs dataset \n \nActivites, Honour and Awards \n6x Deans List, FAST NUCES Chiniot-Faisalabad \nAI & Computer Network TA, FAST NUCES Chiniot-Faisalabad \n99.3 Percentile in NSCT TEST, NUCES, HEC \n3rd Positon FPSC coding competition, FAST NUCES Chiniot-Faisalabad \n \nTECHNICAL EXPERTISE \nLanguages:  Python, C++, SQL \nFrameworks & Libraries:  PyTorch, NumPy, FastAPI, Scikit-learn, LangChain \nTools & Platforms:  Git, Docker, AWS, Ollama, Kaggle, Firebase \n \nInterests & Hobbies \nGeoPolitics, History, Sports \n",
+    "experience": [
+        {
+            "company": "",
+            "designation": "",
+            "start_date": "",
+            "end_date": "",
+            "description": ""
+        }
+    ]
+}

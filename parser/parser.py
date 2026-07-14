@@ -974,9 +974,9 @@ def find_headers(path):
     font_sizes = list(set(font_sizes))
     font_sizes.sort(reverse=True)
     #print("xd2")
-    #print(font_sizes)
+    print(font_sizes)
     name=extract_name(spans,font_sizes[0])
-    sections = build_sections(spans,font_sizes[2])
+    sections = build_sections(spans,font_sizes[1])
     #print(sections)
     return sections,font_sizes[-1],name
    
@@ -1034,13 +1034,13 @@ def merge_lists(data):
 
     return data
 
-def form_json(sections):
+""" def form_json(sections):
     with open("output.json", "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
-
-""" def form_json(sections, filename):
+ """
+def form_json(sections, filename,folder="result5"):
     # Create result folder if it doesn't exist
-    os.makedirs("result3", exist_ok=True)
+    os.makedirs(folder, exist_ok=True)
     
     # Extract just the base filename from the path
     base_name = os.path.basename(filename)
@@ -1048,11 +1048,11 @@ def form_json(sections):
 
     
     # Save in result folder
-    filepath = os.path.join("result3", base_name)
+    filepath = os.path.join(folder, base_name)
     
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(sections, f, indent=4, ensure_ascii=False)
-  """
+  
 
 def merge_empty_keys(data):
     """
@@ -1199,8 +1199,10 @@ def parse_cv(path):
     merged_sections = merge_lists(sections)
     #print(merged_sections)
     merged_sections = merge_empty_keys(merged_sections)
-    print(type(merged_sections))
+    #print(type(merged_sections))
     #form_json(merged_sections,path)
-    form_json(merged_sections)
+    #form_json(merged_sections)
+
+    return merged_sections
 
     
