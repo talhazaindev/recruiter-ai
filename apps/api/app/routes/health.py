@@ -32,7 +32,7 @@ async def ready() -> dict[str, Any]:
     return {
         "status": "ready" if mongo_ok else "degraded",
         "mongo": mongo_ok,
-        "parser_mode": settings.parser_mode,
-        "matcher_mode": settings.matcher_mode,
+        "parser": "auto-route (custom | docling)",
+        "matcher": "ats-agent.v1",
         "org_id_default": settings.default_org_id,
     }

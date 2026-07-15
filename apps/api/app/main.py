@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.auth import seed_admin_user
 from app.config import get_settings
 from app.db import close_db, connect_db
-from app.routes import auth, calls, drive, health, ingest, jobs, results
+from app.routes import auth, calls, drive, health, ingest, jobs, reference, results
 from app.services.storage import ensure_bucket
 
 logging.basicConfig(level=logging.INFO)
@@ -56,6 +56,7 @@ def create_app() -> FastAPI:
     app.include_router(results.router)
     app.include_router(drive.router)
     app.include_router(calls.router)
+    app.include_router(reference.router)
     return app
 
 

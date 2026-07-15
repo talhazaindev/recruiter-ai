@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,8 +19,9 @@ class Settings(BaseSettings):
     admin_email: str = "admin@recruiter.ai"
     admin_password: str = "admin123456"
 
-    mongodb_uri: str = "mongodb://localhost:27017"
-    mongodb_db: str = "recruiter_ai"
+    # Atlas only — no local MongoDB.
+    mongodb_uri: str = ""
+    mongodb_db: str = "RecruiterAI"
 
     redis_url: str = "redis://localhost:6379/0"
 
@@ -30,8 +32,6 @@ class Settings(BaseSettings):
     s3_region: str = "us-east-1"
     s3_use_ssl: bool = False
 
-    parser_mode: str = "local"
-    matcher_mode: str = "stub"
     parse_confidence_review_threshold: float = 0.55
     groq_api_key: str = ""
     groq_model: str = "qwen/qwen3-32b"
@@ -41,6 +41,25 @@ class Settings(BaseSettings):
     google_redirect_uri: str = "http://localhost:8000/v1/integrations/drive/callback"
 
     access_token_expire_minutes: int = 60 * 24
+
+    @field_validator("mongodb_uri")
+    @classmethod
+    def require_atlas_uri(cls, value: str) -> str:
+        """Reject local MongoDB; require an Atlas mongodb+srv URI."""
+        uri = (value or "").strip()
+        if not uri:
+            raise ValueError(
+                "MONGODB_URI is required. Use Atlas: "
+                "mongodb+srv://...@recruit....mongodb.net/?appName=recruit"
+            )
+        lowered = uri.lower()
+        if not lowered.startswith("mongodb+srv://"):
+            raise ValueError(
+                "MONGODB_URI must be an Atlas mongodb+srv:// URI. Local MongoDB is not allowed."
+            )
+        if "localhost" in lowered or "127.0.0.1" in lowered or "@mongo:" in lowered or "//mongo:" in lowered:
+            raise ValueError("Local MongoDB hosts are not allowed. Use MongoDB Atlas only.")
+        return uri
 
     @property
     def cors_origin_list(self) -> list[str]:

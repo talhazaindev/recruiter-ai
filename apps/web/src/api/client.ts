@@ -171,13 +171,10 @@ export const api = {
   driveStatus: () =>
     request<{ configured: boolean; connected: boolean }>('/v1/integrations/drive/status'),
   driveAuthUrl: () => request<{ url: string }>('/v1/integrations/drive/auth-url'),
-  createCall: (candidateId: string, match_result_id?: string) =>
-    request<Record<string, unknown>>(`/v1/candidates/${candidateId}/calls`, {
-      method: 'POST',
-      body: JSON.stringify({ match_result_id }),
-    }),
-  listCalls: (candidateId: string) =>
-    request<Record<string, unknown>[]>(`/v1/candidates/${candidateId}/calls`),
+  listSkills: () => request<{ skills: string[] }>('/v1/reference/skills'),
+  listDegrees: () => request<{ degrees: string[]; aliases: Record<string, string[]> }>('/v1/reference/degrees'),
+  listDisciplines: () =>
+    request<{ disciplines: string[]; aliases: Record<string, string[]> }>('/v1/reference/disciplines'),
   health: () => request<{ status: string }>('/v1/health'),
 }
 
