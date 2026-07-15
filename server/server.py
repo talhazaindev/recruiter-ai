@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi import UploadFile, File, HTTPException
 import os
-from parser.parser import column_boxes, parse_cv,form_json
+import sys
+from pathlib import Path
+from parser.parser import column_boxes, parse_cv, form_json
 
 from parser.final_json_quality import calculate_quality_score
 from parser.file_validator import validate_upload
@@ -9,7 +11,6 @@ import shutil
 import uuid
 import fitz
 from docling.document_converter import DocumentConverter
-
 
 from parser.docling_parser import cv_parse_docling
 from parser.llm import process_resume
@@ -20,12 +21,41 @@ app = FastAPI()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# Repo root so parser.layout_detect is importable when running this legacy server.
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 
 @app.get("/")
 def root():
-    return{
-        "message": "Boolmind cv parser"
-        }
+    return {"message": "Boolmind cv parser"}
+
+
+@app.post("/detect-columns")
+async def detect_columns_endpoint(file: UploadFile = File(...)):
+    """Return multi-column layout stats for an uploaded PDF."""
+    extension = os.path.splitext(file.filename or "")[1].lower()
+    if extension != ".pdf":
+        raise HTTPException(status_code=400, detail="Only PDF files are supported for column detection.")
+
+    filename = f"{uuid.uuid4()}{extension}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    finally:
+        await file.close()
+
+    try:
+        from parser.layout_detect import detect_columns
+
+        layout = detect_columns(file_path)
+        return {"status": "success", **layout, "file_path": file_path}
+    except Exception as exc:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 def parsing(filepath,converter):

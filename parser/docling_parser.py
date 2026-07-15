@@ -1,14 +1,18 @@
-from docling.document_converter import DocumentConverter
-import json
-import re
+"""Docling-based resume parser for multi-column CVs."""
+
+from __future__ import annotations
+
 from collections import defaultdict
-from .parser import normalize_heading, extract_basic_info, form_json
+from typing import Any
+
+from docling.document_converter import DocumentConverter
+
+from parser.parser import extract_basic_info, normalize_heading
 
 HEADING_MAP = {
     # =========================
     # EDUCATION
     # =========================
-
     "education": "education",
     "educational background": "education",
     "academic background": "education",
@@ -380,7 +384,7 @@ def build_docling_sections(doc, HEADER_MAP):
     4. If subsection doesn't exist
             -> create 'content'
     """
-    #print(doc)
+
     texts = {
         t["self_ref"]: t
         for t in doc.get("texts", [])
@@ -517,37 +521,22 @@ def convert_to_resume_schema(doc, HEADER_MAP):
     }
 
 
-def cv_parse_docling(path,converter):
-    converter = DocumentConverter()
+def parse_cv_docling(path: str, converter: DocumentConverter | None = None) -> dict[str, Any]:
+    """Parse a CV with Docling and return nested section dicts (same shape as custom parse_cv)."""
+    converter = converter or DocumentConverter()
     result = converter.convert(path)
-
-    # Get the full document structure as JSON
     doc_dict = result.document.export_to_dict()
-   # print(doc_dict)
-    raw_text= result.document.export_to_text()
-    name=extract_name_docling(doc_dict)
-    email,phone=extract_basic_info(raw_text)
+    raw_text = result.document.export_to_text()
+    name = extract_name_docling(doc_dict)
+    email, phone = extract_basic_info(raw_text)
 
-    final_sections=convert_to_resume_schema(doc_dict,HEADING_MAP)
-    final_sections["name"]=name
-    final_sections["email"]=email
-    final_sections["phone"]=phone
-    final_sections["raw_text"]=raw_text
-    
+    final_sections = convert_to_resume_schema(doc_dict, HEADING_MAP)
+    final_sections["name"] = name
+    final_sections["email"] = email
+    final_sections["phone"] = phone
+    final_sections["raw_text"] = raw_text
     return final_sections
-   # form_json(final_sections,path)
-   
-    # Customize JSON output with specific options
-    # json_output = json.dumps(
-    #     final_sections, 
-    #     indent=2, 
-    #     ensure_ascii=False,
-    #     default=str  # Handles non-serializable objects
-    # )
 
-    # Save with metadata
-    #with open('document.json', 'w', encoding='utf-8') as f:
-     #   f.write(json_output)
 
-#file_path = "./cvs/cvs/cv9.pdf"  # Replace with the actual path to your CV file
-#cv_parse_docling(file_path)
+# Backwards-compatible alias used by legacy server/server.py
+cv_parse_docling = parse_cv_docling

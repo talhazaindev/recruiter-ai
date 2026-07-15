@@ -26,10 +26,6 @@ export function CandidateDetailPage() {
     },
   })
 
-  const callStub = useMutation({
-    mutationFn: () => api.createCall(detail.data!.candidate_id, detail.data!.id),
-  })
-
   useEffect(() => {
     let objectUrl: string | null = null
     let cancelled = false
@@ -108,14 +104,6 @@ export function CandidateDetailPage() {
           <Button onClick={() => shortlist.mutate(!row.shortlisted)}>
             {row.shortlisted ? 'Remove shortlist' : 'Shortlist'}
           </Button>
-          <Button
-            variant="ghost"
-            title="AI voice screening coming soon"
-            disabled={!row.shortlisted || callStub.isPending}
-            onClick={() => callStub.mutate()}
-          >
-            AI Call (stub)
-          </Button>
         </div>
       </div>
 
@@ -159,9 +147,6 @@ export function CandidateDetailPage() {
       <div className="grid lg:grid-cols-2 gap-4">
         <Panel className="p-5 space-y-4">
           <h2 className="font-semibold">Structured resume</h2>
-          {(row.parse_meta?.warnings || []).includes('stub_parser') ? (
-            <Tag tone="warn">Stub parser was used — re-ingest after enabling PARSER_MODE=local</Tag>
-          ) : null}
           <p className="text-sm text-[var(--ink-muted)]">{resume?.professional_summary || '—'}</p>
           <div>
             <h3 className="text-xs uppercase tracking-wide text-[var(--ink-muted)] mb-2">Skills</h3>
@@ -241,8 +226,6 @@ export function CandidateDetailPage() {
               </p>
             )}
           </div>
-
-          {callStub.isSuccess ? <Tag tone="signal">Screening call stub created</Tag> : null}
         </Panel>
       </div>
     </div>

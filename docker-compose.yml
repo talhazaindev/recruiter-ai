@@ -1,21 +1,14 @@
-# Full stack: mongo, redis, minio, api, workers, web
+# Full stack: redis, minio, api, workers, web
+# MongoDB: Atlas only (no local mongo service).
 # From repo root:
 #   docker compose up --build
 #   docker compose up --build -d
+#
+# Required in .env:
+#   MONGODB_URI=mongodb+srv://...@recruit....mongodb.net/?appName=recruit
+#   MONGODB_DB=RecruiterAI
 
 services:
-  mongo:
-    image: mongo:7
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
-      timeout: 5s
-      retries: 12
-
   redis:
     image: redis:7-alpine
     ports:
@@ -46,17 +39,16 @@ services:
       - path: .env.example
         required: false
       - path: .env
-        required: false
+        required: true
     environment:
-      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT: http://minio:9000
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
     ports:
       - "8000:8000"
     depends_on:
-      mongo:
-        condition: service_healthy
       redis:
         condition: service_healthy
       minio:
@@ -71,14 +63,13 @@ services:
       - path: .env.example
         required: false
       - path: .env
-        required: false
+        required: true
     environment:
-      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT: http://minio:9000
     depends_on:
-      mongo:
-        condition: service_healthy
       redis:
         condition: service_healthy
       minio:
@@ -95,14 +86,13 @@ services:
       - path: .env.example
         required: false
       - path: .env
-        required: false
+        required: true
     environment:
-      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT: http://minio:9000
     depends_on:
-      mongo:
-        condition: service_healthy
       redis:
         condition: service_healthy
       api:
@@ -117,14 +107,13 @@ services:
       - path: .env.example
         required: false
       - path: .env
-        required: false
+        required: true
     environment:
-      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
       S3_ENDPOINT: http://minio:9000
     depends_on:
-      mongo:
-        condition: service_healthy
       redis:
         condition: service_healthy
       minio:
@@ -146,5 +135,4 @@ services:
         condition: service_started
 
 volumes:
-  mongo_data:
   minio_data:

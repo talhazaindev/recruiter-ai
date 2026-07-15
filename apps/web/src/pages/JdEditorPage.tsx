@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { api, emptyJd, type JobDescription } from '../api/client'
@@ -17,9 +17,14 @@ export function JdEditorPage() {
   const { jobId } = useParams()
   const qc = useQueryClient()
   const job = useQuery({ queryKey: ['job', jobId], queryFn: () => api.getJob(jobId!), enabled: Boolean(jobId) })
+  const skillsRef = useQuery({ queryKey: ['ref-skills'], queryFn: () => api.listSkills() })
+  const degreesRef = useQuery({ queryKey: ['ref-degrees'], queryFn: () => api.listDegrees() })
+  const disciplinesRef = useQuery({ queryKey: ['ref-disciplines'], queryFn: () => api.listDisciplines() })
+
   const [step, setStep] = useState(0)
   const [jd, setJd] = useState<JobDescription>(emptyJd())
   const [saved, setSaved] = useState(false)
+  const [skillQuery, setSkillQuery] = useState('')
 
   useEffect(() => {
     if (job.data) setJd(job.data.jd)
@@ -38,6 +43,36 @@ export function JdEditorPage() {
   function update<K extends keyof JobDescription>(key: K, value: JobDescription[K]) {
     setJd((prev) => ({ ...prev, [key]: value }))
   }
+
+  function setMustSkills(skills: string[]) {
+    setJd((prev) => ({
+      ...prev,
+      requirements_must_have: { ...prev.requirements_must_have, skills },
+    }))
+  }
+
+  function addSkill(skill: string) {
+    const key = skill.trim()
+    if (!key) return
+    const existing = jd.requirements_must_have.skills
+    if (existing.some((s) => s.toLowerCase() === key.toLowerCase())) return
+    setMustSkills([...existing, key])
+    setSkillQuery('')
+  }
+
+  function removeSkill(skill: string) {
+    setMustSkills(jd.requirements_must_have.skills.filter((s) => s !== skill))
+  }
+
+  const filteredSkills = useMemo(() => {
+    const all = skillsRef.data?.skills || []
+    const q = skillQuery.trim().toLowerCase()
+    const selected = new Set(jd.requirements_must_have.skills.map((s) => s.toLowerCase()))
+    return all
+      .filter((s) => !selected.has(s.toLowerCase()))
+      .filter((s) => !q || s.toLowerCase().includes(q))
+      .slice(0, 40)
+  }, [skillsRef.data, skillQuery, jd.requirements_must_have.skills])
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -103,22 +138,67 @@ export function JdEditorPage() {
 
         {step === 1 && (
           <>
-            <label className="block text-sm">
-              <span className="text-[var(--ink-muted)]">Must-have skills</span>
-              <TextArea
-                className="mt-1"
-                value={jd.requirements_must_have.skills.join('\n')}
-                onChange={(e) =>
-                  setJd((prev) => ({
-                    ...prev,
-                    requirements_must_have: {
-                      ...prev.requirements_must_have,
-                      skills: listFromText(e.target.value),
-                    },
-                  }))
-                }
-              />
-            </label>
+            <div className="space-y-2">
+              <span className="text-sm text-[var(--ink-muted)]">Must-have skills</span>
+              <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
+                {jd.requirements_must_have.skills.map((skill) => (
+                  <button
+                    key={skill}
+                    type="button"
+                    onClick={() => removeSkill(skill)}
+                    className="inline-flex items-center gap-1 rounded-md border border-[var(--line)] bg-white/80 px-2 py-1 text-xs"
+                    title="Remove"
+                  >
+                    {skill}
+                    <span aria-hidden>×</span>
+                  </button>
+                ))}
+                {jd.requirements_must_have.skills.length === 0 ? (
+                  <span className="text-xs text-[var(--ink-muted)]">No skills selected yet</span>
+                ) : null}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  className="flex-1"
+                  placeholder="Search skills catalog…"
+                  value={skillQuery}
+                  onChange={(e) => setSkillQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      if (filteredSkills[0]) addSkill(filteredSkills[0])
+                      else if (skillQuery.trim()) addSkill(skillQuery.trim())
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    if (skillQuery.trim()) addSkill(skillQuery.trim())
+                  }}
+                >
+                  Add
+                </Button>
+              </div>
+              {filteredSkills.length > 0 ? (
+                <div className="max-h-40 overflow-y-auto rounded-md border border-[var(--line)] bg-white/70 p-2">
+                  <div className="flex flex-wrap gap-1.5">
+                    {filteredSkills.map((skill) => (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => addSkill(skill)}
+                        className="rounded-md px-2 py-1 text-xs hover:bg-[var(--signal)]/10"
+                      >
+                        {skill}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-3">
               <label className="block text-sm">
                 <span className="text-[var(--ink-muted)]">Min total years</span>
@@ -152,8 +232,8 @@ export function JdEditorPage() {
               </label>
               <label className="block text-sm">
                 <span className="text-[var(--ink-muted)]">Degree</span>
-                <Input
-                  className="mt-1"
+                <select
+                  className="mt-1 w-full rounded-md border border-[var(--line)] bg-white/80 px-3 py-2 text-sm"
                   value={jd.requirements_must_have.education.degree ?? ''}
                   onChange={(e) =>
                     setJd((prev) => ({
@@ -167,12 +247,19 @@ export function JdEditorPage() {
                       },
                     }))
                   }
-                />
+                >
+                  <option value="">No degree requirement</option>
+                  {(degreesRef.data?.degrees || []).map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block text-sm">
                 <span className="text-[var(--ink-muted)]">Discipline</span>
-                <Input
-                  className="mt-1"
+                <select
+                  className="mt-1 w-full rounded-md border border-[var(--line)] bg-white/80 px-3 py-2 text-sm"
                   value={jd.requirements_must_have.education.discipline ?? ''}
                   onChange={(e) =>
                     setJd((prev) => ({
@@ -186,7 +273,14 @@ export function JdEditorPage() {
                       },
                     }))
                   }
-                />
+                >
+                  <option value="">Any discipline</option>
+                  {(disciplinesRef.data?.disciplines || []).map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
           </>
@@ -251,6 +345,12 @@ export function JdEditorPage() {
             </p>
             <p className="text-[var(--ink-muted)]">{jd.job_summary || 'No summary'}</p>
             <p>Must-have skills: {jd.requirements_must_have.skills.join(', ') || '—'}</p>
+            <p>
+              Education: {jd.requirements_must_have.education.degree || '—'}
+              {jd.requirements_must_have.education.discipline
+                ? ` / ${jd.requirements_must_have.education.discipline}`
+                : ''}
+            </p>
             <p>Tech stack: {jd.tech_stack.join(', ') || '—'}</p>
             <div className="flex gap-2 pt-2">
               <Button onClick={() => save.mutate()}>Save & continue</Button>

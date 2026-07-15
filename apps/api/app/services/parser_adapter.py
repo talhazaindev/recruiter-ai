@@ -1,12 +1,12 @@
-"""Parser service adapter — bridges repo `parser/` into MatchingResumeSchema."""
+"""Parser service adapter — auto-routes custom vs Docling by column layout."""
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import os
 import re
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -27,127 +27,70 @@ PHONE_RE = re.compile(r"(?:\+92|0)?3\d{2}[-\s]?\d{7}")
 URL_RE = re.compile(r"https?://[^\s|]+|(?:www\.)?(?:linkedin|github)\.com/[^\s|]+", re.I)
 
 
+def _ensure_repo_root_on_path() -> Path:
+    """Make repo root importable for ``parser.*`` packages."""
+    root = Path(__file__).resolve().parents[4]
+    root_s = str(root)
+    if root_s not in sys.path:
+        sys.path.insert(0, root_s)
+    return root
+
+
 def parse_resume_bytes(
     data: bytes,
     filename: str,
     content_type: str = "application/pdf",
 ) -> ParseResult:
-    """Parse a resume file into ParseResult.
-
-    PARSER_MODE=local (default for production path) uses the PyMuPDF parser
-    package under repo `parser/`. PARSER_MODE=stub keeps deterministic fakes.
-    """
-    settings = get_settings()
-    if settings.parser_mode == "stub":
-        return _parse_stub(data, filename)
-    return _parse_local(data, filename)
-
-
-def settings_parser_is_stub() -> bool:
-    """Whether the configured parser mode is stub."""
-    return get_settings().parser_mode == "stub"
-
-
-def _parse_stub(data: bytes, filename: str) -> ParseResult:
-    """Deterministic stub parse for demos without PDF deps."""
-    digest = hashlib.sha256(data).hexdigest()[:8]
-    stem = Path(filename).stem.replace("_", " ").replace("-", " ").title() or "Candidate"
-    text = data.decode("utf-8", errors="ignore")
-    emails = EMAIL_RE.findall(text)[:3]
-    phones = PHONE_RE.findall(text)[:3]
-    if not emails:
-        emails = [f"{stem.lower().replace(' ', '.')}@example.com"]
-    if not phones:
-        phones = ["+923001234567"]
-
-    skills = ["Python", "SQL", "React", "FastAPI", "MongoDB"]
-    offset = int(digest[:2], 16) % 3
-    skills = skills[offset:] + skills[:offset]
-    confidence = 0.82 if len(data) > 500 else 0.45
-    needs_review = confidence < get_settings().parse_confidence_review_threshold
-
-    resume = MatchingResumeSchema(
-        raw_resume_text=text[:5000] or f"Stub resume for {stem}",
-        professional_summary=f"Experienced professional ({stem}) with software engineering background.",
-        skills=skills,
-        experience=[
-            ExperienceEntry(
-                company="Acme Soft",
-                designation="Software Engineer",
-                start_date="2021-01",
-                end_date="Present",
-                description="Built APIs and data pipelines.\nImproved hiring ops tooling.",
-            )
-        ],
-        projects=[f"{stem} Portfolio Project"],
-        education=[
-            EducationEntry(
-                degree="BS Computer Science",
-                institution="NUST",
-                cgpa="3.5",
-                graduation_date="2020",
-            )
-        ],
-        certifications=[],
-    )
-    return ParseResult(
-        schema_version="matching.v1",
-        status="partial" if needs_review else "ok",
-        resume=resume,
-        candidate=CandidateExtras(name=stem, emails=emails, phones=phones, links=[]),
-        confidence=confidence,
-        field_confidence={"skills": 0.8, "experience": 0.7, "education": 0.75},
-        warnings=["stub_parser"],
-        needs_review=needs_review,
-        provenance={"parser": "stub", "filename": filename, "digest": digest},
-    )
-
-
-def _parse_local(data: bytes, filename: str) -> ParseResult:
-    """Run the repo CV parser and normalize into MatchingResumeSchema."""
-    import tempfile as _tempfile
+    """Parse a resume: single-column → custom PyMuPDF; multi-column → Docling."""
+    _ensure_repo_root_on_path()
+    groq_key = get_settings().groq_api_key or os.getenv("GROQ_API_KEY", "")
+    if groq_key:
+        os.environ["GROQ_API_KEY"] = groq_key
 
     suffix = Path(filename).suffix.lower() or ".pdf"
     tmp_path: str | None = None
+    converted_path: str | None = None
     warnings: list[str] = []
 
     try:
-        # Ensure repo root is importable for `parser.parser`
-        # .../apps/api/app/services/parser_adapter.py → parents[4] = repo root
-        root = Path(__file__).resolve().parents[4]
-        import sys
-
-        root_s = str(root)
-        if root_s not in sys.path:
-            sys.path.insert(0, root_s)
-
-        # Propagate Groq key from Settings/.env into os.environ for groq client
-        groq_key = get_settings().groq_api_key or os.getenv("GROQ_API_KEY", "")
-        if groq_key:
-            os.environ["GROQ_API_KEY"] = groq_key
-
-        with _tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(data)
             tmp_path = tmp.name
 
-        # DOCX → PDF if LibreOffice available (best-effort)
         path_to_parse = tmp_path
         if suffix in {".docx", ".doc"}:
-            converted = _try_docx_to_pdf(tmp_path)
-            if converted:
-                path_to_parse = converted
+            converted_path = _try_docx_to_pdf(tmp_path)
+            if converted_path:
+                path_to_parse = converted_path
             else:
                 warnings.append("docx_pdf_conversion_unavailable")
 
-        from parser.parser import parse_cv  # type: ignore
+        layout: dict[str, Any] = {"is_multicolumn": False, "max_columns": 1, "pages": []}
+        use_docling = False
+        if path_to_parse.lower().endswith(".pdf"):
+            try:
+                from parser.layout_detect import detect_columns
 
-        # Avoid clobbering process CWD output.json: patch form_json temporarily
-        sections = _run_parse_cv(path_to_parse)
+                layout = detect_columns(path_to_parse)
+                use_docling = bool(layout.get("is_multicolumn"))
+            except Exception as exc:
+                warnings.append(f"column_detect_failed: {exc}")
+                logger.warning("Column detection failed for %s: %s", filename, exc)
+                use_docling = False
+
+        if use_docling:
+            from parser.docling_parser import parse_cv_docling
+
+            sections = parse_cv_docling(path_to_parse)
+            parser_id = "docling"
+        else:
+            sections = _run_parse_cv(path_to_parse)
+            parser_id = "custom.pymupdf"
+
         if not sections:
-            raise RuntimeError("parse_cv returned empty")
+            raise RuntimeError(f"{parser_id} returned empty sections")
 
         structured = _normalize_sections(sections)
-        # Optional Groq enrichment for education/experience arrays
         if os.getenv("GROQ_API_KEY"):
             try:
                 enriched = _groq_structure_edu_exp(
@@ -198,33 +141,29 @@ def _parse_local(data: bytes, filename: str) -> ParseResult:
             },
             warnings=warnings,
             needs_review=needs_review,
-            provenance={"parser": "local.pymupdf", "filename": filename},
+            provenance={
+                "parser": parser_id,
+                "filename": filename,
+                "columns": layout.get("max_columns", 1),
+                "is_multicolumn": layout.get("is_multicolumn", False),
+            },
         )
     except Exception as exc:
-        logger.exception("Local parse failed for %s", filename)
-        result = _parse_stub(data, filename)
-        result.warnings = [f"local_parser_fallback: {exc}", "stub_parser"]
-        result.status = "partial"
-        result.needs_review = True
-        result.provenance = {
-            **result.provenance,
-            "parser": "stub_fallback",
-            "error": str(exc),
-        }
-        return result
+        logger.exception("Parse failed for %s", filename)
+        raise RuntimeError(f"Resume parse failed for {filename}: {exc}") from exc
     finally:
-        if tmp_path and os.path.exists(tmp_path):
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
+        for p in (tmp_path, converted_path):
+            if p and os.path.exists(p):
+                try:
+                    os.unlink(p)
+                except OSError:
+                    pass
 
 
 def _run_parse_cv(path: str) -> dict[str, Any]:
-    """Call parse_cv and prefer its return value; fall back to reading output.json."""
+    """Call custom parse_cv; redirect form_json to a temp file."""
     from parser import parser as parser_mod  # type: ignore
 
-    # Redirect form_json to a temp file so we don't pollute CWD
     out_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
     out_path = out_file.name
     out_file.close()
@@ -251,7 +190,7 @@ def _run_parse_cv(path: str) -> dict[str, Any]:
 
 
 def _normalize_sections(sections: dict[str, Any]) -> dict[str, Any]:
-    """Map legacy nested section dicts → MatchingResumeSchema fields."""
+    """Map nested section dicts → MatchingResumeSchema fields."""
     raw = str(sections.get("raw_text") or "")
     summary = _flatten_section(sections.get("summary") or sections.get("professional_summary"))
     skills = _flatten_skills(sections.get("skills"))
@@ -299,13 +238,11 @@ def _flatten_skills(value: Any) -> list[str]:
     text = _flatten_section(value)
     if not text:
         return []
-    # Split on commas / newlines / pipes / bullets
     chunks = re.split(r"[\n,|/•·;]+", text)
     skills: list[str] = []
     seen: set[str] = set()
     for chunk in chunks:
         s = chunk.strip(" -:\t")
-        # Skip category labels like "Languages" alone if very short category headers
         if not s or len(s) > 80:
             continue
         if s.lower().endswith(":") or s.lower() in {
@@ -349,7 +286,7 @@ def _flatten_projects(value: Any) -> list[str]:
 
 
 def _heuristic_experience(value: Any) -> list[ExperienceEntry]:
-    """Best-effort experience rows without LLM (key ≈ company/title blob)."""
+    """Best-effort experience rows without LLM."""
     if isinstance(value, list):
         rows: list[ExperienceEntry] = []
         for item in value:
@@ -368,13 +305,10 @@ def _heuristic_experience(value: Any) -> list[ExperienceEntry]:
             continue
         desc = _flatten_section(val)
         title = "" if key == "content" else str(key).strip()
-        # Try split "Company — Role" patterns loosely into company
-        company = title
-        designation = ""
         rows.append(
             ExperienceEntry(
-                company=company,
-                designation=designation,
+                company=title,
+                designation="",
                 start_date="",
                 end_date="",
                 description=desc,
@@ -406,7 +340,7 @@ def _heuristic_education(value: Any) -> list[EducationEntry]:
 
 
 def _groq_structure_edu_exp(education: Any, experience: Any) -> dict[str, Any]:
-    """Use Groq to structure education/experience like llm_checking.py."""
+    """Use Groq to structure education/experience."""
     from groq import Groq
 
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
@@ -424,7 +358,7 @@ Experience input:
 {json.dumps(experience, indent=2, ensure_ascii=False)}
 """
     response = client.chat.completions.create(
-        model=os.getenv("GROQ_MODEL", "qwen/qwen3-32b"),
+        model=os.getenv("GROQ_MODEL", get_settings().groq_model or "qwen/qwen3-32b"),
         temperature=0,
         response_format={"type": "json_object"},
         messages=[
@@ -433,7 +367,6 @@ Experience input:
         ],
     )
     content = response.choices[0].message.content or "{}"
-    # Strip accidental fences
     content = content.strip()
     if content.startswith("```"):
         content = re.sub(r"^```(?:json)?\s*", "", content)

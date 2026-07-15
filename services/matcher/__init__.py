@@ -1,15 +1,18 @@
-"""Teammate hybrid matcher package — stable `match_jd_resume` contract."""
+"""Hybrid matcher package — ats-agent verification + ranking."""
 
 from __future__ import annotations
 
 from typing import Any
 
-from services.matcher.stub import stub_match
+from services.matcher.ats_agent import match_jd_resume as ats_match
 
 
 def match_jd_resume(jd: Any, resume: Any) -> Any:
-    """Public matcher entrypoint used by API workers.
+    """Public matcher entrypoint used by API workers."""
+    payload = ats_match(jd, resume)
+    try:
+        from app.models.schemas import MatchOutput
 
-    Replace `stub_match` with the real hybrid pipeline when ready.
-    """
-    return stub_match(jd, resume)
+        return MatchOutput.model_validate(payload)
+    except Exception:
+        return payload
