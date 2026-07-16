@@ -345,7 +345,7 @@ def verify_total_experience(
         experience_req = requirements.get('experience', {})
         required_years = experience_req.get('minimum_total_years')
         
-        if required_years is None:
+        if required_years is None or required_years == 0:
             details['message'] = "No minimum experience requirement specified in JD"
             if return_details:
                 return True, details
