@@ -11,7 +11,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 from parser.docling_parser import parse_cv_docling
-
+from docling.document_converter import DocumentConverter
 
 from app.config import get_settings
 from app.models.schemas import (
@@ -90,6 +90,9 @@ def parse_resume_bytes(
     data: bytes,
     filename: str,
     content_type: str = "application/pdf",
+    min_experience: float=0,
+    converter: DocumentConverter | None = None
+    
 ) -> ParseResult:
     """Parse a resume: single-column → custom PyMuPDF; multi-column → Docling."""
     _ensure_repo_root_on_path()
@@ -101,7 +104,7 @@ def parse_resume_bytes(
     tmp_path: str | None = None
     converted_path: str | None = None
     warnings: list[str] = []
-
+    
     try:
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(data)
@@ -133,7 +136,7 @@ def parse_resume_bytes(
         if use_docling:
             logger.info("========== DOCLING 1START ==========")
             t = perf_counter()
-            sections = parse_cv_docling(path_to_parse)
+            sections = parse_cv_docling(path_to_parse,converter)
             parser_id = "docling"
             logger.info(
                 "========== DOCLING 1END (%.3fs) ==========",
@@ -175,7 +178,7 @@ def parse_resume_bytes(
             else:
                 logger.info("========== DOCLING 1START ==========")
                 t = perf_counter()
-                sections = parse_cv_docling(path_to_parse)
+                sections = parse_cv_docling(path_to_parse,converter)
                 parser_id = "docling"
                 logger.info(
                 "========== DOCLING 1END (%.3fs) ==========",
@@ -223,7 +226,7 @@ def parse_resume_bytes(
             phones = PHONE_RE.findall(raw)[:3]
         links = URL_RE.findall(raw)[:8]
 
-        confidence = _score_confidence(structured, name=name, emails=emails)
+        confidence = _score_confidence(structured, name=name, emails=emails,min_experience=min_experience)
         needs_review = confidence < get_settings().parse_confidence_review_threshold
         status = "ok" if confidence >= 0.7 else "partial"
 
@@ -555,23 +558,142 @@ Experience input:
     return json.loads(content)
 
 
-def _score_confidence(structured: dict[str, Any], *, name: str, emails: list[str]) -> float:
-    """Heuristic confidence from populated matching fields."""
-    score = 0.35
-    if name:
-        score += 0.15
-    if emails:
-        score += 0.1
-    if structured.get("skills"):
-        score += 0.15
-    if structured.get("experience"):
-        score += 0.15
-    if structured.get("education"):
-        score += 0.1
-    if structured.get("raw_resume_text"):
-        score += 0.05
-    return round(min(score, 0.98), 2)
 
+EXPECTED_EXPERIENCE_FIELDS = [
+    "company",
+    "designation",
+    "start_date",
+    "end_date",
+    "description",
+]
+
+EXPECTED_EDUCATION_FIELDS = [
+    "degree",
+    "institution",
+    "cgpa",
+    "graduation_date",
+]
+
+
+def _extract_words(data, include_keys=True):
+    words = []
+
+    if data is None:
+        return words
+
+    if isinstance(data, str):
+        words.extend(re.findall(r"\b\w+\b", data))
+
+    elif isinstance(data, list):
+        for item in data:
+            words.extend(_extract_words(item, include_keys))
+
+    elif isinstance(data, dict):
+        for key, value in data.items():
+            if include_keys:
+                words.extend(re.findall(r"\b\w+\b", str(key)))
+            words.extend(_extract_words(value, include_keys))
+
+    return words
+
+
+def _score_confidence(
+    structured: dict[str, Any],
+    *,
+    name: str,
+    emails: list[str],
+    min_experience: float,
+) -> float:
+    """
+    Confidence that the parser extracted the resume correctly.
+    Returns a value between 0.0 and 1.0.
+    """
+
+    # ---------------- Required Sections ---------------- #
+
+    required_sections = ["skills", "education"]
+
+    if min_experience > 0:
+        required_sections.append("experience")
+
+    section_score = 0.0
+
+    for section in required_sections:
+        if structured.get(section):
+            section_score += 1
+
+    section_score /= len(required_sections)
+
+    # ---------------- Completeness ---------------- #
+
+    total_fields = 0
+    filled_fields = 0
+
+    if structured.get("education"):
+
+        for edu in structured["education"]:
+            for field in EXPECTED_EDUCATION_FIELDS:
+                total_fields += 1
+                value = getattr(edu, field, "")
+                if str(value).strip():
+                    filled_fields += 1
+                
+    if min_experience > 0 and structured.get("experience"):
+
+        for exp in structured["experience"]:
+            for field in EXPECTED_EXPERIENCE_FIELDS:
+                total_fields += 1
+                value = getattr(exp, field, "")
+                if str(value).strip():
+                    filled_fields += 1
+                
+    completeness_score = (
+        filled_fields / total_fields if total_fields else 1.0
+    )
+
+    # ---------------- Raw Text Coverage ---------------- #
+
+    raw_text = structured.get("raw_resume_text", "")
+
+    raw_words = len(re.findall(r"\b\w+\b", raw_text))
+
+    structured_words = []
+
+    structured_words.extend(
+        _extract_words(structured.get("skills", []), include_keys=True)
+    )
+
+    structured_words.extend(
+        _extract_words(structured.get("education", []), include_keys=False)
+    )
+
+    structured_words.extend(
+        _extract_words(structured.get("experience", []), include_keys=False)
+    )
+
+    coverage = (
+        min(len(structured_words) / raw_words, 1.0)
+        if raw_words
+        else 0.0
+    )
+
+    # ---------------- Final Confidence ---------------- #
+
+    confidence = (
+        0.40 * section_score
+        + 0.40 * completeness_score
+        + 0.20 * coverage
+    )
+
+    # Small parser bonuses
+
+    if name:
+        confidence += 0.02
+
+    if emails:
+        confidence += 0.02
+
+    return round(min(confidence, 0.99), 2)
 
 def _as_list(value: Any) -> list[str]:
     """Normalize scalar/list contact fields to list[str]."""

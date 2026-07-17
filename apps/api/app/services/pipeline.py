@@ -16,12 +16,13 @@ from app.services.matcher_adapter import match_jd_resume
 from app.services.parser_adapter import parse_resume_bytes
 from app.services.storage import download_bytes
 from time import perf_counter
+from docling.document_converter import DocumentConverter
 
 
 logger = logging.getLogger(__name__)
 
 
-async def process_parse_task(payload: dict[str, Any]) -> None:
+async def process_parse_task(payload: dict[str, Any],converter: DocumentConverter) -> None:
     """Parse one resume file and enqueue matching."""
     overall_start = perf_counter()
     logger.info("========== PROCESS PARSE TASK START [%s] ==========")
@@ -40,7 +41,10 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
     if not resume_doc:
         logger.error("Resume %s not found", resume_id)
         return
-
+    temp_job=await db.jobs.find_one({"_id": ObjectId(job_id)},
+        {"minimum_relevant_years": 1}
+)
+    min_experience=temp_job.get("minimum_relevant_years", 0) or 0
     t = perf_counter()
 
     await db.resumes.update_one(
@@ -65,7 +69,7 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
         content_type = resume_doc["source_ref"].get("content_type", "application/pdf")
         t = perf_counter()
 
-        result = parse_resume_bytes(data, filename, content_type)
+        result = parse_resume_bytes(data, filename, content_type,min_experience,converter)
         logger.info("======Resume Parser TOTAL: %.3fs", perf_counter() - t)
         candidate = result.candidate
         cand_doc = {
@@ -111,7 +115,7 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
 
         needs_review = result.needs_review or result.confidence < settings.parse_confidence_review_threshold
         t = perf_counter()
-
+        
         await db.resumes.update_one(
             {"_id": ObjectId(resume_id)},
             {
