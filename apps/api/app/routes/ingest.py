@@ -63,6 +63,12 @@ async def _create_batch(
     return str(result.inserted_id)
 
 
+import logging
+from time import perf_counter
+
+logger = logging.getLogger(__name__)
+
+
 @router.post("/v1/jobs/{job_id}/ingest/upload")
 async def ingest_upload(
     job_id: str,
@@ -70,14 +76,24 @@ async def ingest_upload(
     user: UserPublic = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Upload one or more CVs and enqueue parse/match pipeline."""
+    overall_start = perf_counter()
+
+    logger.info("========== INGEST API START ==========")
     db = get_db()
+    t = perf_counter()
+
     job = await db.jobs.find_one({"_id": ObjectId(job_id), "org_id": user.org_id})
+    logger.info("=======Mongo jobs.find_one: %.3fs", perf_counter() - t)
+    
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     if not files:
         raise HTTPException(status_code=400, detail="No files uploaded")
 
+    t = perf_counter()
+
     batch_id = await _create_batch(user.org_id, job_id, "upload", user.id)
+    logger.info("======Create batch: %.3fs", perf_counter() - t)
     resume_ids: list[str] = []
     now = datetime.now(timezone.utc)
 
@@ -91,7 +107,10 @@ async def ingest_upload(
             raise HTTPException(status_code=400, detail=f"{name} exceeds size limit")
         content_type = f.content_type or "application/octet-stream"
         key = f"{user.org_id}/{job_id}/{batch_id}/{uuid.uuid4().hex}{ext}"
+        t = perf_counter()
+
         upload_bytes(key, data, content_type)
+        logger.info("======MinIO upload (%s): %.3fs", name, perf_counter() - t)
         resume_doc = {
             "org_id": user.org_id,
             "candidate_id": None,
@@ -116,11 +135,15 @@ async def ingest_upload(
             "created_at": now,
             "updated_at": now,
         }
+        t = perf_counter()
+
         ins = await db.resumes.insert_one(resume_doc)
+        logger.info("======Mongo resumes.insert_one: %.3fs", perf_counter() - t)
         resume_ids.append(str(ins.inserted_id))
 
     if not resume_ids:
         raise HTTPException(status_code=400, detail="No valid PDF/DOCX files")
+    t = perf_counter()
 
     await db.ingest_batches.update_one(
         {"_id": ObjectId(batch_id)},
@@ -132,15 +155,22 @@ async def ingest_upload(
             }
         },
     )
+    logger.info("======Mongo ingest_batches.update_one: %.3fs", perf_counter() - t)
     # Activate job when ingest starts
     if job.get("status") == "draft":
+        t = perf_counter()
+
         await db.jobs.update_one(
             {"_id": ObjectId(job_id)},
             {"$set": {"status": "active", "updated_at": datetime.now(timezone.utc)}},
         )
+        logger.info("======Mongo jobs.update_one: %.3fs", perf_counter() - t)
 
     try:
+        t = perf_counter()
+
         enqueue_parse_for_batch_files(batch_id, user.org_id, job_id, resume_ids)
+        logger.info("======Redis enqueue: %.3fs", perf_counter() - t)
     except Exception:
         # Fallback: process inline if Redis is down (dev resilience)
         from app.services.pipeline import process_parse_task
@@ -150,6 +180,8 @@ async def ingest_upload(
                 {"resume_id": rid, "org_id": user.org_id, "job_id": job_id, "batch_id": batch_id}
             )
 
+    t = perf_counter()
+
     await write_audit(
         user.org_id,
         user.id,
@@ -158,6 +190,11 @@ async def ingest_upload(
         batch_id,
         {"file_count": len(resume_ids)},
     )
+    logger.info("======Audit write: %.3fs", perf_counter() - t)
+    logger.info(
+    "========== INGEST API END (%.3fs) ==========",
+    perf_counter() - overall_start,
+)
     return {"batch_id": batch_id, "file_count": len(resume_ids), "status": "processing"}
 
 

@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+from parser.docling_parser import parse_cv_docling
+
 
 from app.config import get_settings
 from app.models.schemas import (
@@ -34,6 +36,54 @@ def _ensure_repo_root_on_path() -> Path:
     if root_s not in sys.path:
         sys.path.insert(0, root_s)
     return root
+
+def _should_run_custom_parser(resume: dict) -> bool:
+    """
+    Returns True if the custom parser should be executed.
+
+    Conditions:
+    - A required section is missing.
+    - A required section is empty.
+    - A required section contains only empty strings / empty values.
+    """
+
+    required_sections = [
+        "education",
+        "experience",
+        #"projects",
+        "skills",
+    ]
+    #print(resume)
+    def has_meaningful_data(value):
+        if value is None:
+            return False
+
+        if isinstance(value, str):
+            return value.strip() != ""
+
+        if isinstance(value, list):
+            if len(value) == 0:
+                return False
+            return any(has_meaningful_data(item) for item in value)
+
+        if isinstance(value, dict):
+            if len(value) == 0:
+                return False
+            return any(has_meaningful_data(v) for v in value.values())
+
+        return True
+
+    for section in required_sections:
+        if section not in resume:
+            return True
+
+        if not has_meaningful_data(resume[section]):
+            return True
+
+    return False
+
+import logging
+from time import perf_counter
 
 
 def parse_resume_bytes(
@@ -78,20 +128,71 @@ def parse_resume_bytes(
                 logger.warning("Column detection failed for %s: %s", filename, exc)
                 use_docling = False
 
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
         if use_docling:
-            from parser.docling_parser import parse_cv_docling
-
+            logger.info("========== DOCLING 1START ==========")
+            t = perf_counter()
             sections = parse_cv_docling(path_to_parse)
             parser_id = "docling"
+            logger.info(
+                "========== DOCLING 1END (%.3fs) ==========",
+                 perf_counter() - t
+            )
         else:
+            logger.info("========== CUSTOM PARSER 1START ==========")
+            t = perf_counter()
+
+
             sections = _run_parse_cv(path_to_parse)
+            logger.info(
+    "========== CUSTOM PARSER1 END (%.3fs) ==========",
+    perf_counter() - t
+)
+
             parser_id = "custom.pymupdf"
 
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
 
         structured = _normalize_sections(sections)
+        alternative_flow=_should_run_custom_parser(structured)
+
+        if alternative_flow==True:
+            if parser_id=="docling":
+                logger.info("========== CUSTOM PARSER 2START ==========")
+                t = perf_counter()
+
+                sections=_run_parse_cv(path_to_parse)
+                parser_id = "custom.pymupdf"
+                logger.info(
+    "========== CUSTOM PARSER 2END (%.3fs) ==========",
+    perf_counter() - t
+)
+
+
+                #print("custom2")
+            else:
+                logger.info("========== DOCLING 1START ==========")
+                t = perf_counter()
+                sections = parse_cv_docling(path_to_parse)
+                parser_id = "docling"
+                logger.info(
+                "========== DOCLING 1END (%.3fs) ==========",
+                 perf_counter() - t
+            )
+                
+                #print("docling2")
+
+        if not sections:
+            raise RuntimeError(f"{parser_id} returned empty sections")
+
+        structured = _normalize_sections(sections)
+        
         if os.getenv("GROQ_API_KEY"):
+            logger.info("========== GROQ START ==========")
+            t = perf_counter()
+
             try:
                 enriched = _groq_structure_edu_exp(
                     sections.get("education") or {},
@@ -108,7 +209,10 @@ def parse_resume_bytes(
             except Exception as exc:
                 warnings.append(f"groq_structure_skipped: {exc}")
                 logger.warning("Groq structure failed: %s", exc)
-
+            logger.info(
+    "========== GROQ END (%.3fs) ==========",
+        perf_counter() - t
+)
         name = str(sections.get("name") or "").strip()
         emails = _as_list(sections.get("email"))
         phones = _as_list(sections.get("phone"))
@@ -346,17 +450,93 @@ def _groq_structure_edu_exp(education: Any, experience: Any) -> dict[str, Any]:
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     prompt = f"""
 You are an expert resume parser.
-Reconstruct Education and Experience entries from imperfect nested JSON.
-Rules: do not paraphrase; empty string if unknown; return ONLY JSON with keys experience and education.
-Experience fields: company, designation, start_date, end_date, description
-Education fields: degree, institution, cgpa, graduation_date
+
+You are given ONLY the Education and Experience sections of a resume.
+
+The parser that generated these sections is imperfect.
+Some resumes may have:
+- Missing subsection boundaries (everything merged into one subsection)
+- Too many subsection boundaries
+- Incorrect subsection titles
+- Broken subsection keys
+
+Your task is to reconstruct the original Education and Experience entries.
+
+IMPORTANT RULES
+
+1. There may be ZERO, ONE, OR MANY education entries.
+2. There may be ZERO, ONE, OR MANY experience entries.
+3. Extract ALL entries. Never stop after the first one.
+4. Never omit an entry.
+5. Never merge two different jobs into one.
+6. Never merge two different education records into one.
+
+TEXT PRESERVATION
+
+- Do NOT summarize.
+- Do NOT rewrite.
+- Do NOT paraphrase.
+- Do NOT improve grammar.
+- Preserve all information from the input.
+- Every piece of information must appear exactly once in the output.
+- If a value cannot be assigned to a structured field, include it in the description.
+
+FIELD EXTRACTION
+
+For Experience:
+
+- company
+- designation
+- start_date
+- end_date
+- description
+
+For Education:
+
+- degree
+- institution
+- cgpa
+- graduation_date
+
+If a field cannot be confidently determined, leave it as an empty string.
+
+The description field should contain ALL remaining text that does not belong to the structured fields.
+
+OUTPUT FORMAT
+
+Return ONLY valid JSON.
+
+Always return BOTH keys.
+
+{{
+    "experience": [
+        {{
+            "company": "",
+            "designation": "",
+            "start_date": "",
+            "end_date": "",
+            "description": ""
+        }}
+    ],
+    "education": [
+        {{
+            "degree": "",
+            "institution": "",
+            "cgpa": "",
+            "graduation_date": ""
+        }}
+    ]
+}}
 
 Education input:
-{json.dumps(education, indent=2, ensure_ascii=False)}
+
+{json.dumps(education, indent=2)}
 
 Experience input:
-{json.dumps(experience, indent=2, ensure_ascii=False)}
+
+{json.dumps(experience, indent=2)}
 """
+    print("sent to groq")
     response = client.chat.completions.create(
         model=os.getenv("GROQ_MODEL", get_settings().groq_model or "qwen/qwen3-32b"),
         temperature=0,
@@ -366,6 +546,7 @@ Experience input:
             {"role": "user", "content": prompt},
         ],
     )
+    print(response)
     content = response.choices[0].message.content or "{}"
     content = content.strip()
     if content.startswith("```"):
