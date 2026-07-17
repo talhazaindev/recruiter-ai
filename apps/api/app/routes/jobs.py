@@ -14,7 +14,6 @@ from app.services.audit import write_audit
 
 router = APIRouter(prefix="/v1/jobs", tags=["jobs"])
 
-
 def _job_public(doc: dict, counts: dict | None = None) -> JobPublic:
     """Map a Mongo job document to the public schema."""
     counts = counts or {}
