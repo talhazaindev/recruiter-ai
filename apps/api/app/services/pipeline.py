@@ -15,12 +15,17 @@ from app.queue import QUEUE_MATCH, QUEUE_PARSE, enqueue
 from app.services.matcher_adapter import match_jd_resume
 from app.services.parser_adapter import parse_resume_bytes
 from app.services.storage import download_bytes
+from time import perf_counter
+
 
 logger = logging.getLogger(__name__)
 
 
 async def process_parse_task(payload: dict[str, Any]) -> None:
     """Parse one resume file and enqueue matching."""
+    overall_start = perf_counter()
+    logger.info("========== PROCESS PARSE TASK START [%s] ==========")
+
     db = get_db()
     settings = get_settings()
     resume_id = payload["resume_id"]
@@ -28,27 +33,40 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
     job_id = payload["job_id"]
     batch_id = payload["batch_id"]
 
+    t = perf_counter()
+
     resume_doc = await db.resumes.find_one({"_id": ObjectId(resume_id), "org_id": org_id})
+    logger.info("======Mongo resumes.find_one: %.3fs", perf_counter() - t)
     if not resume_doc:
         logger.error("Resume %s not found", resume_id)
         return
+
+    t = perf_counter()
 
     await db.resumes.update_one(
         {"_id": ObjectId(resume_id)},
         {"$set": {"parse.status": "running", "updated_at": datetime.now(timezone.utc)}},
     )
+    logger.info("======Mongo resumes.update_one (running): %.3fs", perf_counter() - t)
+    t = perf_counter()
+
     await db.ingest_batches.update_one(
         {"_id": ObjectId(batch_id)},
         {"$inc": {"counters.parsing": 1}},
     )
-
+    logger.info("======Mongo ingest_batches.update_one (+parsing): %.3fs", perf_counter() - t)
     try:
         storage_key = resume_doc["source_ref"]["storage_key"]
+        t = perf_counter()
+
         data = download_bytes(storage_key)
+        logger.info("======MinIO download: %.3fs", perf_counter() - t)
         filename = resume_doc["source_ref"].get("original_filename", "resume.pdf")
         content_type = resume_doc["source_ref"].get("content_type", "application/pdf")
-        result = parse_resume_bytes(data, filename, content_type)
+        t = perf_counter()
 
+        result = parse_resume_bytes(data, filename, content_type)
+        logger.info("======Resume Parser TOTAL: %.3fs", perf_counter() - t)
         candidate = result.candidate
         cand_doc = {
             "org_id": org_id,
@@ -63,9 +81,14 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
         # Dedupe loosely by first email within org
         existing = None
         if candidate.emails:
+            t = perf_counter()
+
             existing = await db.candidates.find_one({"org_id": org_id, "emails": candidate.emails[0]})
+            logger.info("======Mongo candidates.find_one: %.3fs", perf_counter() - t)
         if existing:
             candidate_id = existing["_id"]
+            t = perf_counter()
+
             await db.candidates.update_one(
                 {"_id": candidate_id},
                 {
@@ -78,11 +101,17 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
                     },
                 },
             )
+            logger.info("======Mongo candidates.update_one: %.3fs", perf_counter() - t)
         else:
+            t = perf_counter()
+
             ins = await db.candidates.insert_one(cand_doc)
+            logger.info("======Mongo candidates.insert_one: %.3fs", perf_counter() - t)
             candidate_id = ins.inserted_id
 
         needs_review = result.needs_review or result.confidence < settings.parse_confidence_review_threshold
+        t = perf_counter()
+
         await db.resumes.update_one(
             {"_id": ObjectId(resume_id)},
             {
@@ -102,6 +131,9 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
                 }
             },
         )
+        logger.info("======Mongo resumes.update_one (parsed): %.3fs", perf_counter() - t)
+        t = perf_counter()
+
         await db.ingest_batches.update_one(
             {"_id": ObjectId(batch_id)},
             {
@@ -114,8 +146,11 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
                 "$set": {"updated_at": datetime.now(timezone.utc)},
             },
         )
+        logger.info("======Mongo ingest_batches.update_one (parsed): %.3fs", perf_counter() - t)
 
         if result.resume and result.status != "failed":
+            t = perf_counter()
+
             enqueue(
                 QUEUE_MATCH,
                 {
@@ -127,7 +162,9 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
                     "needs_review": needs_review,
                 },
             )
+            logger.info("======Redis enqueue match: %.3fs", perf_counter() - t)
         else:
+
             await _maybe_finish_batch(batch_id)
     except Exception as exc:
         logger.exception("Parse failed for %s", resume_id)
@@ -150,6 +187,12 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
             },
         )
         await _maybe_finish_batch(batch_id)
+        
+    logger.info(
+    "========== PROCESS PARSE TASK END [%s] (%.3fs) ==========",
+    resume_id,
+    perf_counter() - overall_start,
+)
 
 
 async def process_match_task(payload: dict[str, Any]) -> None:
