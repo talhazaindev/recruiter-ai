@@ -87,7 +87,14 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
         if candidate.emails:
             t = perf_counter()
 
-            existing = await db.candidates.find_one({"org_id": org_id, "emails": candidate.emails[0]})
+            #existing = await db.candidates.find_one({"org_id": org_id, "emails": candidate.emails[0]},{})
+            existing = await db.candidates.find_one({
+                        "org_id": org_id,
+                        "$or": [
+                                {"emails": candidate.emails[0]},
+                                {"phones": candidate.phones[0]}
+                                ]
+                        })
             logger.info("======Mongo candidates.find_one: %.3fs", perf_counter() - t)
         if existing:
             candidate_id = existing["_id"]
@@ -115,28 +122,64 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
 
         needs_review = result.needs_review or result.confidence < settings.parse_confidence_review_threshold
         t = perf_counter()
-        
-        await db.resumes.update_one(
-            {"_id": ObjectId(resume_id)},
-            {
-                "$set": {
+
+        need_to_update=True
+        if existing:
+            
+            existing_resume = await db.resumes.find_one(
+                {
                     "candidate_id": str(candidate_id),
-                    "parse": {
-                        "status": result.status,
-                        "schema_version": result.schema_version,
-                        "resume": result.resume.model_dump() if result.resume else None,
-                        "confidence": result.confidence,
-                        "field_confidence": result.field_confidence,
-                        "needs_review": needs_review,
-                        "warnings": result.warnings,
-                        "provenance": result.provenance,
-                    },
-                    "updated_at": datetime.now(timezone.utc),
-                }
-            },
-        )
-        logger.info("======Mongo resumes.update_one (parsed): %.3fs", perf_counter() - t)
-        t = perf_counter()
+                     "job_id": job_id,
+                 },
+                 {"_id": 1},)
+            if existing_resume:
+                result.status=='failed'
+            
+                logger.info("cv already exist")
+                await db.resumes.delete_one(
+                    {"_id": ObjectId(resume_id)})
+            else:
+                await db.resumes.update_one(
+                {"_id": ObjectId(resume_id)},
+                {
+                    "$set": {
+                        "candidate_id": str(candidate_id),
+                        "parse": {
+                            "status": result.status,
+                            "schema_version": result.schema_version,
+                            "resume": result.resume.model_dump() if result.resume else None,
+                            "confidence": result.confidence,
+                            "field_confidence": result.field_confidence,
+                            "needs_review": needs_review,
+                            "warnings": result.warnings,
+                            "provenance": result.provenance,
+                        },
+                        "updated_at": datetime.now(timezone.utc),
+                    }
+                },
+            )
+        else:
+            await db.resumes.update_one(
+                {"_id": ObjectId(resume_id)},
+                {
+                    "$set": {
+                        "candidate_id": str(candidate_id),
+                        "parse": {
+                            "status": result.status,
+                            "schema_version": result.schema_version,
+                            "resume": result.resume.model_dump() if result.resume else None,
+                            "confidence": result.confidence,
+                            "field_confidence": result.field_confidence,
+                            "needs_review": needs_review,
+                            "warnings": result.warnings,
+                            "provenance": result.provenance,
+                        },
+                        "updated_at": datetime.now(timezone.utc),
+                    }
+                },
+            )
+            logger.info("======Mongo resumes.update_one (parsed): %.3fs", perf_counter() - t)
+            t = perf_counter()
 
         await db.ingest_batches.update_one(
             {"_id": ObjectId(batch_id)},
