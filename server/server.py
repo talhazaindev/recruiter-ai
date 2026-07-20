@@ -65,11 +65,13 @@ def parsing(filepath,converter):
     parser=""
     for page_num, page in enumerate(doc,start=1):
         columns = column_boxes(page,footer_margin=5,header_margin=50)
+        print(len(columns))
         if len(columns)<=1:
             multi_column=False
             
             break
-
+    #print(multi_column)
+    #print("xdxdxdxdxdxd")
     if multi_column==True:
         result=cv_parse_docling(filepath,converter)
         parser="docling"
@@ -98,7 +100,7 @@ def should_run_custom_parser(resume: dict) -> bool:
         "projects",
         "skills",
     ]
-
+    #print(resume)
     def has_meaningful_data(value):
         if value is None:
             return False

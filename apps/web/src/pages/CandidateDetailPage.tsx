@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { Button, Panel, ScoreMeter, Tag } from '../components/ui'
+import { numeric, resultStatus } from '../utils/resultSafety'
 
 export function CandidateDetailPage() {
   const { jobId, resultId } = useParams()
@@ -12,15 +13,15 @@ export function CandidateDetailPage() {
   const [previewError, setPreviewError] = useState('')
 
   const detail = useQuery({
-    queryKey: ['result', resultId],
-    queryFn: () => api.getResult(resultId!),
-    enabled: Boolean(resultId),
+    queryKey: ['result', jobId, resultId],
+    queryFn: () => api.getResult(jobId!, resultId!),
+    enabled: Boolean(jobId && resultId),
   })
 
   const shortlist = useMutation({
     mutationFn: (value: boolean) => api.shortlist(resultId!, value),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['result', resultId] })
+      qc.invalidateQueries({ queryKey: ['result', jobId, resultId] })
       qc.invalidateQueries({ queryKey: ['results', jobId] })
       qc.invalidateQueries({ queryKey: ['shortlist', jobId] })
     },
@@ -54,6 +55,13 @@ export function CandidateDetailPage() {
   }, [showPreview, detail.data?.resume_id])
 
   if (detail.isLoading) return <p className="text-[var(--ink-muted)]">Loading…</p>
+  if (detail.isError) {
+    return (
+      <p className="text-[var(--danger)]">
+        {detail.error instanceof Error ? detail.error.message : 'Unable to load this job result.'}
+      </p>
+    )
+  }
   if (!detail.data) return <p className="text-[var(--danger)]">Not found</p>
 
   const row = detail.data
@@ -76,6 +84,7 @@ export function CandidateDetailPage() {
 
   const filename = row.source_ref?.original_filename || 'resume.pdf'
   const isPdf = filename.toLowerCase().endsWith('.pdf')
+  const assessment = row.explanation.details
 
   return (
     <div className="space-y-6">
@@ -202,15 +211,84 @@ export function CandidateDetailPage() {
         <Panel className="p-5 space-y-4">
           <h2 className="font-semibold">Match rationale</h2>
           <ScoreMeter score={row.score} />
-          <Tag tone={row.hard_filters?.passed ? 'ok' : 'danger'}>
-            Hard filters {row.hard_filters?.passed ? 'passed' : 'failed'}
+          <Tag tone={row.hard_filters?.unknown ? 'warn' : row.hard_filters?.passed ? 'ok' : 'danger'}>
+            {resultStatus(row.hard_filters)}
           </Tag>
+          {row.rank_signals.comment ? (
+            <p className="font-medium">{row.rank_signals.comment}</p>
+          ) : null}
           <p className="text-sm text-[var(--ink-muted)]">{String(row.explanation?.summary || '')}</p>
           {Array.isArray(row.explanation?.matched_skills) ? (
             <p className="text-sm">Matched skills: {(row.explanation.matched_skills as string[]).join(', ')}</p>
           ) : null}
           {(row.hard_filters?.failed_rules || []).length > 0 ? (
             <p className="text-sm text-[var(--danger)]">{row.hard_filters.failed_rules.join('; ')}</p>
+          ) : null}
+
+          <div className="grid grid-cols-3 gap-2 border-t border-[var(--line)] pt-4">
+            <div className="rounded-lg bg-white/60 p-3">
+              <p className="text-xs text-[var(--ink-muted)]">Relevant experience</p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {numeric(row.rank_signals.relevant_work_years) != null
+                  ? `${numeric(row.rank_signals.relevant_work_years)!.toFixed(2)} years`
+                  : '—'}
+              </p>
+            </div>
+            <div className="rounded-lg bg-white/60 p-3">
+              <p className="text-xs text-[var(--ink-muted)]">Total experience</p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {numeric(row.rank_signals.total_experience_years) != null
+                  ? `${numeric(row.rank_signals.total_experience_years)!.toFixed(2)} years`
+                  : '—'}
+              </p>
+            </div>
+            <div className="rounded-lg bg-white/60 p-3">
+              <p className="text-xs text-[var(--ink-muted)]">Relevant projects + certificates</p>
+              <p className="mt-1 font-semibold tabular-nums">
+                {row.rank_signals.projects_certificates_count ?? '—'}
+              </p>
+            </div>
+          </div>
+
+          {assessment?.steps?.length ? (
+            <div className="border-t border-[var(--line)] pt-4 space-y-3">
+              <h3 className="font-semibold">Assessment details</h3>
+              {assessment.steps.map((step) => (
+                <div key={step.step} className="rounded-lg border border-[var(--line)] bg-white/50 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium">
+                      {step.step}. {step.title}
+                    </p>
+                    <Tag
+                      tone={step.status === 'failed' ? 'danger' : step.status === 'passed' ? 'ok' : 'neutral'}
+                    >
+                      {step.status}
+                    </Tag>
+                  </div>
+                  {step.message ? (
+                    <p className="mt-2 text-xs text-[var(--ink-muted)]">{step.message}</p>
+                  ) : null}
+                  {(step.summary || []).map((line, index) => (
+                    <p key={index} className="mt-1 text-xs text-[var(--ink-muted)]">{line}</p>
+                  ))}
+                  {(step.failed_requirements || []).map((failure, index) => (
+                    <p key={index} className="mt-2 text-xs text-[var(--danger)]">
+                      {failure.reason || failure.requirement}
+                    </p>
+                  ))}
+                  {step.relevant_projects?.length ? (
+                    <p className="mt-2 text-xs">
+                      Relevant projects: {step.relevant_projects.join('; ')}
+                    </p>
+                  ) : null}
+                  {step.relevant_certifications?.length ? (
+                    <p className="mt-2 text-xs">
+                      Relevant certificates: {step.relevant_certifications.join('; ')}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           ) : null}
 
           <div className="border-t border-[var(--line)] pt-4">

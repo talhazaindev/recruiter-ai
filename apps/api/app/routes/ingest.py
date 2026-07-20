@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import re
-import uuid
+import hashlib
 from datetime import datetime, timezone
 from typing import Any
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from pymongo.errors import DuplicateKeyError
 
 from app.auth import get_current_user
 from app.db import get_db
@@ -63,6 +64,12 @@ async def _create_batch(
     return str(result.inserted_id)
 
 
+import logging
+from time import perf_counter
+
+logger = logging.getLogger(__name__)
+
+
 @router.post("/v1/jobs/{job_id}/ingest/upload")
 async def ingest_upload(
     job_id: str,
@@ -70,15 +77,27 @@ async def ingest_upload(
     user: UserPublic = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Upload one or more CVs and enqueue parse/match pipeline."""
+    overall_start = perf_counter()
+
+    logger.info("========== INGEST API START ==========")
     db = get_db()
+    t = perf_counter()
+
     job = await db.jobs.find_one({"_id": ObjectId(job_id), "org_id": user.org_id})
+    logger.info("=======Mongo jobs.find_one: %.3fs", perf_counter() - t)
+    
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     if not files:
         raise HTTPException(status_code=400, detail="No files uploaded")
 
+    t = perf_counter()
+
     batch_id = await _create_batch(user.org_id, job_id, "upload", user.id)
+    logger.info("======Create batch: %.3fs", perf_counter() - t)
     resume_ids: list[str] = []
+    skipped_count = 0
+    request_hashes: set[str] = set()
     now = datetime.now(timezone.utc)
 
     for f in files:
@@ -89,9 +108,27 @@ async def ingest_upload(
         data = await f.read()
         if len(data) > MAX_FILE_BYTES:
             raise HTTPException(status_code=400, detail=f"{name} exceeds size limit")
+        source_sha256 = hashlib.sha256(data).hexdigest()
+        if source_sha256 in request_hashes:
+            skipped_count += 1
+            continue
+        request_hashes.add(source_sha256)
+        if await db.resumes.find_one(
+            {
+                "org_id": user.org_id,
+                "job_id": job_id,
+                "source_ref.source_sha256": source_sha256,
+            },
+            {"_id": 1},
+        ):
+            skipped_count += 1
+            continue
         content_type = f.content_type or "application/octet-stream"
-        key = f"{user.org_id}/{job_id}/{batch_id}/{uuid.uuid4().hex}{ext}"
+        key = f"{user.org_id}/{job_id}/sha256/{source_sha256}{ext}"
+        t = perf_counter()
+
         upload_bytes(key, data, content_type)
+        logger.info("======MinIO upload (%s): %.3fs", name, perf_counter() - t)
         resume_doc = {
             "org_id": user.org_id,
             "candidate_id": None,
@@ -102,6 +139,7 @@ async def ingest_upload(
                 "original_filename": name,
                 "content_type": content_type,
                 "storage_key": key,
+                "source_sha256": source_sha256,
             },
             "parse": {
                 "status": "queued",
@@ -116,31 +154,48 @@ async def ingest_upload(
             "created_at": now,
             "updated_at": now,
         }
-        ins = await db.resumes.insert_one(resume_doc)
+        t = perf_counter()
+
+        try:
+            ins = await db.resumes.insert_one(resume_doc)
+        except DuplicateKeyError:
+            skipped_count += 1
+            continue
+        logger.info("======Mongo resumes.insert_one: %.3fs", perf_counter() - t)
         resume_ids.append(str(ins.inserted_id))
 
-    if not resume_ids:
+    if not resume_ids and skipped_count == 0:
         raise HTTPException(status_code=400, detail="No valid PDF/DOCX files")
+    t = perf_counter()
 
     await db.ingest_batches.update_one(
         {"_id": ObjectId(batch_id)},
         {
             "$set": {
-                "status": "processing",
+                "status": "processing" if resume_ids else "completed",
                 "counters.total": len(resume_ids),
+                "meta.skipped_duplicates": skipped_count,
                 "updated_at": datetime.now(timezone.utc),
             }
         },
     )
+    logger.info("======Mongo ingest_batches.update_one: %.3fs", perf_counter() - t)
     # Activate job when ingest starts
     if job.get("status") == "draft":
+        t = perf_counter()
+
         await db.jobs.update_one(
             {"_id": ObjectId(job_id)},
             {"$set": {"status": "active", "updated_at": datetime.now(timezone.utc)}},
         )
+        logger.info("======Mongo jobs.update_one: %.3fs", perf_counter() - t)
 
     try:
-        enqueue_parse_for_batch_files(batch_id, user.org_id, job_id, resume_ids)
+        t = perf_counter()
+
+        if resume_ids:
+            enqueue_parse_for_batch_files(batch_id, user.org_id, job_id, resume_ids)
+        logger.info("======Redis enqueue: %.3fs", perf_counter() - t)
     except Exception:
         # Fallback: process inline if Redis is down (dev resilience)
         from app.services.pipeline import process_parse_task
@@ -150,6 +205,8 @@ async def ingest_upload(
                 {"resume_id": rid, "org_id": user.org_id, "job_id": job_id, "batch_id": batch_id}
             )
 
+    t = perf_counter()
+
     await write_audit(
         user.org_id,
         user.id,
@@ -158,7 +215,17 @@ async def ingest_upload(
         batch_id,
         {"file_count": len(resume_ids)},
     )
-    return {"batch_id": batch_id, "file_count": len(resume_ids), "status": "processing"}
+    logger.info("======Audit write: %.3fs", perf_counter() - t)
+    logger.info(
+    "========== INGEST API END (%.3fs) ==========",
+    perf_counter() - overall_start,
+)
+    return {
+        "batch_id": batch_id,
+        "file_count": len(resume_ids),
+        "skipped_count": skipped_count,
+        "status": "processing" if resume_ids else "completed",
+    }
 
 
 @router.post("/v1/jobs/{job_id}/ingest/drive")

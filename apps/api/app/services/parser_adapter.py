@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import os
 import re
@@ -10,6 +11,8 @@ import sys
 import tempfile
 from pathlib import Path
 from typing import Any
+from parser.docling_parser import parse_cv_docling
+from docling.document_converter import DocumentConverter
 
 from app.config import get_settings
 from app.models.schemas import (
@@ -21,6 +24,7 @@ from app.models.schemas import (
 )
 
 logger = logging.getLogger(__name__)
+ROUTE_VERSION = "layout.v2"
 
 EMAIL_RE = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 PHONE_RE = re.compile(r"(?:\+92|0)?3\d{2}[-\s]?\d{7}")
@@ -35,11 +39,97 @@ def _ensure_repo_root_on_path() -> Path:
         sys.path.insert(0, root_s)
     return root
 
+def _should_run_custom_parser(resume: dict) -> bool:
+    """
+    Returns True if the custom parser should be executed.
+
+    Conditions:
+    - A required section is missing.
+    - A required section is empty.
+    - A required section contains only empty strings / empty values.
+    """
+
+    required_sections = [
+        "education",
+        "experience",
+        #"projects",
+        "skills",
+    ]
+    #print(resume)
+    def has_meaningful_data(value):
+        if value is None:
+            return False
+
+        if isinstance(value, str):
+            return value.strip() != ""
+
+        if isinstance(value, list):
+            if len(value) == 0:
+                return False
+            return any(has_meaningful_data(item) for item in value)
+
+        if isinstance(value, dict):
+            if len(value) == 0:
+                return False
+            return any(has_meaningful_data(v) for v in value.values())
+
+        return True
+
+    for section in required_sections:
+        if section not in resume:
+            return True
+
+        if not has_meaningful_data(resume[section]):
+            return True
+
+    return False
+
+
+def _sections_quality(sections: dict[str, Any]) -> float:
+    """Score parser output for deterministic whole-result selection."""
+    normalized = _normalize_sections(sections)
+    raw = str(sections.get("raw_text") or "")
+    score = min(len(raw) / 2000, 1.0) * 0.25
+    score += 0.2 if normalized["skills"] else 0.0
+    score += 0.2 if any(e.model_dump(exclude_defaults=True) for e in normalized["experience"]) else 0.0
+    score += 0.15 if any(e.model_dump(exclude_defaults=True) for e in normalized["education"]) else 0.0
+    score += 0.1 if normalized["projects"] else 0.0
+    score += 0.1 if _valid_name(str(sections.get("name") or "")) else 0.0
+    return round(score, 3)
+
+
+def _valid_name(value: str) -> bool:
+    """Return whether a parser candidate name is safe to display."""
+    text = " ".join(value.split()).strip()
+    words = text.split()
+    blocked = {
+        "software engineer",
+        "work experience",
+        "professional summary",
+        "curriculum vitae",
+        "education",
+        "skills",
+    }
+    return (
+        2 <= len(words) <= 6
+        and len(text) <= 80
+        and text.lower() not in blocked
+        and "@" not in text
+        and "http" not in text.lower()
+        and not any(char.isdigit() for char in text)
+    )
+
+import logging
+from time import perf_counter
+
 
 def parse_resume_bytes(
     data: bytes,
     filename: str,
     content_type: str = "application/pdf",
+    min_experience: float=0,
+    converter: DocumentConverter | None = None
+    
 ) -> ParseResult:
     """Parse a resume: single-column → custom PyMuPDF; multi-column → Docling."""
     _ensure_repo_root_on_path()
@@ -51,47 +141,111 @@ def parse_resume_bytes(
     tmp_path: str | None = None
     converted_path: str | None = None
     warnings: list[str] = []
-
+    
     try:
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(data)
             tmp_path = tmp.name
 
         path_to_parse = tmp_path
+        conversion_method = "none"
         if suffix in {".docx", ".doc"}:
             converted_path = _try_docx_to_pdf(tmp_path)
             if converted_path:
                 path_to_parse = converted_path
+                conversion_method = "libreoffice"
             else:
-                warnings.append("docx_pdf_conversion_unavailable")
+                raise RuntimeError(f"{suffix} conversion unavailable; LibreOffice is required")
 
-        layout: dict[str, Any] = {"is_multicolumn": False, "max_columns": 1, "pages": []}
-        use_docling = False
+        layout: dict[str, Any] = {
+            "classification": "unknown",
+            "is_multicolumn": False,
+            "max_columns": 0,
+            "pages": [],
+            "failures": [],
+        }
         if path_to_parse.lower().endswith(".pdf"):
             try:
                 from parser.layout_detect import detect_columns
 
                 layout = detect_columns(path_to_parse)
-                use_docling = bool(layout.get("is_multicolumn"))
             except Exception as exc:
                 warnings.append(f"column_detect_failed: {exc}")
                 logger.warning("Column detection failed for %s: %s", filename, exc)
                 use_docling = False
 
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger(__name__)
         if use_docling:
+            logger.info("========== DOCLING 1START ==========")
+            t = perf_counter()
+            sections = parse_cv_docling(path_to_parse,converter)
+            parser_id = "docling"
+            logger.info(
+                "========== DOCLING 1END (%.3fs) ==========",
+                 perf_counter() - t
+            )
+        else:
+            logger.info("========== CUSTOM PARSER 1START ==========")
+            t = perf_counter()
+
+
+        classification = str(layout.get("classification") or "unknown")
+        attempts: list[dict[str, Any]] = []
+        candidates: list[tuple[str, dict[str, Any], float]] = []
+
+        if classification == "multi":
             from parser.docling_parser import parse_cv_docling
 
-            sections = parse_cv_docling(path_to_parse)
-            parser_id = "docling"
-        else:
-            sections = _run_parse_cv(path_to_parse)
-            parser_id = "custom.pymupdf"
+                #print("custom2")
+            else:
+                logger.info("========== DOCLING 1START ==========")
+                t = perf_counter()
+                sections = parse_cv_docling(path_to_parse,converter)
+                parser_id = "docling"
+                logger.info(
+                "========== DOCLING 1END (%.3fs) ==========",
+                 perf_counter() - t
+            )
+                
+                #print("docling2")
 
+            if not candidates or candidates[0][2] < 0.55:
+                started = perf_counter()
+                try:
+                    custom_sections = _run_parse_cv(path_to_parse)
+                    quality = _sections_quality(custom_sections)
+                    attempts.append(
+                        {"parser": "custom.pymupdf", "status": "ok", "quality": quality}
+                    )
+                    candidates.append(("custom.pymupdf", custom_sections, quality))
+                except Exception as exc:
+                    warnings.append(f"custom_fallback_failed: {exc}")
+                    attempts.append(
+                        {"parser": "custom.pymupdf", "status": "failed", "error": str(exc)}
+                    )
+                logger.info("Custom fallback completed in %.3fs", perf_counter() - started)
+        else:
+            if classification == "unknown":
+                warnings.append("layout_unknown_custom_only")
+            started = perf_counter()
+            custom_sections = _run_parse_cv(path_to_parse)
+            quality = _sections_quality(custom_sections)
+            attempts.append({"parser": "custom.pymupdf", "status": "ok", "quality": quality})
+            candidates.append(("custom.pymupdf", custom_sections, quality))
+            logger.info("Custom parse completed in %.3fs", perf_counter() - started)
+
+        if not candidates:
+            raise RuntimeError("All eligible parsers failed")
+        parser_id, sections, selected_quality = max(candidates, key=lambda item: item[2])
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
-
         structured = _normalize_sections(sections)
+        
         if os.getenv("GROQ_API_KEY"):
+            logger.info("========== GROQ START ==========")
+            t = perf_counter()
+
             try:
                 enriched = _groq_structure_edu_exp(
                     sections.get("education") or {},
@@ -108,8 +262,14 @@ def parse_resume_bytes(
             except Exception as exc:
                 warnings.append(f"groq_structure_skipped: {exc}")
                 logger.warning("Groq structure failed: %s", exc)
-
-        name = str(sections.get("name") or "").strip()
+            logger.info(
+    "========== GROQ END (%.3fs) ==========",
+        perf_counter() - t
+)
+        parsed_name = str(sections.get("name") or "").strip()
+        name = parsed_name if _valid_name(parsed_name) else ""
+        if not name:
+            warnings.append("candidate_name_invalid_or_missing")
         emails = _as_list(sections.get("email"))
         phones = _as_list(sections.get("phone"))
         raw = str(sections.get("raw_text") or "")
@@ -119,9 +279,28 @@ def parse_resume_bytes(
             phones = PHONE_RE.findall(raw)[:3]
         links = URL_RE.findall(raw)[:8]
 
-        confidence = _score_confidence(structured, name=name, emails=emails)
+        confidence = _score_confidence(structured, name=name, emails=emails,min_experience=min_experience)
         needs_review = confidence < get_settings().parse_confidence_review_threshold
         status = "ok" if confidence >= 0.7 else "partial"
+        source_sha256 = hashlib.sha256(data).hexdigest()
+        parse_hash = hashlib.sha256(
+            json.dumps(
+                {
+                    "resume": {
+                        key: [
+                            item.model_dump() if hasattr(item, "model_dump") else item
+                            for item in value
+                        ]
+                        if isinstance(value, list)
+                        else value
+                        for key, value in structured.items()
+                    },
+                    "candidate": {"name": name, "emails": emails, "phones": phones},
+                },
+                sort_keys=True,
+                ensure_ascii=False,
+            ).encode("utf-8")
+        ).hexdigest()
 
         return ParseResult(
             schema_version="matching.v1",
@@ -143,9 +322,20 @@ def parse_resume_bytes(
             needs_review=needs_review,
             provenance={
                 "parser": parser_id,
+                "selected_parser": parser_id,
+                "selection_reason": f"highest_quality:{selected_quality}",
+                "attempts": attempts,
+                "route_version": ROUTE_VERSION,
+                "layout_classification": classification,
                 "filename": filename,
                 "columns": layout.get("max_columns", 1),
                 "is_multicolumn": layout.get("is_multicolumn", False),
+                "layout_pages": layout.get("pages", []),
+                "layout_failures": layout.get("failures", []),
+                "conversion_method": conversion_method,
+                "source_sha256": source_sha256,
+                "parse_attempt_id": source_sha256[:16] + "-" + parse_hash[:16],
+                "parse_hash": parse_hash,
             },
         )
     except Exception as exc:
@@ -346,17 +536,93 @@ def _groq_structure_edu_exp(education: Any, experience: Any) -> dict[str, Any]:
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     prompt = f"""
 You are an expert resume parser.
-Reconstruct Education and Experience entries from imperfect nested JSON.
-Rules: do not paraphrase; empty string if unknown; return ONLY JSON with keys experience and education.
-Experience fields: company, designation, start_date, end_date, description
-Education fields: degree, institution, cgpa, graduation_date
+
+You are given ONLY the Education and Experience sections of a resume.
+
+The parser that generated these sections is imperfect.
+Some resumes may have:
+- Missing subsection boundaries (everything merged into one subsection)
+- Too many subsection boundaries
+- Incorrect subsection titles
+- Broken subsection keys
+
+Your task is to reconstruct the original Education and Experience entries.
+
+IMPORTANT RULES
+
+1. There may be ZERO, ONE, OR MANY education entries.
+2. There may be ZERO, ONE, OR MANY experience entries.
+3. Extract ALL entries. Never stop after the first one.
+4. Never omit an entry.
+5. Never merge two different jobs into one.
+6. Never merge two different education records into one.
+
+TEXT PRESERVATION
+
+- Do NOT summarize.
+- Do NOT rewrite.
+- Do NOT paraphrase.
+- Do NOT improve grammar.
+- Preserve all information from the input.
+- Every piece of information must appear exactly once in the output.
+- If a value cannot be assigned to a structured field, include it in the description.
+
+FIELD EXTRACTION
+
+For Experience:
+
+- company
+- designation
+- start_date
+- end_date
+- description
+
+For Education:
+
+- degree
+- institution
+- cgpa
+- graduation_date
+
+If a field cannot be confidently determined, leave it as an empty string.
+
+The description field should contain ALL remaining text that does not belong to the structured fields.
+
+OUTPUT FORMAT
+
+Return ONLY valid JSON.
+
+Always return BOTH keys.
+
+{{
+    "experience": [
+        {{
+            "company": "",
+            "designation": "",
+            "start_date": "",
+            "end_date": "",
+            "description": ""
+        }}
+    ],
+    "education": [
+        {{
+            "degree": "",
+            "institution": "",
+            "cgpa": "",
+            "graduation_date": ""
+        }}
+    ]
+}}
 
 Education input:
-{json.dumps(education, indent=2, ensure_ascii=False)}
+
+{json.dumps(education, indent=2)}
 
 Experience input:
-{json.dumps(experience, indent=2, ensure_ascii=False)}
+
+{json.dumps(experience, indent=2)}
 """
+    print("sent to groq")
     response = client.chat.completions.create(
         model=os.getenv("GROQ_MODEL", get_settings().groq_model or "qwen/qwen3-32b"),
         temperature=0,
@@ -366,6 +632,7 @@ Experience input:
             {"role": "user", "content": prompt},
         ],
     )
+    print(response)
     content = response.choices[0].message.content or "{}"
     content = content.strip()
     if content.startswith("```"):
@@ -374,23 +641,142 @@ Experience input:
     return json.loads(content)
 
 
-def _score_confidence(structured: dict[str, Any], *, name: str, emails: list[str]) -> float:
-    """Heuristic confidence from populated matching fields."""
-    score = 0.35
-    if name:
-        score += 0.15
-    if emails:
-        score += 0.1
-    if structured.get("skills"):
-        score += 0.15
-    if structured.get("experience"):
-        score += 0.15
-    if structured.get("education"):
-        score += 0.1
-    if structured.get("raw_resume_text"):
-        score += 0.05
-    return round(min(score, 0.98), 2)
 
+EXPECTED_EXPERIENCE_FIELDS = [
+    "company",
+    "designation",
+    "start_date",
+    "end_date",
+    "description",
+]
+
+EXPECTED_EDUCATION_FIELDS = [
+    "degree",
+    "institution",
+    "cgpa",
+    "graduation_date",
+]
+
+
+def _extract_words(data, include_keys=True):
+    words = []
+
+    if data is None:
+        return words
+
+    if isinstance(data, str):
+        words.extend(re.findall(r"\b\w+\b", data))
+
+    elif isinstance(data, list):
+        for item in data:
+            words.extend(_extract_words(item, include_keys))
+
+    elif isinstance(data, dict):
+        for key, value in data.items():
+            if include_keys:
+                words.extend(re.findall(r"\b\w+\b", str(key)))
+            words.extend(_extract_words(value, include_keys))
+
+    return words
+
+
+def _score_confidence(
+    structured: dict[str, Any],
+    *,
+    name: str,
+    emails: list[str],
+    min_experience: float,
+) -> float:
+    """
+    Confidence that the parser extracted the resume correctly.
+    Returns a value between 0.0 and 1.0.
+    """
+
+    # ---------------- Required Sections ---------------- #
+
+    required_sections = ["skills", "education"]
+
+    if min_experience > 0:
+        required_sections.append("experience")
+
+    section_score = 0.0
+
+    for section in required_sections:
+        if structured.get(section):
+            section_score += 1
+
+    section_score /= len(required_sections)
+
+    # ---------------- Completeness ---------------- #
+
+    total_fields = 0
+    filled_fields = 0
+
+    if structured.get("education"):
+
+        for edu in structured["education"]:
+            for field in EXPECTED_EDUCATION_FIELDS:
+                total_fields += 1
+                value = getattr(edu, field, "")
+                if str(value).strip():
+                    filled_fields += 1
+                
+    if min_experience > 0 and structured.get("experience"):
+
+        for exp in structured["experience"]:
+            for field in EXPECTED_EXPERIENCE_FIELDS:
+                total_fields += 1
+                value = getattr(exp, field, "")
+                if str(value).strip():
+                    filled_fields += 1
+                
+    completeness_score = (
+        filled_fields / total_fields if total_fields else 1.0
+    )
+
+    # ---------------- Raw Text Coverage ---------------- #
+
+    raw_text = structured.get("raw_resume_text", "")
+
+    raw_words = len(re.findall(r"\b\w+\b", raw_text))
+
+    structured_words = []
+
+    structured_words.extend(
+        _extract_words(structured.get("skills", []), include_keys=True)
+    )
+
+    structured_words.extend(
+        _extract_words(structured.get("education", []), include_keys=False)
+    )
+
+    structured_words.extend(
+        _extract_words(structured.get("experience", []), include_keys=False)
+    )
+
+    coverage = (
+        min(len(structured_words) / raw_words, 1.0)
+        if raw_words
+        else 0.0
+    )
+
+    # ---------------- Final Confidence ---------------- #
+
+    confidence = (
+        0.40 * section_score
+        + 0.40 * completeness_score
+        + 0.20 * coverage
+    )
+
+    # Small parser bonuses
+
+    if name:
+        confidence += 0.02
+
+    if emails:
+        confidence += 0.02
+
+    return round(min(confidence, 0.99), 2)
 
 def _as_list(value: Any) -> list[str]:
     """Normalize scalar/list contact fields to list[str]."""

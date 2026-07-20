@@ -61,17 +61,40 @@ async def ensure_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.resumes.create_index([("org_id", 1), ("batch_id", 1)])
     await db.resumes.create_index([("org_id", 1), ("job_id", 1)])
     await db.resumes.create_index([("org_id", 1), ("parse.needs_review", 1)])
+    await db.resumes.create_index(
+        [("org_id", 1), ("job_id", 1), ("source_ref.source_sha256", 1)],
+        unique=True,
+        partialFilterExpression={"source_ref.source_sha256": {"$type": "string"}},
+        name="unique_job_resume_sha256",
+    )
+    await db.resumes.create_index(
+        [("org_id", 1), ("job_id", 1), ("source_ref.drive_file_id", 1)],
+        unique=True,
+        partialFilterExpression={"source_ref.drive_file_id": {"$type": "string"}},
+        name="unique_job_drive_file",
+    )
 
     await db.match_results.create_index([("org_id", 1), ("job_id", 1), ("score", -1)])
     await db.match_results.create_index([("org_id", 1), ("job_id", 1), ("shortlisted", 1)])
     await db.match_results.create_index([("org_id", 1), ("job_id", 1), ("review_status", 1)])
+    legacy_match_index = "org_id_1_job_id_1_resume_id_1"
+    if legacy_match_index in await db.match_results.index_information():
+        await db.match_results.drop_index(legacy_match_index)
     await db.match_results.create_index(
-        [("org_id", 1), ("job_id", 1), ("resume_id", 1)],
+        [("org_id", 1), ("job_id", 1), ("candidate_id", 1)],
         unique=True,
+        partialFilterExpression={"is_current": True},
+        name="unique_current_job_candidate",
     )
 
     await db.candidates.create_index([("org_id", 1), ("emails", 1)])
     await db.candidates.create_index([("org_id", 1), ("phones", 1)])
+    await db.candidates.create_index(
+        [("org_id", 1), ("primary_email_normalized", 1)],
+        unique=True,
+        partialFilterExpression={"primary_email_normalized": {"$type": "string"}},
+        name="unique_org_primary_email",
+    )
 
     await db.ingest_batches.create_index([("org_id", 1), ("job_id", 1), ("created_at", -1)])
     await db.screening_calls.create_index([("org_id", 1), ("candidate_id", 1), ("created_at", -1)])

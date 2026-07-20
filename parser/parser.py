@@ -1136,22 +1136,62 @@ def merge_empty_keys(data):
 
     return new_data
 
-def extract_name(spans,max_size):
+INVALID_NAME_TERMS = {
+    "about me",
+    "contact",
+    "curriculum vitae",
+    "education",
+    "experience",
+    "professional summary",
+    "profile",
+    "resume",
+    "skills",
+    "software engineer",
+    "work experience",
+}
 
-    name_parts = []
 
-    for span in spans:
-        text = span["text"].strip()
+def _is_person_name(value):
+    """Return whether text is a plausible person name."""
+    text = " ".join(str(value or "").split()).strip(" |,-")
+    lowered = text.lower()
+    words = text.split()
+    if lowered in INVALID_NAME_TERMS or not 2 <= len(words) <= 6:
+        return False
+    if len(text) > 80 or "@" in text or "http" in lowered:
+        return False
+    if any(char.isdigit() for char in text):
+        return False
+    alpha_words = [re.sub(r"[^A-Za-zÀ-ÖØ-öø-ÿ'’-]", "", word) for word in words]
+    return all(len(word) >= 2 for word in alpha_words)
 
-        if span["size"] == max_size:
-            name_parts.append(text)
 
-
-       
-    if not name_parts:
+def extract_name(spans, max_size):
+    """Extract a plausible name from the top of the first page only."""
+    first_page = [span for span in spans if span.get("page", 1) == 1]
+    if not first_page:
         return None
-
-    return " ".join(name_parts)
+    top_spans = sorted(
+        first_page,
+        key=lambda span: (
+            float((span.get("bbox") or [0, 0, 0, 0])[1]),
+            float((span.get("bbox") or [0, 0, 0, 0])[0]),
+        ),
+    )[:20]
+    font_sizes = sorted({float(span.get("size", 0)) for span in top_spans}, reverse=True)
+    for size in font_sizes[:3]:
+        same_line = [
+            str(span.get("text") or "").strip()
+            for span in top_spans
+            if abs(float(span.get("size", 0)) - size) < 0.1
+        ]
+        candidate = " ".join(part for part in same_line if part)
+        if _is_person_name(candidate):
+            return candidate
+        for part in same_line:
+            if _is_person_name(part):
+                return part
+    return None
 
 def extract_basic_info(raw_text):
     

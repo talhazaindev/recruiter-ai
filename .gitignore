@@ -10,6 +10,7 @@ cvs
 result
 result2
 result3
+result5
 temp
 node_modules
 apps/web/dist
@@ -23,3 +24,4 @@ temp.json
 parsed_sections.json
 parsed_sections2.json
 pdf_extracted_data.txt
+uploads

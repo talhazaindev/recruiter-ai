@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
+import hashlib
+import json
 from datetime import datetime, timezone
 
 from bson import ObjectId
@@ -10,9 +13,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.auth import get_current_user
 from app.db import get_db
 from app.models.schemas import JobCreate, JobPublic, JobUpdate, UserPublic
+from app.queue import QUEUE_MATCH, enqueue
 from app.services.audit import write_audit
 
 router = APIRouter(prefix="/v1/jobs", tags=["jobs"])
+
+
+def _jd_hash(jd: dict) -> str:
+    """Return a stable hash for a canonical JD payload."""
+    return hashlib.sha256(
+        json.dumps(jd, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
 
 def _job_public(doc: dict, counts: dict | None = None) -> JobPublic:
     """Map a Mongo job document to the public schema."""
@@ -35,12 +46,17 @@ def _job_public(doc: dict, counts: dict | None = None) -> JobPublic:
 async def _counts_for_job(org_id: str, job_id: str) -> dict:
     """Aggregate dashboard counts for a job."""
     db = get_db()
-    candidate_count = await db.match_results.count_documents({"org_id": org_id, "job_id": job_id})
-    needs_review_count = await db.match_results.count_documents(
-        {"org_id": org_id, "job_id": job_id, "review_status": "needs_review"}
+    base = {"org_id": org_id, "job_id": job_id}
+    candidate_count = len(await db.match_results.distinct("candidate_id", base))
+    needs_review_count = len(
+        await db.match_results.distinct(
+            "candidate_id", {**base, "review_status": "needs_review"}
+        )
     )
-    shortlisted_count = await db.match_results.count_documents(
-        {"org_id": org_id, "job_id": job_id, "shortlisted": True}
+    shortlisted_count = len(
+        await db.match_results.distinct(
+            "candidate_id", {**base, "shortlisted": True}
+        )
     )
     return {
         "candidate_count": candidate_count,
@@ -71,6 +87,8 @@ async def create_job(body: JobCreate, user: UserPublic = Depends(get_current_use
         "status": body.status,
         "jd": body.jd.model_dump(),
         "jd_schema_version": "jd.v1",
+        "jd_revision": 1,
+        "jd_hash": _jd_hash(body.jd.model_dump()),
         "created_by": user.id,
         "created_at": now,
         "updated_at": now,
@@ -105,11 +123,50 @@ async def update_job(
         raise HTTPException(status_code=404, detail="Job not found")
     updates: dict = {"updated_at": datetime.now(timezone.utc)}
     if body.jd is not None:
-        updates["jd"] = body.jd.model_dump()
+        new_jd = body.jd.model_dump()
+        if new_jd != doc.get("jd"):
+            updates["jd"] = new_jd
+            updates["jd_revision"] = int(doc.get("jd_revision") or 1) + 1
+            updates["jd_hash"] = _jd_hash(new_jd)
     if body.status is not None:
         updates["status"] = body.status
     await db.jobs.update_one({"_id": ObjectId(job_id)}, {"$set": updates})
     doc.update(updates)
     await write_audit(user.org_id, user.id, "job.update", "job", job_id)
+    if "jd_revision" in updates:
+        await db.match_results.update_many(
+            {"org_id": user.org_id, "job_id": job_id},
+            {"$set": {"stale": True, "updated_at": datetime.now(timezone.utc)}},
+        )
+        latest_resumes = db.resumes.aggregate(
+            [
+                {
+                    "$match": {
+                        "org_id": user.org_id,
+                        "job_id": job_id,
+                        "candidate_id": {"$type": "string"},
+                        "parse.resume": {"$ne": None},
+                        "parse.status": {"$ne": "failed"},
+                    }
+                },
+                {"$sort": {"updated_at": -1}},
+                {"$group": {"_id": "$candidate_id", "resume": {"$first": "$$ROOT"}}},
+            ]
+        )
+        async for item in latest_resumes:
+            resume = item["resume"]
+            await asyncio.to_thread(
+                enqueue,
+                QUEUE_MATCH,
+                {
+                    "resume_id": str(resume["_id"]),
+                    "candidate_id": resume["candidate_id"],
+                    "job_id": job_id,
+                    "batch_id": resume["batch_id"],
+                    "org_id": user.org_id,
+                    "needs_review": resume.get("parse", {}).get("needs_review", False),
+                    "rematch": True,
+                },
+            )
     counts = await _counts_for_job(user.org_id, job_id)
     return _job_public(doc, counts)
