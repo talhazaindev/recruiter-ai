@@ -20,6 +20,7 @@ from app.services.matcher_adapter import match_jd_resume
 from app.services.parser_adapter import parse_resume_bytes
 from app.services.storage import download_bytes
 from time import perf_counter
+from docling.document_converter import DocumentConverter
 
 
 logger = logging.getLogger(__name__)
@@ -151,7 +152,10 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
     if not resume_doc:
         logger.error("Resume %s not found", resume_id)
         return
-
+    temp_job=await db.jobs.find_one({"_id": ObjectId(job_id)},
+        {"minimum_relevant_years": 1}
+)
+    min_experience=temp_job.get("minimum_relevant_years", 0) or 0
     t = perf_counter()
 
     await db.resumes.update_one(
@@ -177,44 +181,120 @@ async def process_parse_task(payload: dict[str, Any]) -> None:
         content_type = resume_doc["source_ref"].get("content_type", "application/pdf")
         t = perf_counter()
 
-        result = parse_resume_bytes(data, filename, content_type)
+        result = parse_resume_bytes(data, filename, content_type,min_experience,converter)
         logger.info("======Resume Parser TOTAL: %.3fs", perf_counter() - t)
         candidate = result.candidate
-        t = perf_counter()
-        candidate_id, identity_snapshot = await _resolve_candidate(
-            org_id,
-            job_id,
-            candidate,
-            result.confidence,
-            result.warnings,
-        )
-        logger.info("======Mongo candidate resolution: %.3fs", perf_counter() - t)
+        cand_doc = {
+            "org_id": org_id,
+            "name": candidate.name,
+            "emails": candidate.emails,
+            "phones": candidate.phones,
+            "links": candidate.links,
+            "job_ids": [job_id],
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+        }
+        # Dedupe loosely by first email within org
+        existing = None
+        if candidate.emails or candidate.phones:
+            t = perf_counter()
+
+            or_conditions = []
+            if candidate.emails:
+                or_conditions.append({"emails": candidate.emails[0]})
+            if candidate.phones:
+                or_conditions.append({"phones": candidate.phones[0]})
+            
+            #existing = await db.candidates.find_one({"org_id": org_id, "emails": candidate.emails[0]},{})
+            existing = await db.candidates.find_one({
+                        "org_id": org_id,
+                        "$or": or_conditions
+                        })
+            logger.info("======Mongo candidates.find_one: %.3fs", perf_counter() - t)
+        if existing:
+            candidate_id = existing["_id"]
+            t = perf_counter()
+
+            await db.candidates.update_one(
+                {"_id": candidate_id},
+                {
+                    "$addToSet": {"job_ids": job_id},
+                    "$set": {
+                        "name": candidate.name or existing.get("name", ""),
+                        "phones": candidate.phones or existing.get("phones", []),
+                        "links": candidate.links or existing.get("links", []),
+                        "updated_at": datetime.now(timezone.utc),
+                    },
+                },
+            )
+            logger.info("======Mongo candidates.update_one: %.3fs", perf_counter() - t)
+        else:
+            t = perf_counter()
+
+            ins = await db.candidates.insert_one(cand_doc)
+            logger.info("======Mongo candidates.insert_one: %.3fs", perf_counter() - t)
+            candidate_id = ins.inserted_id
 
         needs_review = result.needs_review or result.confidence < settings.parse_confidence_review_threshold
         t = perf_counter()
 
-        await db.resumes.update_one(
-            {"_id": ObjectId(resume_id)},
-            {
-                "$set": {
+        need_to_update=True
+        if existing:
+            
+            existing_resume = await db.resumes.find_one(
+                {
                     "candidate_id": str(candidate_id),
-                    "parse": {
-                        "status": result.status,
-                        "schema_version": result.schema_version,
-                        "resume": result.resume.model_dump() if result.resume else None,
-                        "confidence": result.confidence,
-                        "field_confidence": result.field_confidence,
-                        "needs_review": needs_review,
-                        "warnings": result.warnings,
-                        "provenance": result.provenance,
-                        "identity": identity_snapshot,
-                    },
-                    "updated_at": datetime.now(timezone.utc),
-                }
-            },
-        )
-        logger.info("======Mongo resumes.update_one (parsed): %.3fs", perf_counter() - t)
-        t = perf_counter()
+                     "job_id": job_id,
+                 },
+                 {"_id": 1},)
+            if existing_resume:
+                result.status='failed'
+            
+                logger.info("cv already exist")
+                await db.resumes.delete_one(
+                    {"_id": ObjectId(resume_id)})
+            else:
+                await db.resumes.update_one(
+                {"_id": ObjectId(resume_id)},
+                {
+                    "$set": {
+                        "candidate_id": str(candidate_id),
+                        "parse": {
+                            "status": result.status,
+                            "schema_version": result.schema_version,
+                            "resume": result.resume.model_dump() if result.resume else None,
+                            "confidence": result.confidence,
+                            "field_confidence": result.field_confidence,
+                            "needs_review": needs_review,
+                            "warnings": result.warnings,
+                            "provenance": result.provenance,
+                        },
+                        "updated_at": datetime.now(timezone.utc),
+                    }
+                },
+            )
+        else:
+            await db.resumes.update_one(
+                {"_id": ObjectId(resume_id)},
+                {
+                    "$set": {
+                        "candidate_id": str(candidate_id),
+                        "parse": {
+                            "status": result.status,
+                            "schema_version": result.schema_version,
+                            "resume": result.resume.model_dump() if result.resume else None,
+                            "confidence": result.confidence,
+                            "field_confidence": result.field_confidence,
+                            "needs_review": needs_review,
+                            "warnings": result.warnings,
+                            "provenance": result.provenance,
+                        },
+                        "updated_at": datetime.now(timezone.utc),
+                    }
+                },
+            )
+            logger.info("======Mongo resumes.update_one (parsed): %.3fs", perf_counter() - t)
+            t = perf_counter()
 
         if not reparse:
             await db.ingest_batches.update_one(

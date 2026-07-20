@@ -27,12 +27,17 @@ from app.routes.drive import ingest_drive_folder  # noqa: E402
 from app.services.pipeline import process_match_task, process_parse_task  # noqa: E402
 from app.services.storage import ensure_bucket  # noqa: E402
 
+from docling.document_converter import DocumentConverter
+
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("workers")
 
 
 async def run_parse_loop() -> None:
     """Continuously process parse queue."""
+    converter = DocumentConverter()
+
     await connect_db()
     try:
         ensure_bucket()
@@ -47,9 +52,8 @@ async def run_parse_loop() -> None:
         if not payload:
             continue
         try:
-            await process_parse_task(payload)
-            await asyncio.to_thread(acknowledge, payload)
-        except Exception as exc:
+            await process_parse_task(payload,converter)
+        except Exception:
             logger.exception("parse task failed")
             await asyncio.to_thread(retry_or_dead_letter, payload, str(exc))
 
