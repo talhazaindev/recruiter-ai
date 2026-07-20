@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import os
 import re
@@ -23,6 +24,7 @@ from app.models.schemas import (
 )
 
 logger = logging.getLogger(__name__)
+ROUTE_VERSION = "layout.v2"
 
 EMAIL_RE = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 PHONE_RE = re.compile(r"(?:\+92|0)?3\d{2}[-\s]?\d{7}")
@@ -82,6 +84,41 @@ def _should_run_custom_parser(resume: dict) -> bool:
 
     return False
 
+
+def _sections_quality(sections: dict[str, Any]) -> float:
+    """Score parser output for deterministic whole-result selection."""
+    normalized = _normalize_sections(sections)
+    raw = str(sections.get("raw_text") or "")
+    score = min(len(raw) / 2000, 1.0) * 0.25
+    score += 0.2 if normalized["skills"] else 0.0
+    score += 0.2 if any(e.model_dump(exclude_defaults=True) for e in normalized["experience"]) else 0.0
+    score += 0.15 if any(e.model_dump(exclude_defaults=True) for e in normalized["education"]) else 0.0
+    score += 0.1 if normalized["projects"] else 0.0
+    score += 0.1 if _valid_name(str(sections.get("name") or "")) else 0.0
+    return round(score, 3)
+
+
+def _valid_name(value: str) -> bool:
+    """Return whether a parser candidate name is safe to display."""
+    text = " ".join(value.split()).strip()
+    words = text.split()
+    blocked = {
+        "software engineer",
+        "work experience",
+        "professional summary",
+        "curriculum vitae",
+        "education",
+        "skills",
+    }
+    return (
+        2 <= len(words) <= 6
+        and len(text) <= 80
+        and text.lower() not in blocked
+        and "@" not in text
+        and "http" not in text.lower()
+        and not any(char.isdigit() for char in text)
+    )
+
 import logging
 from time import perf_counter
 
@@ -111,21 +148,27 @@ def parse_resume_bytes(
             tmp_path = tmp.name
 
         path_to_parse = tmp_path
+        conversion_method = "none"
         if suffix in {".docx", ".doc"}:
             converted_path = _try_docx_to_pdf(tmp_path)
             if converted_path:
                 path_to_parse = converted_path
+                conversion_method = "libreoffice"
             else:
-                warnings.append("docx_pdf_conversion_unavailable")
+                raise RuntimeError(f"{suffix} conversion unavailable; LibreOffice is required")
 
-        layout: dict[str, Any] = {"is_multicolumn": False, "max_columns": 1, "pages": []}
-        use_docling = False
+        layout: dict[str, Any] = {
+            "classification": "unknown",
+            "is_multicolumn": False,
+            "max_columns": 0,
+            "pages": [],
+            "failures": [],
+        }
         if path_to_parse.lower().endswith(".pdf"):
             try:
                 from parser.layout_detect import detect_columns
 
                 layout = detect_columns(path_to_parse)
-                use_docling = bool(layout.get("is_multicolumn"))
             except Exception as exc:
                 warnings.append(f"column_detect_failed: {exc}")
                 logger.warning("Column detection failed for %s: %s", filename, exc)
@@ -147,32 +190,12 @@ def parse_resume_bytes(
             t = perf_counter()
 
 
-            sections = _run_parse_cv(path_to_parse)
-            logger.info(
-    "========== CUSTOM PARSER1 END (%.3fs) ==========",
-    perf_counter() - t
-)
+        classification = str(layout.get("classification") or "unknown")
+        attempts: list[dict[str, Any]] = []
+        candidates: list[tuple[str, dict[str, Any], float]] = []
 
-            parser_id = "custom.pymupdf"
-
-        if not sections:
-            raise RuntimeError(f"{parser_id} returned empty sections")
-
-        structured = _normalize_sections(sections)
-        alternative_flow=_should_run_custom_parser(structured)
-
-        if alternative_flow==True:
-            if parser_id=="docling":
-                logger.info("========== CUSTOM PARSER 2START ==========")
-                t = perf_counter()
-
-                sections=_run_parse_cv(path_to_parse)
-                parser_id = "custom.pymupdf"
-                logger.info(
-    "========== CUSTOM PARSER 2END (%.3fs) ==========",
-    perf_counter() - t
-)
-
+        if classification == "multi":
+            from parser.docling_parser import parse_cv_docling
 
                 #print("custom2")
             else:
@@ -187,9 +210,36 @@ def parse_resume_bytes(
                 
                 #print("docling2")
 
+            if not candidates or candidates[0][2] < 0.55:
+                started = perf_counter()
+                try:
+                    custom_sections = _run_parse_cv(path_to_parse)
+                    quality = _sections_quality(custom_sections)
+                    attempts.append(
+                        {"parser": "custom.pymupdf", "status": "ok", "quality": quality}
+                    )
+                    candidates.append(("custom.pymupdf", custom_sections, quality))
+                except Exception as exc:
+                    warnings.append(f"custom_fallback_failed: {exc}")
+                    attempts.append(
+                        {"parser": "custom.pymupdf", "status": "failed", "error": str(exc)}
+                    )
+                logger.info("Custom fallback completed in %.3fs", perf_counter() - started)
+        else:
+            if classification == "unknown":
+                warnings.append("layout_unknown_custom_only")
+            started = perf_counter()
+            custom_sections = _run_parse_cv(path_to_parse)
+            quality = _sections_quality(custom_sections)
+            attempts.append({"parser": "custom.pymupdf", "status": "ok", "quality": quality})
+            candidates.append(("custom.pymupdf", custom_sections, quality))
+            logger.info("Custom parse completed in %.3fs", perf_counter() - started)
+
+        if not candidates:
+            raise RuntimeError("All eligible parsers failed")
+        parser_id, sections, selected_quality = max(candidates, key=lambda item: item[2])
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
-
         structured = _normalize_sections(sections)
         
         if os.getenv("GROQ_API_KEY"):
@@ -216,7 +266,10 @@ def parse_resume_bytes(
     "========== GROQ END (%.3fs) ==========",
         perf_counter() - t
 )
-        name = str(sections.get("name") or "").strip()
+        parsed_name = str(sections.get("name") or "").strip()
+        name = parsed_name if _valid_name(parsed_name) else ""
+        if not name:
+            warnings.append("candidate_name_invalid_or_missing")
         emails = _as_list(sections.get("email"))
         phones = _as_list(sections.get("phone"))
         raw = str(sections.get("raw_text") or "")
@@ -229,6 +282,25 @@ def parse_resume_bytes(
         confidence = _score_confidence(structured, name=name, emails=emails,min_experience=min_experience)
         needs_review = confidence < get_settings().parse_confidence_review_threshold
         status = "ok" if confidence >= 0.7 else "partial"
+        source_sha256 = hashlib.sha256(data).hexdigest()
+        parse_hash = hashlib.sha256(
+            json.dumps(
+                {
+                    "resume": {
+                        key: [
+                            item.model_dump() if hasattr(item, "model_dump") else item
+                            for item in value
+                        ]
+                        if isinstance(value, list)
+                        else value
+                        for key, value in structured.items()
+                    },
+                    "candidate": {"name": name, "emails": emails, "phones": phones},
+                },
+                sort_keys=True,
+                ensure_ascii=False,
+            ).encode("utf-8")
+        ).hexdigest()
 
         return ParseResult(
             schema_version="matching.v1",
@@ -250,9 +322,20 @@ def parse_resume_bytes(
             needs_review=needs_review,
             provenance={
                 "parser": parser_id,
+                "selected_parser": parser_id,
+                "selection_reason": f"highest_quality:{selected_quality}",
+                "attempts": attempts,
+                "route_version": ROUTE_VERSION,
+                "layout_classification": classification,
                 "filename": filename,
                 "columns": layout.get("max_columns", 1),
                 "is_multicolumn": layout.get("is_multicolumn", False),
+                "layout_pages": layout.get("pages", []),
+                "layout_failures": layout.get("failures", []),
+                "conversion_method": conversion_method,
+                "source_sha256": source_sha256,
+                "parse_attempt_id": source_sha256[:16] + "-" + parse_hash[:16],
+                "parse_hash": parse_hash,
             },
         )
     except Exception as exc:

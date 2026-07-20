@@ -24,6 +24,10 @@ export function ReviewPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [queue.data?.length])
 
+  useEffect(() => {
+    setIndex((current) => Math.max(0, Math.min(current, (queue.data?.length || 1) - 1)))
+  }, [queue.data?.length])
+
   const review = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => api.updateReview(id, status),
     onSuccess: () => {

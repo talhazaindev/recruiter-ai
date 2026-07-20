@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate, useParams, useLocation } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import { StepRail, Tag } from './ui'
 
@@ -14,6 +14,7 @@ const PIPELINE = [
 
 export function AppShell() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const location = useLocation()
   const { jobId } = useParams()
   const me = useQuery({ queryKey: ['me'], queryFn: api.me })
@@ -25,6 +26,7 @@ export function AppShell() {
 
   function logout() {
     localStorage.removeItem('access_token')
+    queryClient.clear()
     navigate('/login')
   }
 

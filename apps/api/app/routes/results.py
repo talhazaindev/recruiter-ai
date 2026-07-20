@@ -36,8 +36,14 @@ async def _hydrate_row(db, org_id: str, mr: dict, reveal_contact: bool) -> dict[
     """Join match_result with candidate + resume summary fields."""
     cand = await db.candidates.find_one({"_id": ObjectId(mr["candidate_id"]), "org_id": org_id})
     resume = await db.resumes.find_one({"_id": ObjectId(mr["resume_id"]), "org_id": org_id})
-    emails = (cand or {}).get("emails", [])
-    phones = (cand or {}).get("phones", [])
+    snapshot = (
+        mr.get("identity_snapshot")
+        or (resume or {}).get("parse", {}).get("identity")
+        or cand
+        or {}
+    )
+    emails = snapshot.get("emails", [])
+    phones = snapshot.get("phones", [])
     shortlisted = bool(mr.get("shortlisted"))
     show = reveal_contact or shortlisted
     return {
@@ -53,11 +59,14 @@ async def _hydrate_row(db, org_id: str, mr: dict, reveal_contact: bool) -> dict[
         "shortlisted": shortlisted,
         "review_status": mr.get("review_status", "none"),
         "matcher_version": mr.get("matcher_version"),
+        "jd_revision": mr.get("jd_revision"),
+        "parse_attempt_id": mr.get("parse_attempt_id"),
+        "stale": bool(mr.get("stale")),
         "candidate": {
-            "name": (cand or {}).get("name", ""),
+            "name": snapshot.get("name", ""),
             "emails": emails if show else [_mask_email(e) for e in emails],
             "phones": phones if show else [_mask_phone(p) for p in phones],
-            "links": (cand or {}).get("links", []) if show else [],
+            "links": snapshot.get("links", []) if show else [],
             "contact_revealed": show,
         },
         "parse": {
@@ -81,42 +90,72 @@ async def list_results(
     view: str = Query("best_fit", pattern="^(best_fit|shortlisted|needs_review|failed_filters|all)$"),
     min_score: float | None = None,
     limit: int = Query(100, ge=1, le=500),
-) -> list[dict[str, Any]]:
+    offset: int = Query(0, ge=0),
+) -> dict[str, Any]:
     """Ranked match results for the dashboard."""
     db = get_db()
     job = await db.jobs.find_one({"_id": ObjectId(job_id), "org_id": user.org_id})
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
-    query: dict[str, Any] = {"org_id": user.org_id, "job_id": job_id}
+    view_query: dict[str, Any] = {}
     if view == "shortlisted":
-        query["shortlisted"] = True
+        view_query["shortlisted"] = True
     elif view == "needs_review":
-        query["review_status"] = "needs_review"
+        view_query["review_status"] = "needs_review"
     elif view == "failed_filters":
-        query["hard_filters.passed"] = False
+        view_query["hard_filters.passed"] = False
+        view_query["hard_filters.unknown"] = {"$ne": True}
     elif view == "best_fit":
-        query["hard_filters.passed"] = True
+        view_query["hard_filters.passed"] = True
 
     if min_score is not None:
-        query["score"] = {"$gte": min_score}
+        view_query["score"] = {"$gte": min_score}
 
-    cursor = db.match_results.find(query).sort("score", -1).limit(limit)
+    base_pipeline: list[dict[str, Any]] = [
+        {"$match": {"org_id": user.org_id, "job_id": job_id}},
+        {
+            "$sort": {
+                "is_current": -1,
+                "updated_at": -1,
+                "created_at": -1,
+            }
+        },
+        {"$group": {"_id": "$candidate_id", "result": {"$first": "$$ROOT"}}},
+        {"$replaceRoot": {"newRoot": "$result"}},
+    ]
+    if view_query:
+        base_pipeline.append({"$match": view_query})
+    total_rows = await db.match_results.aggregate(
+        [*base_pipeline, {"$count": "total"}]
+    ).to_list(length=1)
+    total = int(total_rows[0]["total"]) if total_rows else 0
+    pipeline = [
+        *base_pipeline,
+        {"$sort": {"score": -1, "updated_at": -1, "_id": 1}},
+        {"$skip": offset},
+        {"$limit": limit},
+    ]
     rows: list[dict[str, Any]] = []
-    async for mr in cursor:
+    async for mr in db.match_results.aggregate(pipeline):
+        mr["stale"] = int(mr.get("jd_revision") or 0) != int(job.get("jd_revision") or 1)
         rows.append(await _hydrate_row(db, user.org_id, mr, reveal_contact=False))
-    return rows
+    return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 
-@router.get("/v1/match-results/{result_id}")
-async def get_result(result_id: str, user: UserPublic = Depends(get_current_user)) -> dict[str, Any]:
-    """Candidate/match detail including structured resume when available."""
+async def _get_result_detail(result_id: str, user: UserPublic, job_id: str | None = None) -> dict[str, Any]:
+    """Build candidate/match detail with optional job binding."""
     db = get_db()
-    mr = await db.match_results.find_one({"_id": ObjectId(result_id), "org_id": user.org_id})
+    query: dict[str, Any] = {"_id": ObjectId(result_id), "org_id": user.org_id}
+    if job_id is not None:
+        query["job_id"] = job_id
+    mr = await db.match_results.find_one(query)
     if not mr:
         raise HTTPException(status_code=404, detail="Result not found")
     row = await _hydrate_row(db, user.org_id, mr, reveal_contact=bool(mr.get("shortlisted")))
-    resume = await db.resumes.find_one({"_id": ObjectId(mr["resume_id"])})
+    resume = await db.resumes.find_one(
+        {"_id": ObjectId(mr["resume_id"]), "org_id": user.org_id}
+    )
     row["resume"] = (resume or {}).get("parse", {}).get("resume")
     row["raw_resume_text"] = ((resume or {}).get("parse", {}).get("resume") or {}).get("raw_resume_text", "")
     row["source_ref"] = (resume or {}).get("source_ref") or {}
@@ -127,6 +166,22 @@ async def get_result(result_id: str, user: UserPublic = Depends(get_current_user
         "provenance": (resume or {}).get("parse", {}).get("provenance", {}),
     }
     return row
+
+
+@router.get("/v1/jobs/{job_id}/match-results/{result_id}")
+async def get_job_result(
+    job_id: str,
+    result_id: str,
+    user: UserPublic = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Return a result only when it belongs to the requested job."""
+    return await _get_result_detail(result_id, user, job_id)
+
+
+@router.get("/v1/match-results/{result_id}")
+async def get_result(result_id: str, user: UserPublic = Depends(get_current_user)) -> dict[str, Any]:
+    """Backwards-compatible organization-scoped result detail."""
+    return await _get_result_detail(result_id, user)
 
 
 @router.get("/v1/resumes/{resume_id}/file")
@@ -202,7 +257,12 @@ async def shortlist_contacts(job_id: str, user: UserPublic = Depends(get_current
         {"org_id": user.org_id, "job_id": job_id, "shortlisted": True}
     ).sort("score", -1)
     rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
     async for mr in cursor:
+        candidate_id = str(mr.get("candidate_id") or "")
+        if candidate_id in seen:
+            continue
+        seen.add(candidate_id)
         rows.append(await _hydrate_row(db, user.org_id, mr, reveal_contact=True))
     return rows
 
@@ -215,7 +275,12 @@ async def review_queue(job_id: str, user: UserPublic = Depends(get_current_user)
         {"org_id": user.org_id, "job_id": job_id, "review_status": "needs_review"}
     ).sort("score", -1)
     rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
     async for mr in cursor:
+        candidate_id = str(mr.get("candidate_id") or "")
+        if candidate_id in seen:
+            continue
+        seen.add(candidate_id)
         rows.append(await _hydrate_row(db, user.org_id, mr, reveal_contact=False))
     return rows
 

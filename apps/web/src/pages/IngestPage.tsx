@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import { Button, Input, LiveRegion, Panel, ProgressRing, Tag } from '../components/ui'
 
 export function IngestPage() {
   const { jobId } = useParams()
+  const queryClient = useQueryClient()
   const [files, setFiles] = useState<File[]>([])
   const [folderUrl, setFolderUrl] = useState('')
   const [batchId, setBatchId] = useState<string | null>(null)
@@ -30,6 +31,15 @@ export function IngestPage() {
     const stored = sessionStorage.getItem(`batch:${jobId}`)
     if (stored) setBatchId(stored)
   }, [jobId])
+
+  useEffect(() => {
+    const status = batch.data?.status
+    if (!jobId || !['completed', 'completed_with_errors', 'failed'].includes(status || '')) return
+    queryClient.invalidateQueries({ queryKey: ['results', jobId] })
+    queryClient.invalidateQueries({ queryKey: ['result-counts', jobId] })
+    queryClient.invalidateQueries({ queryKey: ['job', jobId] })
+    queryClient.invalidateQueries({ queryKey: ['jobs'] })
+  }, [batch.data?.status, jobId, queryClient])
 
   async function onUpload(e: FormEvent) {
     e.preventDefault()

@@ -56,8 +56,13 @@ def fuzzy_match(str1: str, str2: str, threshold: float = FUZZY_MATCH_THRESHOLD) 
     if str1 == str2:
         return True
     
-    # Check if one contains the other
-    if str1 in str2 or str2 in str1:
+    # Containment is useful for full role phrases, but unsafe for short tokens
+    # such as "ai" (which otherwise matches "trainee").
+    shorter = min(len(str1), len(str2))
+    if shorter >= 5 and (
+        re.search(r"(?<!\w)" + re.escape(str1) + r"(?!\w)", str2)
+        or re.search(r"(?<!\w)" + re.escape(str2) + r"(?!\w)", str1)
+    ):
         return True
     
     # Use SequenceMatcher for fuzzy matching
@@ -119,12 +124,12 @@ def is_tech_match(description: str, tech: str) -> bool:
     
     # Check each alias
     for alias in aliases:
-        # First try direct substring match
-        if alias in description_lower:
-            return True
-        
-        # Try word boundary matching for the alias
-        pattern = r'\b' + re.escape(alias) + r'\b'
+        normalized_alias = alias.strip().lower()
+        if len(normalized_alias) < 3 and normalized_alias not in {"ai", "ml", "r"}:
+            continue
+        # Require token boundaries; raw substring checks made aliases such as
+        # "ai", "py", and "it" match unrelated words.
+        pattern = r'(?<!\w)' + re.escape(normalized_alias) + r'(?!\w)'
         if re.search(pattern, description_lower):
             return True
     
@@ -132,7 +137,9 @@ def is_tech_match(description: str, tech: str) -> bool:
     if len(aliases) > 3:  # Likely a compound alias
         matching_components = 0
         for alias in aliases:
-            if len(alias) > 2 and alias in description_lower:
+            if len(alias) > 2 and re.search(
+                r"(?<!\w)" + re.escape(alias) + r"(?!\w)", description_lower
+            ):
                 matching_components += 1
         
         # If at least 60% of components match, consider it a match
@@ -153,7 +160,7 @@ def is_tech_match(description: str, tech: str) -> bool:
     if len(description) > 50:  # Only for substantial descriptions
         # Split into sentences and check fuzzy match
         for word in description_words:
-            if len(word) > 3 and fuzzy_match(tech.lower(), word, 0.8):
+            if len(tech) >= 5 and len(word) > 4 and fuzzy_match(tech.lower(), word, 0.88):
                 return True
     
     return False
@@ -177,13 +184,12 @@ def normalize_title(title: str) -> str:
         if title.startswith(prefix):
             title = title[len(prefix):]
     
-    # Handle compound titles like "AI/ML Engineer" or "ML/AI Engineer"
-    if '/' in title:
-        parts = title.split('/')
-        title = parts[0].strip()
-    
-    # Remove special characters except spaces, hyphens, and slashes
-    title = re.sub(r'[^\w\s\-/]', '', title)
+    # Preserve both sides of compound titles. "AI/ML Engineer" becomes
+    # "ai ml engineer", not the dangerously broad title "ai".
+    title = title.replace("/", " ")
+
+    # Remove special characters except spaces and hyphens
+    title = re.sub(r'[^\w\s\-]', '', title)
     
     # Remove extra spaces
     title = ' '.join(title.split())
@@ -263,11 +269,15 @@ def is_title_match(experience_title: str, job_title: str) -> bool:
                 if fuzzy_match(normalized_exp, alias):
                     return True
             for alias in aliases:
-                if alias in normalized_exp or normalized_exp in alias:
+                alias_words = set(normalize_title(alias).split())
+                exp_words = set(normalized_exp.split())
+                if len(alias_words & exp_words) >= min(2, len(alias_words)):
                     return True
             if fuzzy_match(normalized_exp, key):
                 return True
-            if key in normalized_exp or normalized_exp in key:
+            key_words = set(normalize_title(key).split())
+            exp_words = set(normalized_exp.split())
+            if len(key_words & exp_words) >= min(2, len(key_words)):
                 return True
     
     exp_words = set(normalized_exp.split())
