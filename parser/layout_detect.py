@@ -9,10 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 def detect_columns(pdf_path: str, *, footer_margin: int = 50, header_margin: int = 50) -> dict[str, Any]:
-    """Return column layout stats for a PDF.
+    """Classify a PDF as single-column, multi-column, or unknown.
 
     Uses PyMuPDF ``column_boxes`` (same algorithm as ``parser.multi_column``).
-    ``is_multicolumn`` is True when any page has more than one column box.
+    A page is substantive multi-column only when at least two detected boxes
+    contain enough text to avoid routing sidebars and decorative fragments to
+    Docling.
     """
     import fitz
 
@@ -21,6 +23,9 @@ def detect_columns(pdf_path: str, *, footer_margin: int = 50, header_margin: int
     doc = fitz.open(pdf_path)
     pages: list[dict[str, Any]] = []
     max_columns = 0
+    failures: list[str] = []
+    useful_pages = 0
+    multi_pages = 0
 
     try:
         for page_index, page in enumerate(doc):
@@ -31,21 +36,53 @@ def detect_columns(pdf_path: str, *, footer_margin: int = 50, header_margin: int
                     header_margin=header_margin,
                     no_image_text=True,
                 )
+                text_lengths = [
+                    len(page.get_text("text", clip=box).strip())
+                    for box in boxes
+                ]
+                substantive = [length for length in text_lengths if length >= 80]
+                page_text_length = len(page.get_text("text").strip())
                 count = len(boxes)
+                if page_text_length >= 80:
+                    useful_pages += 1
+                if len(substantive) >= 2:
+                    multi_pages += 1
             except Exception as exc:
                 logger.warning("column_boxes failed on page %s: %s", page_index, exc)
-                count = 1
-            pages.append({"page": page_index, "columns": count})
+                failures.append(f"page_{page_index}: {exc}")
+                count = 0
+                text_lengths = []
+                page_text_length = 0
+            pages.append(
+                {
+                    "page": page_index,
+                    "columns": count,
+                    "column_text_lengths": text_lengths,
+                    "text_length": page_text_length,
+                    "substantive_multicolumn": len(
+                        [length for length in text_lengths if length >= 80]
+                    )
+                    >= 2,
+                }
+            )
             if count > max_columns:
                 max_columns = count
     finally:
         doc.close()
 
-    if max_columns < 1:
-        max_columns = 1
+    if multi_pages:
+        classification = "multi"
+    elif failures or useful_pages == 0:
+        classification = "unknown"
+    else:
+        classification = "single"
 
     return {
-        "is_multicolumn": max_columns > 1,
+        "classification": classification,
+        "is_multicolumn": classification == "multi",
         "max_columns": max_columns,
         "pages": pages,
+        "failures": failures,
+        "useful_pages": useful_pages,
+        "multi_pages": multi_pages,
     }

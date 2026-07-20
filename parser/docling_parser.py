@@ -7,12 +7,23 @@ from typing import Any
 
 from docling.document_converter import DocumentConverter
 
-from parser.parser import extract_basic_info, normalize_heading
+from parser.parser import _is_person_name, extract_basic_info, normalize_heading
+
+_converter: DocumentConverter | None = None
+
+
+def get_docling_converter() -> DocumentConverter:
+    """Return one lazy converter per worker process."""
+    global _converter
+    if _converter is None:
+        _converter = DocumentConverter()
+    return _converter
 
 HEADING_MAP = {
     # =========================
     # EDUCATION
     # =========================
+
     "education": "education",
     "educational background": "education",
     "academic background": "education",
@@ -340,7 +351,7 @@ def extract_name_docling(docling_json):
 
         value = text["text"].strip()
 
-        if len(value.split()) < 2:
+        if not _is_person_name(value):
             continue
 
         candidates.append((prov[0]["bbox"]["t"], value))
@@ -384,7 +395,7 @@ def build_docling_sections(doc, HEADER_MAP):
     4. If subsection doesn't exist
             -> create 'content'
     """
-
+    #print(doc)
     texts = {
         t["self_ref"]: t
         for t in doc.get("texts", [])
@@ -521,9 +532,12 @@ def convert_to_resume_schema(doc, HEADER_MAP):
     }
 
 
-def parse_cv_docling(path: str, converter: DocumentConverter | None = None) -> dict[str, Any]:
+def parse_cv_docling(
+    path: str,
+    converter: DocumentConverter | None = None,
+) -> dict[str, Any]:
     """Parse a CV with Docling and return nested section dicts (same shape as custom parse_cv)."""
-    converter = converter or DocumentConverter()
+    converter = converter or get_docling_converter()
     result = converter.convert(path)
     doc_dict = result.document.export_to_dict()
     raw_text = result.document.export_to_text()
@@ -538,5 +552,5 @@ def parse_cv_docling(path: str, converter: DocumentConverter | None = None) -> d
     return final_sections
 
 
-# Backwards-compatible alias used by legacy server/server.py
+# Backwards-compatible alias
 cv_parse_docling = parse_cv_docling

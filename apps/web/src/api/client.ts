@@ -41,17 +41,64 @@ export type Job = {
   shortlisted_count: number
 }
 
+export type AssessmentStep = {
+  step: number
+  title: string
+  status: 'passed' | 'failed' | 'completed'
+  summary?: string[]
+  message?: string
+  total_experience?: number
+  relevant_experience?: number
+  minimum_required?: number | null
+  projects_certificates_count?: number
+  relevant_projects?: string[]
+  relevant_certifications?: string[]
+  gap_found?: boolean
+  gaps?: unknown[]
+  comment?: string
+  overall_status?: 'Pass' | 'Fail'
+  failed_requirements?: { requirement: string; status?: string; reason?: string }[]
+}
+
+export type AssessmentDetails = {
+  passed: boolean
+  final_status: 'Pass' | 'Fail'
+  final_comment: string
+  failed_requirements: { requirement: string; status?: string; reason?: string }[]
+  steps: AssessmentStep[]
+}
+
 export type MatchRow = {
   id: string
   job_id: string
   resume_id: string
   candidate_id: string
   score: number
-  hard_filters: { passed: boolean; failed_rules: string[] }
-  rank_signals: Record<string, unknown>
-  explanation: Record<string, unknown>
+  hard_filters: { passed: boolean; failed_rules: string[]; unknown?: boolean }
+  rank_signals: {
+    relevant_work_years?: number
+    total_experience_years?: number
+    relevant_project_years?: number
+    projects_certificates_count?: number
+    relevant_projects?: number
+    relevant_certifications?: number
+    status?: 'Pass' | 'Fail'
+    comment?: string
+    [key: string]: unknown
+  }
+  explanation: {
+    summary?: string
+    matched_skills?: string[]
+    failed_rules?: string[]
+    verification?: Record<string, unknown>
+    details?: AssessmentDetails
+    [key: string]: unknown
+  }
   shortlisted: boolean
   review_status: string
+  stale?: boolean
+  jd_revision?: number
+  parse_attempt_id?: string
   candidate: {
     name: string
     emails: string[]
@@ -67,6 +114,13 @@ export type MatchRow = {
   }
   skills: string[]
   resume?: Record<string, unknown>
+}
+
+export type MatchResultsPage = {
+  items: MatchRow[]
+  total: number
+  limit: number
+  offset: number
 }
 
 export type Batch = {
@@ -130,7 +184,7 @@ export const api = {
   uploadCvs: async (jobId: string, files: File[]) => {
     const fd = new FormData()
     files.forEach((f) => fd.append('files', f))
-    return request<{ batch_id: string; file_count: number; status: string }>(
+    return request<{ batch_id: string; file_count: number; skipped_count: number; status: string }>(
       `/v1/jobs/${jobId}/ingest/upload`,
       { method: 'POST', body: fd },
     )
@@ -141,14 +195,16 @@ export const api = {
       { method: 'POST', body: JSON.stringify({ folder_url }) },
     ),
   getBatch: (batchId: string) => request<Batch>(`/v1/batches/${batchId}`),
-  listResults: (jobId: string, view: string = 'best_fit') =>
-    request<MatchRow[]>(`/v1/jobs/${jobId}/results?view=${view}`),
-  getResult: (id: string) => request<MatchRow & {
+  listResults: (jobId: string, view: string = 'best_fit', limit: number = 50, offset: number = 0) =>
+    request<MatchResultsPage>(
+      `/v1/jobs/${jobId}/results?view=${encodeURIComponent(view)}&limit=${limit}&offset=${offset}`,
+    ),
+  getResult: (jobId: string, id: string) => request<MatchRow & {
     resume?: Record<string, unknown>
     raw_resume_text?: string
     source_ref?: { original_filename?: string; content_type?: string; storage_key?: string }
     parse_meta?: { status?: string; confidence?: number; warnings?: string[]; provenance?: Record<string, unknown> }
-  }>(`/v1/match-results/${id}`),
+  }>(`/v1/jobs/${jobId}/match-results/${id}`),
   resumeFileUrl: (resumeId: string) => `${API_BASE}/v1/resumes/${resumeId}/file`,
   fetchResumeBlob: async (resumeId: string) => {
     const headers = new Headers(authHeaders())

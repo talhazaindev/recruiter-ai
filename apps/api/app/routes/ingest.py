@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import re
-import uuid
+import hashlib
 from datetime import datetime, timezone
 from typing import Any
 
 from bson import ObjectId
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from pymongo.errors import DuplicateKeyError
 
 from app.auth import get_current_user
 from app.db import get_db
@@ -95,6 +96,8 @@ async def ingest_upload(
     batch_id = await _create_batch(user.org_id, job_id, "upload", user.id)
     logger.info("======Create batch: %.3fs", perf_counter() - t)
     resume_ids: list[str] = []
+    skipped_count = 0
+    request_hashes: set[str] = set()
     now = datetime.now(timezone.utc)
 
     for f in files:
@@ -105,8 +108,23 @@ async def ingest_upload(
         data = await f.read()
         if len(data) > MAX_FILE_BYTES:
             raise HTTPException(status_code=400, detail=f"{name} exceeds size limit")
+        source_sha256 = hashlib.sha256(data).hexdigest()
+        if source_sha256 in request_hashes:
+            skipped_count += 1
+            continue
+        request_hashes.add(source_sha256)
+        if await db.resumes.find_one(
+            {
+                "org_id": user.org_id,
+                "job_id": job_id,
+                "source_ref.source_sha256": source_sha256,
+            },
+            {"_id": 1},
+        ):
+            skipped_count += 1
+            continue
         content_type = f.content_type or "application/octet-stream"
-        key = f"{user.org_id}/{job_id}/{batch_id}/{uuid.uuid4().hex}{ext}"
+        key = f"{user.org_id}/{job_id}/sha256/{source_sha256}{ext}"
         t = perf_counter()
 
         upload_bytes(key, data, content_type)
@@ -121,6 +139,7 @@ async def ingest_upload(
                 "original_filename": name,
                 "content_type": content_type,
                 "storage_key": key,
+                "source_sha256": source_sha256,
             },
             "parse": {
                 "status": "queued",
@@ -137,11 +156,15 @@ async def ingest_upload(
         }
         t = perf_counter()
 
-        ins = await db.resumes.insert_one(resume_doc)
+        try:
+            ins = await db.resumes.insert_one(resume_doc)
+        except DuplicateKeyError:
+            skipped_count += 1
+            continue
         logger.info("======Mongo resumes.insert_one: %.3fs", perf_counter() - t)
         resume_ids.append(str(ins.inserted_id))
 
-    if not resume_ids:
+    if not resume_ids and skipped_count == 0:
         raise HTTPException(status_code=400, detail="No valid PDF/DOCX files")
     t = perf_counter()
 
@@ -149,8 +172,9 @@ async def ingest_upload(
         {"_id": ObjectId(batch_id)},
         {
             "$set": {
-                "status": "processing",
+                "status": "processing" if resume_ids else "completed",
                 "counters.total": len(resume_ids),
+                "meta.skipped_duplicates": skipped_count,
                 "updated_at": datetime.now(timezone.utc),
             }
         },
@@ -169,7 +193,8 @@ async def ingest_upload(
     try:
         t = perf_counter()
 
-        enqueue_parse_for_batch_files(batch_id, user.org_id, job_id, resume_ids)
+        if resume_ids:
+            enqueue_parse_for_batch_files(batch_id, user.org_id, job_id, resume_ids)
         logger.info("======Redis enqueue: %.3fs", perf_counter() - t)
     except Exception:
         # Fallback: process inline if Redis is down (dev resilience)
@@ -195,7 +220,12 @@ async def ingest_upload(
     "========== INGEST API END (%.3fs) ==========",
     perf_counter() - overall_start,
 )
-    return {"batch_id": batch_id, "file_count": len(resume_ids), "status": "processing"}
+    return {
+        "batch_id": batch_id,
+        "file_count": len(resume_ids),
+        "skipped_count": skipped_count,
+        "status": "processing" if resume_ids else "completed",
+    }
 
 
 @router.post("/v1/jobs/{job_id}/ingest/drive")

@@ -163,6 +163,8 @@ def parse_graduation_date(value: Any) -> Optional[datetime]:
 
     text = str(value).strip().lower()
     text = text.replace("graduated", "").replace("graduation", "").strip()
+    if re.fullmatch(r"(19|20)\d{2}", text):
+        return datetime(int(text), 12, 31)
 
     formats = [
         "%Y-%m",
@@ -219,7 +221,7 @@ def discipline_meets_requirement(candidate_discipline: Optional[str], required_d
 
 
 def completion_meets_requirement(graduation_date: Any, must_be_completed: Optional[bool]) -> bool:
-    if must_be_completed is None:
+    if must_be_completed is None or must_be_completed is False:
         return True
 
     parsed_date = parse_graduation_date(graduation_date)
@@ -227,8 +229,7 @@ def completion_meets_requirement(graduation_date: Any, must_be_completed: Option
         # If we require completion but cannot parse the date, fail.
         return False if must_be_completed else True
 
-    is_completed = parsed_date <= datetime.today()
-    return is_completed == must_be_completed
+    return parsed_date <= datetime.today()
 
 
 def education_entry_matches(entry: dict, edu_req: dict) -> Tuple[bool, Dict[str, Any]]:
@@ -238,7 +239,10 @@ def education_entry_matches(entry: dict, edu_req: dict) -> Tuple[bool, Dict[str,
     min_cgpa = edu_req.get("minimum_cgpa")
     must_be_completed = edu_req.get("must_be_completed")
 
-    degree_text = entry.get("degree", "")
+    degree_text = " ".join(
+        str(entry.get(field, "") or "")
+        for field in ("degree", "institution")
+    )
     candidate_degree = find_degree_level(degree_text)
     candidate_discipline = find_discipline(degree_text)
 

@@ -233,12 +233,24 @@ def calculate_experience_months(
         start_float = get_date_as_float(start_date, is_end_date=False)
         end_float = get_date_as_float(end_date, is_end_date=True)
         
-        # If end date is missing or invalid, use current date
+        # A genuinely omitted end date means current employment. An invalid
+        # non-empty date is uncertain and must not inflate experience.
         if end_float is None:
-            now = datetime.now()
-            end_float = now.year + (now.month - 1) / 12 + (now.day - 1) / 365
+            if not str(end_date or "").strip():
+                now = datetime.now()
+                end_float = now.year + (now.month - 1) / 12 + (now.day - 1) / 365
+            else:
+                skipped_entries += 1
+                continue
         
         if start_float is not None and end_float is not None:
+            if end_float < start_float:
+                skipped_entries += 1
+                logger.warning(
+                    "Skipping reversed experience range for %s",
+                    exp.get("company", "Unknown"),
+                )
+                continue
             parsed_experiences.append({
                 'company': exp.get('company', ''),
                 'designation': exp.get('designation', ''),

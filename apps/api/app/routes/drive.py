@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import hashlib
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlencode
@@ -11,6 +12,7 @@ import httpx
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
+from pymongo.errors import DuplicateKeyError
 
 from app.auth import get_current_user
 from app.config import get_settings
@@ -142,8 +144,6 @@ async def ingest_drive_folder(
     folder_id: str,
 ) -> int:
     """List PDF/DOCX in a Drive folder, store files, enqueue parse. Returns file count."""
-    import uuid
-
     token = await get_access_token(org_id, user_id)
     db = get_db()
     if not token:
@@ -203,6 +203,7 @@ async def ingest_drive_folder(
                 break
 
         resume_ids: list[str] = []
+        skipped_count = 0
         now = datetime.now(timezone.utc)
         for f in files:
             file_id = f["id"]
@@ -214,37 +215,56 @@ async def ingest_drive_folder(
             if dl.status_code >= 400:
                 logger.warning("Skip Drive file %s: %s", name, dl.status_code)
                 continue
-            ext = "." + name.rsplit(".", 1)[-1].lower() if "." in name else ".pdf"
-            key = f"{org_id}/{job_id}/{batch_id}/{uuid.uuid4().hex}{ext}"
-            content_type = f.get("mimeType") or "application/octet-stream"
-            upload_bytes(key, dl.content, content_type)
-            ins = await db.resumes.insert_one(
+            source_sha256 = hashlib.sha256(dl.content).hexdigest()
+            if await db.resumes.find_one(
                 {
                     "org_id": org_id,
-                    "candidate_id": None,
                     "job_id": job_id,
-                    "batch_id": batch_id,
-                    "source": "gdrive",
-                    "source_ref": {
-                        "drive_file_id": file_id,
-                        "original_filename": name,
-                        "content_type": content_type,
-                        "storage_key": key,
-                    },
-                    "parse": {
-                        "status": "queued",
-                        "schema_version": "matching.v1",
-                        "resume": None,
-                        "confidence": 0.0,
-                        "field_confidence": {},
-                        "needs_review": False,
-                        "warnings": [],
-                        "provenance": {},
-                    },
-                    "created_at": now,
-                    "updated_at": now,
-                }
-            )
+                    "$or": [
+                        {"source_ref.drive_file_id": file_id},
+                        {"source_ref.source_sha256": source_sha256},
+                    ],
+                },
+                {"_id": 1},
+            ):
+                skipped_count += 1
+                continue
+            ext = "." + name.rsplit(".", 1)[-1].lower() if "." in name else ".pdf"
+            key = f"{org_id}/{job_id}/sha256/{source_sha256}{ext}"
+            content_type = f.get("mimeType") or "application/octet-stream"
+            upload_bytes(key, dl.content, content_type)
+            try:
+                ins = await db.resumes.insert_one(
+                    {
+                        "org_id": org_id,
+                        "candidate_id": None,
+                        "job_id": job_id,
+                        "batch_id": batch_id,
+                        "source": "gdrive",
+                        "source_ref": {
+                            "drive_file_id": file_id,
+                            "original_filename": name,
+                            "content_type": content_type,
+                            "storage_key": key,
+                            "source_sha256": source_sha256,
+                        },
+                        "parse": {
+                            "status": "queued",
+                            "schema_version": "matching.v1",
+                            "resume": None,
+                            "confidence": 0.0,
+                            "field_confidence": {},
+                            "needs_review": False,
+                            "warnings": [],
+                            "provenance": {},
+                        },
+                        "created_at": now,
+                        "updated_at": now,
+                    }
+                )
+            except DuplicateKeyError:
+                skipped_count += 1
+                continue
             resume_ids.append(str(ins.inserted_id))
 
     await db.ingest_batches.update_one(
@@ -253,6 +273,7 @@ async def ingest_drive_folder(
             "$set": {
                 "status": "processing" if resume_ids else "completed",
                 "counters.total": len(resume_ids),
+                "meta.skipped_duplicates": skipped_count,
                 "updated_at": datetime.now(timezone.utc),
             }
         },
