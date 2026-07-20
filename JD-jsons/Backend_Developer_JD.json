@@ -20,8 +20,8 @@
   ],
   "requirements_must_have": {
     "education": {
-      "degree": null,
-      "discipline": null,
+      "degree": "BS",
+      "discipline": "IT",
       "minimum_cgpa": null,
       "must_be_completed": null
     },

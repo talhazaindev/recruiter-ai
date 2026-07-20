@@ -198,6 +198,7 @@ async def process_match_task(payload: dict[str, Any]) -> None:
             "created_at": now,
             "updated_at": now,
         }
+        
         await db.match_results.update_one(
             {"org_id": org_id, "job_id": job_id, "resume_id": resume_id},
             {"$set": doc},
