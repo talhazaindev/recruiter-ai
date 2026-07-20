@@ -84,16 +84,19 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
         }
         # Dedupe loosely by first email within org
         existing = None
-        if candidate.emails:
+        if candidate.emails or candidate.phones:
             t = perf_counter()
 
+            or_conditions = []
+            if candidate.emails:
+                or_conditions.append({"emails": candidate.emails[0]})
+            if candidate.phones:
+                or_conditions.append({"phones": candidate.phones[0]})
+            
             #existing = await db.candidates.find_one({"org_id": org_id, "emails": candidate.emails[0]},{})
             existing = await db.candidates.find_one({
                         "org_id": org_id,
-                        "$or": [
-                                {"emails": candidate.emails[0]},
-                                {"phones": candidate.phones[0]}
-                                ]
+                        "$or": or_conditions
                         })
             logger.info("======Mongo candidates.find_one: %.3fs", perf_counter() - t)
         if existing:
