@@ -133,7 +133,7 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
                  },
                  {"_id": 1},)
             if existing_resume:
-                result.status=='failed'
+                result.status='failed'
             
                 logger.info("cv already exist")
                 await db.resumes.delete_one(
