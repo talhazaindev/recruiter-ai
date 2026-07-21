@@ -6,12 +6,13 @@ from datetime import datetime, timezone
 from typing import Any
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 
 from app.auth import get_current_user
 from app.db import get_db
 from app.models.schemas import ReviewUpdate, ShortlistRequest, UserPublic
 from app.services.audit import write_audit
+from app.services.deletion import delete_candidate_from_job, delete_resume
 
 router = APIRouter(tags=["results"])
 
@@ -216,6 +217,96 @@ async def download_resume_file(resume_id: str, user: UserPublic = Depends(get_cu
             "Cache-Control": "private, max-age=60",
         },
     )
+
+
+@router.delete(
+    "/v1/resumes/{resume_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+async def remove_resume(
+    resume_id: str,
+    user: UserPublic = Depends(get_current_user),
+) -> Response:
+    """Delete one CV and any match rows derived from it."""
+    db = get_db()
+    try:
+        object_id = ObjectId(resume_id)
+    except Exception as exc:
+        raise HTTPException(status_code=404, detail="Resume not found") from exc
+    resume = await db.resumes.find_one({"_id": object_id, "org_id": user.org_id})
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+
+    try:
+        counts = await delete_resume(db, user.org_id, resume)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to delete CV: {exc}") from exc
+    await write_audit(
+        user.org_id,
+        user.id,
+        "resume.delete",
+        "resume",
+        resume_id,
+        counts,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.delete(
+    "/v1/jobs/{job_id}/candidates/{candidate_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+async def remove_candidate(
+    job_id: str,
+    candidate_id: str,
+    user: UserPublic = Depends(get_current_user),
+) -> Response:
+    """Delete a candidate and all of their CV data from one job."""
+    db = get_db()
+    try:
+        job_oid = ObjectId(job_id)
+        candidate_oid = ObjectId(candidate_id)
+    except Exception as exc:
+        raise HTTPException(status_code=404, detail="Candidate not found") from exc
+
+    job = await db.jobs.find_one({"_id": job_oid, "org_id": user.org_id}, {"_id": 1})
+    candidate = await db.candidates.find_one(
+        {"_id": candidate_oid, "org_id": user.org_id},
+        {"_id": 1},
+    )
+    has_resume = await db.resumes.find_one(
+        {"org_id": user.org_id, "job_id": job_id, "candidate_id": candidate_id},
+        {"_id": 1},
+    )
+    has_result = await db.match_results.find_one(
+        {"org_id": user.org_id, "job_id": job_id, "candidate_id": candidate_id},
+        {"_id": 1},
+    )
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if not candidate or (not has_resume and not has_result):
+        raise HTTPException(status_code=404, detail="Candidate not found for this job")
+
+    try:
+        counts = await delete_candidate_from_job(
+            db,
+            user.org_id,
+            job_id,
+            candidate_id,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to delete candidate: {exc}") from exc
+    await write_audit(
+        user.org_id,
+        user.id,
+        "candidate.delete_from_job",
+        "candidate",
+        candidate_id,
+        {"job_id": job_id, **counts},
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/v1/match-results/{result_id}/shortlist")

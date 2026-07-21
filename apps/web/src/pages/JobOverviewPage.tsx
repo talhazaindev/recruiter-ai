@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
+import { JdStaleBanner } from '../components/JdStaleBanner'
 import { Button, Panel, Tag } from '../components/ui'
 
 export function JobOverviewPage() {
@@ -22,6 +23,13 @@ export function JobOverviewPage() {
         </h1>
         <p className="mt-2 text-[var(--ink-muted)]">{j.jd.job_summary || 'Add a job summary in the JD editor.'}</p>
       </div>
+
+      <JdStaleBanner
+        jobId={jobId!}
+        staleMatchCount={j.stale_match_count}
+        rematchInProgress={j.rematch_in_progress}
+        activeRematchBatchId={j.active_rematch_batch_id}
+      />
 
       <div className="grid sm:grid-cols-3 gap-3">
         <Panel className="p-4">

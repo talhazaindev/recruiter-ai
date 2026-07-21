@@ -6,11 +6,33 @@ import { Button, Input, Panel, Tag, TextArea } from '../components/ui'
 
 const STEPS = ['Summary', 'Must-have', 'Tech', 'Nice-to-have', 'Keywords', 'Review'] as const
 
-function listFromText(value: string): string[] {
-  return value
-    .split(/[\n,]/)
-    .map((s) => s.trim())
-    .filter(Boolean)
+function listFromLines(value: string): string[] {
+  return value.split('\n')
+}
+
+function compactList(values: string[]): string[] {
+  return values.map((value) => value.trim()).filter(Boolean)
+}
+
+function normalizedJd(jd: JobDescription): JobDescription {
+  return {
+    ...jd,
+    key_responsibilities: compactList(jd.key_responsibilities),
+    requirements_must_have: {
+      ...jd.requirements_must_have,
+      skills: compactList(jd.requirements_must_have.skills),
+    },
+    tech_stack: compactList(jd.tech_stack),
+    preferred_skills: compactList(jd.preferred_skills),
+    nice_to_have: {
+      skills: compactList(jd.nice_to_have.skills),
+      certifications: compactList(jd.nice_to_have.certifications),
+      education: compactList(jd.nice_to_have.education),
+      experience: compactList(jd.nice_to_have.experience),
+      companies: compactList(jd.nice_to_have.companies),
+    },
+    keywords: compactList(jd.keywords),
+  }
 }
 
 export function JdEditorPage() {
@@ -31,10 +53,11 @@ export function JdEditorPage() {
   }, [job.data])
 
   const save = useMutation({
-    mutationFn: () => api.updateJob(jobId!, { jd }),
-    onSuccess: () => {
+    mutationFn: () => api.updateJob(jobId!, { jd: normalizedJd(jd) }),
+    onSuccess: (updatedJob) => {
       qc.invalidateQueries({ queryKey: ['job', jobId] })
       qc.invalidateQueries({ queryKey: ['jobs'] })
+      setJd(updatedJob.jd)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     },
@@ -126,11 +149,11 @@ export function JdEditorPage() {
               />
             </label>
             <label className="block text-sm">
-              <span className="text-[var(--ink-muted)]">Key responsibilities (comma or newline)</span>
+              <span className="text-[var(--ink-muted)]">Key responsibilities (one per line; commas allowed)</span>
               <TextArea
                 className="mt-1"
                 value={jd.key_responsibilities.join('\n')}
-                onChange={(e) => update('key_responsibilities', listFromText(e.target.value))}
+                onChange={(e) => update('key_responsibilities', listFromLines(e.target.value))}
               />
             </label>
           </>
@@ -293,7 +316,7 @@ export function JdEditorPage() {
               <TextArea
                 className="mt-1"
                 value={jd.tech_stack.join('\n')}
-                onChange={(e) => update('tech_stack', listFromText(e.target.value))}
+                onChange={(e) => update('tech_stack', listFromLines(e.target.value))}
               />
             </label>
             <label className="block text-sm">
@@ -301,7 +324,7 @@ export function JdEditorPage() {
               <TextArea
                 className="mt-1"
                 value={jd.preferred_skills.join('\n')}
-                onChange={(e) => update('preferred_skills', listFromText(e.target.value))}
+                onChange={(e) => update('preferred_skills', listFromLines(e.target.value))}
               />
             </label>
           </>
@@ -318,7 +341,7 @@ export function JdEditorPage() {
                   onChange={(e) =>
                     setJd((prev) => ({
                       ...prev,
-                      nice_to_have: { ...prev.nice_to_have, [key]: listFromText(e.target.value) },
+                      nice_to_have: { ...prev.nice_to_have, [key]: listFromLines(e.target.value) },
                     }))
                   }
                 />
@@ -333,7 +356,7 @@ export function JdEditorPage() {
             <TextArea
               className="mt-1"
               value={jd.keywords.join('\n')}
-              onChange={(e) => update('keywords', listFromText(e.target.value))}
+              onChange={(e) => update('keywords', listFromLines(e.target.value))}
             />
           </label>
         )}

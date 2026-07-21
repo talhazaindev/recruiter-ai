@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import { Button, Panel, ScoreMeter, Tag } from '../components/ui'
 import { numeric, resultStatus } from '../utils/resultSafety'
 
 export function CandidateDetailPage() {
   const { jobId, resultId } = useParams()
+  const navigate = useNavigate()
   const qc = useQueryClient()
   const [showPreview, setShowPreview] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -25,6 +26,22 @@ export function CandidateDetailPage() {
       qc.invalidateQueries({ queryKey: ['results', jobId] })
       qc.invalidateQueries({ queryKey: ['shortlist', jobId] })
     },
+  })
+  const afterDelete = () => {
+    qc.invalidateQueries({ queryKey: ['results', jobId] })
+    qc.invalidateQueries({ queryKey: ['result-counts', jobId] })
+    qc.invalidateQueries({ queryKey: ['shortlist', jobId] })
+    qc.invalidateQueries({ queryKey: ['review', jobId] })
+    qc.invalidateQueries({ queryKey: ['job', jobId] })
+    navigate(`/jobs/${jobId}/results`)
+  }
+  const removeCv = useMutation({
+    mutationFn: (resumeId: string) => api.deleteResume(resumeId),
+    onSuccess: afterDelete,
+  })
+  const removeCandidate = useMutation({
+    mutationFn: (candidateId: string) => api.deleteCandidate(jobId!, candidateId),
+    onSuccess: afterDelete,
   })
 
   useEffect(() => {
@@ -113,8 +130,37 @@ export function CandidateDetailPage() {
           <Button onClick={() => shortlist.mutate(!row.shortlisted)}>
             {row.shortlisted ? 'Remove shortlist' : 'Shortlist'}
           </Button>
+          <Button
+            variant="danger"
+            disabled={removeCv.isPending || removeCandidate.isPending}
+            onClick={() => {
+              if (window.confirm(`Delete ${filename}? This cannot be undone.`)) {
+                removeCv.mutate(row.resume_id)
+              }
+            }}
+          >
+            Delete CV
+          </Button>
+          <Button
+            variant="danger"
+            disabled={removeCv.isPending || removeCandidate.isPending}
+            onClick={() => {
+              if (window.confirm(`Delete ${row.candidate.name || 'this candidate'} from this job?`)) {
+                removeCandidate.mutate(row.candidate_id)
+              }
+            }}
+          >
+            Delete candidate
+          </Button>
         </div>
       </div>
+      {removeCv.isError || removeCandidate.isError ? (
+        <p className="text-sm text-[var(--danger)]" role="alert">
+          {(removeCv.error instanceof Error && removeCv.error.message) ||
+            (removeCandidate.error instanceof Error && removeCandidate.error.message) ||
+            'Unable to delete this record.'}
+        </p>
+      ) : null}
 
       {showPreview ? (
         <Panel className="p-3 overflow-hidden">

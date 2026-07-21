@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { api } from '../api/client'
+import { JdStaleBanner } from '../components/JdStaleBanner'
 import { Button, EmptyState, Panel, Tag } from '../components/ui'
 import { numeric, pageRange, resultStatus } from '../utils/resultSafety'
 
@@ -24,6 +25,13 @@ export function ResultsPage() {
   const results = useQuery({
     queryKey: ['results', jobId, view, offset],
     queryFn: () => api.listResults(jobId!, view, PAGE_SIZE, offset),
+    enabled: Boolean(jobId),
+    refetchInterval: 3000,
+  })
+
+  const job = useQuery({
+    queryKey: ['job', jobId],
+    queryFn: () => api.getJob(jobId!),
     enabled: Boolean(jobId),
     refetchInterval: 3000,
   })
@@ -58,6 +66,21 @@ export function ResultsPage() {
       qc.invalidateQueries({ queryKey: ['job', jobId] })
     },
   })
+  const invalidateCandidateLists = () => {
+    qc.invalidateQueries({ queryKey: ['results', jobId] })
+    qc.invalidateQueries({ queryKey: ['result-counts', jobId] })
+    qc.invalidateQueries({ queryKey: ['shortlist', jobId] })
+    qc.invalidateQueries({ queryKey: ['review', jobId] })
+    qc.invalidateQueries({ queryKey: ['job', jobId] })
+  }
+  const removeCv = useMutation({
+    mutationFn: (resumeId: string) => api.deleteResume(resumeId),
+    onSuccess: invalidateCandidateLists,
+  })
+  const removeCandidate = useMutation({
+    mutationFn: (candidateId: string) => api.deleteCandidate(jobId!, candidateId),
+    onSuccess: invalidateCandidateLists,
+  })
 
   return (
     <div className="space-y-6">
@@ -69,6 +92,15 @@ export function ResultsPage() {
           </p>
         </div>
       </div>
+
+      {job.data ? (
+        <JdStaleBanner
+          jobId={jobId!}
+          staleMatchCount={job.data.stale_match_count}
+          rematchInProgress={job.data.rematch_in_progress}
+          activeRematchBatchId={job.data.active_rematch_batch_id}
+        />
+      ) : null}
 
       <div className="sticky top-16 z-20 flex flex-wrap gap-2 bg-[var(--bg)]/90 backdrop-blur py-2">
         {VIEWS.map((v) => (
@@ -93,6 +125,13 @@ export function ResultsPage() {
       {results.isError ? (
         <p className="text-[var(--danger)]">
           {results.error instanceof Error ? results.error.message : 'Unable to load candidate results.'}
+        </p>
+      ) : null}
+      {removeCv.isError || removeCandidate.isError ? (
+        <p className="text-[var(--danger)]" role="alert">
+          {(removeCv.error instanceof Error && removeCv.error.message) ||
+            (removeCandidate.error instanceof Error && removeCandidate.error.message) ||
+            'Unable to delete this record.'}
         </p>
       ) : null}
       {!results.isLoading && !results.isError && (results.data?.items.length ?? 0) === 0 ? (
@@ -133,7 +172,7 @@ export function ResultsPage() {
                     <td className="px-3 py-3">
                       <span className="font-medium">{row.candidate.name || 'Unknown'}</span>
                       <p className="text-xs text-[var(--ink-muted)]">{row.candidate.emails[0]}</p>
-                      {row.stale ? <Tag tone="warn">Recalculating</Tag> : null}
+                      {row.stale ? <Tag tone="warn">Outdated</Tag> : null}
                     </td>
                     <td className="px-3 py-3 font-medium tabular-nums">{Math.round(row.score)}</td>
                     <td className="px-3 py-3 tabular-nums whitespace-nowrap">
@@ -171,6 +210,34 @@ export function ResultsPage() {
                         <Link to={`/jobs/${jobId}/candidates/${row.id}`}>
                           <Button size="sm" variant="ghost">View Details</Button>
                         </Link>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={removeCv.isPending || removeCandidate.isPending}
+                          onClick={() => {
+                            if (window.confirm(`Delete the CV for ${row.candidate.name || 'this candidate'}?`)) {
+                              removeCv.mutate(row.resume_id)
+                            }
+                          }}
+                        >
+                          Delete CV
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={removeCv.isPending || removeCandidate.isPending}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `Delete ${row.candidate.name || 'this candidate'} and all of their CVs from this job?`,
+                              )
+                            ) {
+                              removeCandidate.mutate(row.candidate_id)
+                            }
+                          }}
+                        >
+                          Delete candidate
+                        </Button>
                       </div>
                     </td>
                   </motion.tr>
