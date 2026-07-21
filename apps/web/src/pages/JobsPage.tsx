@@ -15,6 +15,12 @@ export function JobsPage() {
       navigate(`/jobs/${job.id}/jd`)
     },
   })
+  const remove = useMutation({
+    mutationFn: (jobId: string) => api.deleteJob(jobId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['jobs'] })
+    },
+  })
 
   return (
     <div className="space-y-6">
@@ -38,6 +44,11 @@ export function JobsPage() {
           {(jobs.error as Error).message}. Is the API running on port 8000?
         </p>
       ) : null}
+      {remove.isError ? (
+        <p className="text-[var(--danger)]" role="alert">
+          {remove.error instanceof Error ? remove.error.message : 'Unable to delete the job description.'}
+        </p>
+      ) : null}
 
       {!jobs.isLoading && (jobs.data?.length ?? 0) === 0 ? (
         <EmptyState
@@ -54,9 +65,9 @@ export function JobsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.04, 0.3) }}
             >
-              <Link to={`/jobs/${job.id}`}>
-                <Panel className="p-4 hover:bg-white/90 transition">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+              <Panel className="p-4 hover:bg-white/90 transition">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <Link to={`/jobs/${job.id}`} className="min-w-0 flex-1">
                     <div>
                       <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">
                         {job.jd.job_title || 'Untitled role'}
@@ -65,6 +76,8 @@ export function JobsPage() {
                         {job.jd.job_summary || 'No summary yet'}
                       </p>
                     </div>
+                  </Link>
+                  <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2">
                       <Tag tone="signal">{job.status}</Tag>
                       <span className="text-xs text-[var(--ink-muted)]">
@@ -72,9 +85,22 @@ export function JobsPage() {
                         review
                       </span>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      disabled={remove.isPending}
+                      onClick={() => {
+                        const title = job.jd.job_title || 'Untitled role'
+                        if (window.confirm(`Delete "${title}" and all of its CVs and candidates? This cannot be undone.`)) {
+                          remove.mutate(job.id)
+                        }
+                      }}
+                    >
+                      Delete JD
+                    </Button>
                   </div>
-                </Panel>
-              </Link>
+                </div>
+              </Panel>
             </motion.div>
           ))}
         </div>

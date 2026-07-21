@@ -8,12 +8,13 @@ from datetime import datetime, timezone
 from typing import Any
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.auth import get_current_user
 from app.db import get_db
 from app.models.schemas import JobCreate, JobPublic, JobRematchResponse, JobUpdate, UserPublic
 from app.services.audit import write_audit
+from app.services.deletion import delete_job as delete_job_data
 from app.services.rematch import enqueue_rematch_for_job, iter_latest_parsed_resumes
 
 router = APIRouter(prefix="/v1/jobs", tags=["jobs"])
@@ -243,6 +244,40 @@ async def update_job(
         int(doc.get("jd_revision") or 1),
     )
     return _job_public(doc, counts)
+
+
+@router.delete(
+    "/{job_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+async def delete_job(
+    job_id: str,
+    user: UserPublic = Depends(get_current_user),
+) -> Response:
+    """Delete a job description and all data scoped to that job."""
+    db = get_db()
+    try:
+        object_id = ObjectId(job_id)
+    except Exception as exc:
+        raise HTTPException(status_code=404, detail="Job not found") from exc
+    doc = await db.jobs.find_one({"_id": object_id, "org_id": user.org_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    try:
+        counts = await delete_job_data(db, user.org_id, job_id)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Unable to delete job: {exc}") from exc
+    await write_audit(
+        user.org_id,
+        user.id,
+        "job.delete",
+        "job",
+        job_id,
+        counts,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/{job_id}/rematch", response_model=JobRematchResponse)

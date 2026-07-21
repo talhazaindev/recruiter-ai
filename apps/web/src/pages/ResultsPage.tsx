@@ -66,6 +66,21 @@ export function ResultsPage() {
       qc.invalidateQueries({ queryKey: ['job', jobId] })
     },
   })
+  const invalidateCandidateLists = () => {
+    qc.invalidateQueries({ queryKey: ['results', jobId] })
+    qc.invalidateQueries({ queryKey: ['result-counts', jobId] })
+    qc.invalidateQueries({ queryKey: ['shortlist', jobId] })
+    qc.invalidateQueries({ queryKey: ['review', jobId] })
+    qc.invalidateQueries({ queryKey: ['job', jobId] })
+  }
+  const removeCv = useMutation({
+    mutationFn: (resumeId: string) => api.deleteResume(resumeId),
+    onSuccess: invalidateCandidateLists,
+  })
+  const removeCandidate = useMutation({
+    mutationFn: (candidateId: string) => api.deleteCandidate(jobId!, candidateId),
+    onSuccess: invalidateCandidateLists,
+  })
 
   return (
     <div className="space-y-6">
@@ -110,6 +125,13 @@ export function ResultsPage() {
       {results.isError ? (
         <p className="text-[var(--danger)]">
           {results.error instanceof Error ? results.error.message : 'Unable to load candidate results.'}
+        </p>
+      ) : null}
+      {removeCv.isError || removeCandidate.isError ? (
+        <p className="text-[var(--danger)]" role="alert">
+          {(removeCv.error instanceof Error && removeCv.error.message) ||
+            (removeCandidate.error instanceof Error && removeCandidate.error.message) ||
+            'Unable to delete this record.'}
         </p>
       ) : null}
       {!results.isLoading && !results.isError && (results.data?.items.length ?? 0) === 0 ? (
@@ -188,6 +210,34 @@ export function ResultsPage() {
                         <Link to={`/jobs/${jobId}/candidates/${row.id}`}>
                           <Button size="sm" variant="ghost">View Details</Button>
                         </Link>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={removeCv.isPending || removeCandidate.isPending}
+                          onClick={() => {
+                            if (window.confirm(`Delete the CV for ${row.candidate.name || 'this candidate'}?`)) {
+                              removeCv.mutate(row.resume_id)
+                            }
+                          }}
+                        >
+                          Delete CV
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={removeCv.isPending || removeCandidate.isPending}
+                          onClick={() => {
+                            if (
+                              window.confirm(
+                                `Delete ${row.candidate.name || 'this candidate'} and all of their CVs from this job?`,
+                              )
+                            ) {
+                              removeCandidate.mutate(row.candidate_id)
+                            }
+                          }}
+                        >
+                          Delete candidate
+                        </Button>
                       </div>
                     </td>
                   </motion.tr>

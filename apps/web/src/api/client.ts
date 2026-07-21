@@ -185,6 +185,7 @@ export const api = {
     request<Job>('/v1/jobs', { method: 'POST', body: JSON.stringify({ jd, status }) }),
   updateJob: (id: string, patch: { jd?: JobDescription; status?: string }) =>
     request<Job>(`/v1/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  deleteJob: (id: string) => request<void>(`/v1/jobs/${id}`, { method: 'DELETE' }),
   rematchJob: (jobId: string) =>
     request<{ batch_id: string; candidate_count: number; status: string }>(
       `/v1/jobs/${jobId}/rematch`,
@@ -221,6 +222,10 @@ export const api = {
     if (!res.ok) throw new Error('Failed to load CV file')
     return res.blob()
   },
+  deleteResume: (resumeId: string) =>
+    request<void>(`/v1/resumes/${resumeId}`, { method: 'DELETE' }),
+  deleteCandidate: (jobId: string, candidateId: string) =>
+    request<void>(`/v1/jobs/${jobId}/candidates/${candidateId}`, { method: 'DELETE' }),
   shortlist: (id: string, shortlisted: boolean) =>
     request<MatchRow>(`/v1/match-results/${id}/shortlist`, {
       method: 'POST',
