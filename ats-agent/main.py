@@ -501,7 +501,7 @@ if __name__ == "__main__":
     print("💡 Frontend Integration:")
     print("  - Use 'results' list for main table display")
     print("  - Each result tuple: (Title, Relevant Exp, Total Exp, Projects+Certs, Comment, Status)")
-    print("  - Status is 'Pass' if ALL must-have requirements AND min relevant experience are met")
+    print("  - Status is 'Pass' if ALL must-have requirements AND relevant exp >= min relevant experience  are met")
     print("  - Status is 'Fail' otherwise")
     print("  - Use 'details' list for popup/modal when user clicks on view details")
     print("  - Each detail contains:")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import json
 from datetime import datetime, timezone
 from typing import Any
 
@@ -70,6 +71,8 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
         t = perf_counter()
 
         result = parse_resume_bytes(data, filename, content_type,min_experience,converter)
+        
+        logger.info("Resume parsing result:\n%s", json.dumps(result, indent=2, default=str))
         logger.info("======Resume Parser TOTAL: %.3fs", perf_counter() - t)
         candidate = result.candidate
         cand_doc = {
