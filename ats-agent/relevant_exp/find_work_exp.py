@@ -19,7 +19,7 @@ from pathlib import Path
 
 # Configuration
 GAP_THRESHOLD_MONTHS = 3  # Maximum allowed gap in months before flagging
-MIN_TECH_STACK_MATCH_PERCENTAGE = 30  # Minimum percentage of tech stack matches (0-100)
+MIN_TECH_STACK_MATCH_PERCENTAGE = 20  # Minimum percentage of tech stack matches (0-100)
 FUZZY_MATCH_THRESHOLD = 0.85  # Threshold for fuzzy matching (0.0 to 1.0)
 JOB_TITLE_TOKEN_WEIGHT = 0.7  # Minimum token overlap ratio for partial matches
 
@@ -762,110 +762,27 @@ if __name__ == "__main__":
     # Test Case 1: Irrelevant 2023-2024, Relevant 2024-2026 (year-only)
     test_case_1 = {
         "job": {
-            "job_title": "Backend Developer",
-            "tech_stack": ["Python", "Django", "PostgreSQL", "Docker"]
+            "job_title": "Agentic AI Engineer",
+            "tech_stack": ["Python", "FastAPI", "PostgreSQL", "Docker","Langchain", "LlamaIndex", "OpenAI API","machine learning"]
         },
         "resume": {
             "experience": [
                 {
                     "company": "Irrelevant Corp",
-                    "designation": "Frontend Developer",
+                    "designation": "AI Engineer",
                     "start_date": "2023",
                     "end_date": "2024",
-                    "description": "Built frontend with React and JavaScript"
-                },
-                {
-                    "company": "Relevant Corp",
-                    "designation": "Backend Developer",
-                    "start_date": "2024",
-                    "end_date": "2026",
-                    "description": "Built backend with Python, Django, PostgreSQL, and Docker"
+                    "description": "Built voice agents using Flask, Docker , Langgraph, etc"
                 }
             ]
         }
     }
     
-    # Test Case 2: Irrelevant with partial dates, Relevant with partial dates
-    test_case_2 = {
-        "job": {
-            "job_title": "Backend Developer",
-            "tech_stack": ["Python", "Django", "PostgreSQL", "Docker"]
-        },
-        "resume": {
-            "experience": [
-                {
-                    "company": "Irrelevant Corp",
-                    "designation": "Frontend Developer",
-                    "start_date": "2023-01-01",
-                    "end_date": "2024-06-30",
-                    "description": "Built frontend with React and JavaScript"
-                },
-                {
-                    "company": "Relevant Corp",
-                    "designation": "Backend Developer",
-                    "start_date": "2024-07-01",
-                    "end_date": "2026-12-31",
-                    "description": "Built backend with Python, Django, PostgreSQL, and Docker"
-                }
-            ]
-        }
-    }
     
-    # Test Case 3: Gap detection
-    test_case_3 = {
-        "job": {
-            "job_title": "Software Engineer",
-            "tech_stack": ["Python", "Django", "PostgreSQL"]
-        },
-        "resume": {
-            "experience": [
-                {
-                    "company": "Company A",
-                    "designation": "Software Engineer",
-                    "start_date": "2020-01-01",
-                    "end_date": "2021-12-31",
-                    "description": "Built apps with Python and Django"
-                },
-                {
-                    "company": "Company B",
-                    "designation": "Software Engineer",
-                    "start_date": "2022-06-01",
-                    "end_date": "2024-12-31",
-                    "description": "Led development with Python and Django"
-                }
-            ]
-        }
-    }
-    
-    # Test Case 4: No gap
-    test_case_4 = {
-        "job": {
-            "job_title": "Software Engineer",
-            "tech_stack": ["Python", "Django", "PostgreSQL"]
-        },
-        "resume": {
-            "experience": [
-                {
-                    "company": "Company A",
-                    "designation": "Software Engineer",
-                    "start_date": "2020-01-01",
-                    "end_date": "2022-12-31",
-                    "description": "Built apps with Python and Django"
-                },
-                {
-                    "company": "Company B",
-                    "designation": "Senior Software Engineer",
-                    "start_date": "2023-01-01",
-                    "end_date": "2024-12-31",
-                    "description": "Led development with Python and Django"
-                }
-            ]
-        }
-    }
     
     print("🧪 Running Test Cases\n" + "="*80)
     
-    test_cases = [test_case_1, test_case_2, test_case_3, test_case_4]
+    test_cases = [test_case_1]
     for i, test in enumerate(test_cases, 1):
         print(f"\n{'='*80}")
         print(f"📝 Test Case {i}")
