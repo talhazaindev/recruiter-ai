@@ -13,6 +13,8 @@ from typing import Any
 from parser.docling_parser import parse_cv_docling
 from docling.document_converter import DocumentConverter
 
+from time import perf_counter
+
 from app.config import get_settings
 from app.models.schemas import (
     CandidateExtras,
@@ -36,6 +38,27 @@ def _ensure_repo_root_on_path() -> Path:
     if root_s not in sys.path:
         sys.path.insert(0, root_s)
     return root
+
+
+def merge_sections(
+    first: dict[str, Any],
+    second: dict[str, Any],
+) -> dict[str, Any]:
+    required_sections = [
+        "education",
+        "experience",
+        "skills",
+    ]
+
+    merged = {}
+
+    for section in required_sections:
+        if section in first:
+            first[section] = first[section]
+        elif section in second:
+            first[section] = second[section]
+
+    return first
 
 def _should_run_custom_parser(resume: dict) -> bool:
     """
@@ -73,17 +96,19 @@ def _should_run_custom_parser(resume: dict) -> bool:
 
         return True
 
+    issue=False
     for section in required_sections:
         if section not in resume:
-            return True
+            logger.info(f"{section} not found")
+            issue= True
 
         if not has_meaningful_data(resume[section]):
-            return True
+            logger.info(f"{section} not meaningful data found")
 
-    return False
+            issue= True
 
-import logging
-from time import perf_counter
+    return issue
+
 
 
 def parse_resume_bytes(
@@ -166,27 +191,28 @@ def parse_resume_bytes(
                 logger.info("========== CUSTOM PARSER 2START ==========")
                 t = perf_counter()
 
-                sections=_run_parse_cv(path_to_parse)
+                sections2=_run_parse_cv(path_to_parse)
                 parser_id = "custom.pymupdf"
                 logger.info(
-    "========== CUSTOM PARSER 2END (%.3fs) ==========",
-    perf_counter() - t
-)
+                    "========== CUSTOM PARSER 2END (%.3fs) ==========",
+                    perf_counter() - t
+                )
 
-
+                sections=merge_sections(sections,sections2)
                 #print("custom2")
             else:
                 logger.info("========== DOCLING 1START ==========")
                 t = perf_counter()
-                sections = parse_cv_docling(path_to_parse,converter)
+                sections2 = parse_cv_docling(path_to_parse,converter)
                 parser_id = "docling"
                 logger.info(
-                "========== DOCLING 1END (%.3fs) ==========",
-                 perf_counter() - t
-            )
+                    "========== DOCLING 1END (%.3fs) ==========",
+                    perf_counter() - t
+                )
                 
                 #print("docling2")
-
+                sections=merge_sections(sections,sections2)
+                
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
 
@@ -213,9 +239,9 @@ def parse_resume_bytes(
                 warnings.append(f"groq_structure_skipped: {exc}")
                 logger.warning("Groq structure failed: %s", exc)
             logger.info(
-    "========== GROQ END (%.3fs) ==========",
-        perf_counter() - t
-)
+                "========== GROQ END (%.3fs) ==========",
+                perf_counter() - t
+            )
         name = str(sections.get("name") or "").strip()
         emails = _as_list(sections.get("email"))
         phones = _as_list(sections.get("phone"))
@@ -549,7 +575,7 @@ Experience input:
             {"role": "user", "content": prompt},
         ],
     )
-    print(response)
+    #print(response)
     content = response.choices[0].message.content or "{}"
     content = content.strip()
     if content.startswith("```"):
