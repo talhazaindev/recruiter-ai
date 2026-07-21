@@ -192,12 +192,24 @@ class JobPublic(BaseModel):
     status: str
     jd: JobDescriptionSchema
     jd_schema_version: str = "jd.v1"
+    jd_revision: int = 1
     created_by: str | None = None
     created_at: datetime
     updated_at: datetime
     candidate_count: int = 0
     needs_review_count: int = 0
     shortlisted_count: int = 0
+    stale_match_count: int = 0
+    rematch_in_progress: bool = False
+    active_rematch_batch_id: str | None = None
+
+
+class JobRematchResponse(BaseModel):
+    """Manual JD rematch kickoff response."""
+
+    batch_id: str
+    candidate_count: int
+    status: str = "processing"
 
 
 class DriveIngestRequest(BaseModel):

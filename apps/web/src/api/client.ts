@@ -34,11 +34,15 @@ export type Job = {
   org_id: string
   status: string
   jd: JobDescription
+  jd_revision: number
   created_at: string
   updated_at: string
   candidate_count: number
   needs_review_count: number
   shortlisted_count: number
+  stale_match_count: number
+  rematch_in_progress: boolean
+  active_rematch_batch_id: string | null
 }
 
 export type AssessmentStep = {
@@ -181,6 +185,11 @@ export const api = {
     request<Job>('/v1/jobs', { method: 'POST', body: JSON.stringify({ jd, status }) }),
   updateJob: (id: string, patch: { jd?: JobDescription; status?: string }) =>
     request<Job>(`/v1/jobs/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }),
+  rematchJob: (jobId: string) =>
+    request<{ batch_id: string; candidate_count: number; status: string }>(
+      `/v1/jobs/${jobId}/rematch`,
+      { method: 'POST' },
+    ),
   uploadCvs: async (jobId: string, files: File[]) => {
     const fd = new FormData()
     files.forEach((f) => fd.append('files', f))

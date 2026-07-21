@@ -254,6 +254,7 @@ async def process_match_task(payload: dict[str, Any]) -> None:
     batch_id = payload["batch_id"]
     candidate_id = payload["candidate_id"]
     needs_review = payload.get("needs_review", False)
+    is_rematch = bool(payload.get("rematch"))
 
     job = await db.jobs.find_one({"_id": ObjectId(job_id), "org_id": org_id})
     resume_doc = await db.resumes.find_one({"_id": ObjectId(resume_id), "org_id": org_id})
@@ -272,6 +273,7 @@ async def process_match_task(payload: dict[str, Any]) -> None:
         output = match_jd_resume(jd, resume)
 
         review_status = "needs_review" if needs_review else "none"
+        jd_revision = int(job.get("jd_revision") or 1)
         now = datetime.now(timezone.utc)
         doc = {
             "org_id": org_id,
@@ -288,9 +290,31 @@ async def process_match_task(payload: dict[str, Any]) -> None:
             "shortlisted_at": None,
             "shortlisted_by": None,
             "review_status": review_status,
+            "review_notes": "",
+            "reviewed_by": None,
+            "reviewed_at": None,
+            "jd_revision": jd_revision,
+            "stale": False,
+            "is_current": True,
             "created_at": now,
             "updated_at": now,
         }
+        if not is_rematch:
+            existing = await db.match_results.find_one(
+                {"org_id": org_id, "job_id": job_id, "resume_id": resume_id},
+                {"created_at": 1},
+            )
+            if existing and existing.get("created_at"):
+                doc["created_at"] = existing["created_at"]
+        await db.match_results.update_many(
+            {
+                "org_id": org_id,
+                "job_id": job_id,
+                "candidate_id": candidate_id,
+                "resume_id": {"$ne": resume_id},
+            },
+            {"$set": {"is_current": False, "updated_at": now}},
+        )
         await db.match_results.update_one(
             {"org_id": org_id, "job_id": job_id, "resume_id": resume_id},
             {"$set": doc},
@@ -328,6 +352,18 @@ async def _maybe_finish_batch(batch_id: str) -> None:
     matching = c.get("matching", 0)
     parsing = c.get("parsing", 0)
     matched = c.get("matched", 0)
+    is_rematch = batch.get("source") == "rematch"
+    if is_rematch and total > 0 and parsing <= 0 and matching <= 0 and matched >= (total - c.get("failed", 0)):
+        status = "completed"
+        if c.get("failed", 0) == total:
+            status = "failed"
+        elif c.get("failed", 0) > 0:
+            status = "completed_with_errors"
+        await db.ingest_batches.update_one(
+            {"_id": ObjectId(batch_id)},
+            {"$set": {"status": status, "updated_at": datetime.now(timezone.utc)}},
+        )
+        return
     if total > 0 and done >= total and parsing <= 0 and matching <= 0 and matched >= (total - c.get("failed", 0)):
         # Soft complete: parsed all and no workers in flight
         status = "completed"

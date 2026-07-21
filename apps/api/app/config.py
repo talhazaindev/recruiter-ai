@@ -25,13 +25,6 @@ class Settings(BaseSettings):
 
     redis_url: str = "redis://localhost:6379/0"
 
-    s3_endpoint: str = "http://localhost:9000"
-    s3_access_key: str = "minioadmin"
-    s3_secret_key: str = "minioadmin"
-    s3_bucket: str = "resumes"
-    s3_region: str = "us-east-1"
-    s3_use_ssl: bool = False
-
     parse_confidence_review_threshold: float = 0.55
     groq_api_key: str = ""
     groq_model: str = "qwen/qwen3-32b"
