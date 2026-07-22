@@ -45,17 +45,49 @@ def load_json(file_path: Path) -> Dict[str, Any]:
 
 def normalize_text(text: str) -> str:
     """
-    Normalize text by converting to lowercase and removing extra spaces.
+    Robust text normalization for raw resume text.
+    Removes special characters, extra whitespace, newlines, tabs, and other noise.
     
     Args:
-        text: Input text string
+        text: Input raw text string
         
     Returns:
-        Normalized text
+        Normalized clean text
     """
     if not text:
         return ""
-    return ' '.join(text.lower().split())
+    
+    # Convert to string if needed
+    text = str(text)
+    
+    # Remove URLs
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+    
+    # Remove email addresses
+    text = re.sub(r'\S+@\S+', '', text)
+    
+    # Remove phone numbers (Pakistan format: +92, 0092, 92, 0 followed by 3xx-xxxxxxx)
+    text = re.sub(r'(?<!\d)(?:\+92|0092|92|0)[\s-]?(3\d{2})[\s-]?\d{7}(?!\d)', '', text)
+    
+    # Replace newlines, tabs, carriage returns with space
+    text = re.sub(r'[\n\r\t]+', ' ', text)
+    
+    # Replace multiple spaces, including those with special chars in between, with single space
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Remove special characters but keep letters, numbers, spaces, hyphens, apostrophes
+    text = re.sub(r'[^a-zA-Z0-9\s\-\']', ' ', text)
+    
+    # Replace multiple spaces again after special character removal
+    text = re.sub(r'\s+', ' ', text)
+    
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Strip leading/trailing whitespace
+    text = text.strip()
+    
+    return text
 
 
 def get_synonyms(skill: str) -> List[str]:
@@ -201,17 +233,18 @@ def calculate_similarity(text1: str, text2: str) -> float:
 
 def check_skill_in_text(
     skill: str, 
-    text: str, 
+    normalized_text: str,
     use_word_boundaries: bool = True,
     use_fuzzy_matching: bool = True,
     fuzzy_threshold: float = 0.85
 ) -> Tuple[bool, Set[str], Set[str], str]:
     """
-    Check if a skill (or its variations) appears in the text with fuzzy matching.
+    Check if a skill (or its variations) appears in the normalized text with fuzzy matching.
+    Now uses pre-normalized text to avoid repeated normalization.
     
     Args:
         skill: Skill to check
-        text: Resume text to search in
+        normalized_text: Pre-normalized resume text
         use_word_boundaries: If True, use word boundaries for exact matching
         use_fuzzy_matching: If True, use fuzzy matching for typos
         fuzzy_threshold: Similarity threshold for fuzzy matching (0-1)
@@ -220,11 +253,8 @@ def check_skill_in_text(
         Tuple of (found, variations_found, variations_checked, match_type)
         match_type: 'exact', 'word_boundary', 'substring', 'fuzzy', 'none'
     """
-    if not skill or not text:
+    if not skill or not normalized_text:
         return False, set(), set(), 'none'
-    
-    # Normalize text
-    normalized_text = normalize_text(text)
     
     # Generate variations
     variations = generate_skill_variations(skill)
@@ -245,7 +275,8 @@ def check_skill_in_text(
         if found_variations:
             return True, found_variations, variations, match_type
     
-    # Strategy 2: Substring matching (for compound words)
+    # Strategy 2: Substring matching (handles merged words)
+    # This handles cases where words might be merged without spaces
     for variation in variations:
         if variation and variation in normalized_text:
             found_variations.add(variation)
@@ -255,7 +286,26 @@ def check_skill_in_text(
     if found_variations:
         return True, found_variations, variations, match_type
     
-    # Strategy 3: Fuzzy matching (for typos)
+    # Strategy 3: Check if skill appears as substring in any word
+    # This handles cases where skill is part of a larger word
+    cleaned_text = re.sub(r'[^\w\s]', ' ', normalized_text)
+    words = cleaned_text.split()
+    
+    for variation in variations:
+        if not variation:
+            continue
+        for word in words:
+            if variation in word.lower():
+                found_variations.add(variation)
+                match_type = 'substring'
+                break
+        if found_variations:
+            break
+    
+    if found_variations:
+        return True, found_variations, variations, match_type
+    
+    # Strategy 4: Fuzzy matching (for typos)
     if use_fuzzy_matching:
         # Clean text by removing special characters and splitting into words
         cleaned_text = re.sub(r'[^\w\s]', '', normalized_text)
@@ -380,6 +430,7 @@ def verify_skills(
 ) -> Tuple[bool, Optional[Dict[str, Any]]]:
     """
     Verify if candidate possesses all required skills.
+    Normalizes resume text only once for efficiency.
     
     Args:
         resume: Resume dictionary with 'raw_resume_text' field
@@ -443,7 +494,10 @@ def verify_skills(
                 return False, details
             return False, None
         
-        # Check each required skill
+        # Normalize resume text only once
+        normalized_resume_text = normalize_text(resume_text)
+        
+        # Check each required skill using pre-normalized text
         found_skills = []
         missing_skills = []
         skill_variations = {}
@@ -455,7 +509,7 @@ def verify_skills(
         for skill in required_skills:
             found, found_vars, checked_vars, match_type = check_skill_in_text(
                 skill, 
-                resume_text,
+                normalized_resume_text,
                 use_fuzzy_matching=use_fuzzy_matching,
                 fuzzy_threshold=fuzzy_threshold
             )
