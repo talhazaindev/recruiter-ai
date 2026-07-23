@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     groq_model: str = "qwen/qwen3-32b"
 
+    # Docling: bake models into the image at /opt/docling/models (see Dockerfile.api).
+    # OCR/tables off by default — resumes are born-digital multi-column PDFs.
+    docling_artifacts_path: str = ""
+    docling_do_ocr: bool = False
+    docling_do_table_structure: bool = False
+
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://localhost:8000/v1/integrations/drive/callback"

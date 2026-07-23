@@ -69,7 +69,12 @@ def retry_or_dead_letter(payload: dict[str, Any], error: str) -> None:
 
 
 def recover_claimed(queue: str) -> int:
-    """Return tasks left claimed by a stopped worker to the ready queue."""
+    """Return tasks left claimed by a stopped worker to the ready queue.
+
+    Workers call this on startup so in-flight jobs survive restarts. Handlers must
+    be idempotent (skip already-finished work). To discard leftover jobs after a
+    messy restart: DEL the ready and ``:processing`` keys for each queue.
+    """
     client = get_redis()
     processing = f"{queue}:processing"
     recovered = 0

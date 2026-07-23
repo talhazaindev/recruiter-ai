@@ -17,19 +17,21 @@ from app.services.matcher_adapter import match_jd_resume
 from app.services.parser_adapter import parse_resume_bytes
 from app.services.storage import download_bytes
 from time import perf_counter
-from docling.document_converter import DocumentConverter
 
 
 logger = logging.getLogger(__name__)
 
 
-async def process_parse_task(payload: dict[str, Any],converter: DocumentConverter) -> None:
-    """Parse one resume file and enqueue matching."""
+async def process_parse_task(payload: dict[str, Any], converter: Any | None = None) -> None:
+    """Parse one resume file and enqueue matching.
+
+    ``converter`` is the process-local Docling DocumentConverter when provided
+    by the parse worker. Inline API fallback resolves the shared singleton.
+    """
     overall_start = perf_counter()
     logger.info("========== PROCESS PARSE TASK START [%s] ==========")
 
     db = get_db()
-    settings = get_settings()
     resume_id = payload["resume_id"]
     org_id = payload["org_id"]
     job_id = payload["job_id"]
@@ -42,10 +44,64 @@ async def process_parse_task(payload: dict[str, Any],converter: DocumentConverte
     if not resume_doc:
         logger.error("Resume %s not found", resume_id)
         return
-    temp_job=await db.jobs.find_one({"_id": ObjectId(job_id)},
-        {"minimum_relevant_years": 1}
-)
-    min_experience=temp_job.get("minimum_relevant_years", 0) or 0
+
+    parse_state = resume_doc.get("parse") or {}
+    if parse_state.get("resume"):
+        # Recovered/replayed task after a successful parse — do not re-run Docling.
+        logger.info("Skipping parse for %s; already parsed", resume_id)
+        candidate_id = resume_doc.get("candidate_id")
+        if candidate_id:
+            existing_match = await db.match_results.find_one(
+                {
+                    "org_id": org_id,
+                    "job_id": job_id,
+                    "resume_id": resume_id,
+                    "is_current": True,
+                    "stale": {"$ne": True},
+                },
+                {"_id": 1},
+            )
+            if not existing_match:
+                enqueue(
+                    QUEUE_MATCH,
+                    {
+                        "resume_id": resume_id,
+                        "candidate_id": str(candidate_id),
+                        "job_id": job_id,
+                        "batch_id": batch_id,
+                        "org_id": org_id,
+                        "needs_review": bool(parse_state.get("needs_review")),
+                    },
+                )
+            else:
+                await _maybe_finish_batch(batch_id)
+        else:
+            await _maybe_finish_batch(batch_id)
+        logger.info(
+            "========== PROCESS PARSE TASK END [%s] (%.3fs) ==========",
+            resume_id,
+            perf_counter() - overall_start,
+        )
+        return
+
+    if parse_state.get("status") == "failed":
+        logger.info("Skipping parse for %s; previously failed", resume_id)
+        await _maybe_finish_batch(batch_id)
+        logger.info(
+            "========== PROCESS PARSE TASK END [%s] (%.3fs) ==========",
+            resume_id,
+            perf_counter() - overall_start,
+        )
+        return
+
+    if converter is None:
+        from parser.docling_parser import get_docling_converter
+
+        converter = get_docling_converter()
+
+    settings = get_settings()
+    temp_job = await db.jobs.find_one({"_id": ObjectId(job_id)}, {"minimum_relevant_years": 1})
+    min_experience = (temp_job or {}).get("minimum_relevant_years", 0) or 0
     t = perf_counter()
 
     await db.resumes.update_one(
@@ -264,6 +320,22 @@ async def process_match_task(payload: dict[str, Any]) -> None:
     if not job or not resume_doc or not resume_doc.get("parse", {}).get("resume"):
         logger.error("Missing job/resume for match %s", resume_id)
         return
+
+    if not is_rematch:
+        existing_current = await db.match_results.find_one(
+            {
+                "org_id": org_id,
+                "job_id": job_id,
+                "resume_id": resume_id,
+                "is_current": True,
+                "stale": {"$ne": True},
+            },
+            {"_id": 1},
+        )
+        if existing_current:
+            logger.info("Skipping match for %s; current result exists", resume_id)
+            await _maybe_finish_batch(batch_id)
+            return
 
     await db.ingest_batches.update_one(
         {"_id": ObjectId(batch_id)},

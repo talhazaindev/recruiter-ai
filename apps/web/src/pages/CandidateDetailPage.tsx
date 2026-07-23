@@ -1,9 +1,80 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../api/client'
+import {
+  api,
+  type ExperienceEvaluation,
+  type ExperienceGap,
+  type ItemMatchDetail,
+} from '../api/client'
 import { Button, Panel, ScoreMeter, Tag } from '../components/ui'
 import { numeric, resultStatus } from '../utils/resultSafety'
+
+function reasonLabel(reason?: string): string {
+  switch (reason) {
+    case 'relevant':
+      return 'Counted toward relevant years'
+    case 'title_mismatch':
+      return 'Title did not match JD'
+    case 'tech_below_threshold':
+      return 'Tech stack match below threshold'
+    case 'invalid_dates':
+      return 'Invalid or missing dates'
+    default:
+      return reason || 'No evaluation detail'
+  }
+}
+
+function findExperienceEvaluation(
+  evaluations: ExperienceEvaluation[],
+  exp: { company?: string; designation?: string; start_date?: string; end_date?: string },
+  index: number,
+): ExperienceEvaluation | undefined {
+  const exact = evaluations.find(
+    (row) =>
+      (row.company || '') === (exp.company || '') &&
+      (row.designation || '') === (exp.designation || '') &&
+      (row.start_date || '') === (exp.start_date || '') &&
+      (row.end_date || '') === (exp.end_date || ''),
+  )
+  if (exact) return exact
+  return evaluations[index]
+}
+
+function findItemMatch(
+  matches: Record<string, ItemMatchDetail> | undefined,
+  text: string,
+): ItemMatchDetail | undefined {
+  if (!matches) return undefined
+  if (matches[text]) return matches[text]
+  const lower = text.toLowerCase()
+  const key = Object.keys(matches).find((entry) => entry.toLowerCase() === lower || lower.includes(entry.toLowerCase()))
+  return key ? matches[key] : undefined
+}
+
+function RelevanceBadge({
+  evaluation,
+}: {
+  evaluation?: { is_relevant?: boolean; reason?: string; match_percentage?: number; tech_matches?: number; tech_stack_size?: number }
+}) {
+  if (!evaluation) return null
+  const relevant = Boolean(evaluation.is_relevant)
+  const detailParts: string[] = [reasonLabel(evaluation.reason)]
+  if (evaluation.tech_stack_size != null && evaluation.tech_matches != null) {
+    detailParts.push(
+      `${evaluation.tech_matches}/${evaluation.tech_stack_size}` +
+        (evaluation.match_percentage != null ? ` (${evaluation.match_percentage}%)` : ''),
+    )
+  } else if (evaluation.match_percentage != null) {
+    detailParts.push(`${evaluation.match_percentage}%`)
+  }
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-2">
+      <Tag tone={relevant ? 'ok' : 'danger'}>{relevant ? 'Relevant' : 'Not relevant'}</Tag>
+      <span className="text-xs text-[var(--ink-muted)]">{detailParts.join(' · ')}</span>
+    </div>
+  )
+}
 
 export function CandidateDetailPage() {
   const { jobId, resultId } = useParams()
@@ -71,6 +142,39 @@ export function CandidateDetailPage() {
     }
   }, [showPreview, detail.data?.resume_id])
 
+  const row = detail.data
+  const assessment = row?.explanation?.details
+  const step3 = assessment?.steps?.find((step) => step.step === 3)
+  const step4 = assessment?.steps?.find((step) => step.step === 4)
+
+  const experienceEvaluations = useMemo(() => {
+    const fromSignals = row?.rank_signals.experience_evaluations
+    if (Array.isArray(fromSignals) && fromSignals.length) return fromSignals
+    return step3?.experience_evaluations || []
+  }, [row, step3])
+
+  const projectMatches = useMemo(() => {
+    const fromSignals = row?.rank_signals.project_matches
+    if (fromSignals && typeof fromSignals === 'object') return fromSignals as Record<string, ItemMatchDetail>
+    return step4?.project_matches
+  }, [row, step4])
+
+  const certificationMatches = useMemo(() => {
+    const fromSignals = row?.rank_signals.certification_matches
+    if (fromSignals && typeof fromSignals === 'object') {
+      return fromSignals as Record<string, ItemMatchDetail>
+    }
+    return step4?.certification_matches
+  }, [row, step4])
+
+  const gaps = useMemo(() => {
+    const fromSignals = row?.rank_signals.gaps
+    if (Array.isArray(fromSignals) && fromSignals.length) return fromSignals as ExperienceGap[]
+    return (step3?.gaps || []) as ExperienceGap[]
+  }, [row, step3])
+
+  const hasBreakdown = experienceEvaluations.length > 0 || Boolean(projectMatches) || Boolean(certificationMatches)
+
   if (detail.isLoading) return <p className="text-[var(--ink-muted)]">Loading…</p>
   if (detail.isError) {
     return (
@@ -79,9 +183,8 @@ export function CandidateDetailPage() {
       </p>
     )
   }
-  if (!detail.data) return <p className="text-[var(--danger)]">Not found</p>
+  if (!row) return <p className="text-[var(--danger)]">Not found</p>
 
-  const row = detail.data
   const resume = row.resume as
     | {
         skills?: string[]
@@ -101,7 +204,10 @@ export function CandidateDetailPage() {
 
   const filename = row.source_ref?.original_filename || 'resume.pdf'
   const isPdf = filename.toLowerCase().endsWith('.pdf')
-  const assessment = row.explanation.details
+  const missingSkills = Array.isArray(row.rank_signals.missing_skills)
+    ? (row.rank_signals.missing_skills as string[])
+    : []
+  const verification = row.explanation.verification || {}
 
   return (
     <div className="space-y-6">
@@ -162,6 +268,13 @@ export function CandidateDetailPage() {
         </p>
       ) : null}
 
+      {!hasBreakdown ? (
+        <p className="text-sm text-[var(--ink-muted)] rounded-lg border border-[var(--line)] bg-white/60 px-3 py-2">
+          Relevance breakdown is unavailable for this older match. Rematch the job to see which
+          experience, projects, and certifications were counted.
+        </p>
+      ) : null}
+
       {showPreview ? (
         <Panel className="p-3 overflow-hidden">
           <div className="flex items-center justify-between gap-2 mb-2 px-1">
@@ -217,17 +330,21 @@ export function CandidateDetailPage() {
             {(resume?.experience || []).length === 0 ? (
               <p className="text-sm text-[var(--ink-muted)]">—</p>
             ) : null}
-            {(resume?.experience || []).map((exp, i) => (
-              <div key={i} className="text-sm border-t border-[var(--line)] pt-3">
-                <p className="font-medium">
-                  {[exp.designation, exp.company].filter(Boolean).join(' · ') || 'Role'}
-                </p>
-                <p className="text-xs text-[var(--ink-muted)]">
-                  {exp.start_date || '—'} – {exp.end_date || '—'}
-                </p>
-                <p className="mt-1 whitespace-pre-line text-[var(--ink-muted)]">{exp.description}</p>
-              </div>
-            ))}
+            {(resume?.experience || []).map((exp, i) => {
+              const evaluation = findExperienceEvaluation(experienceEvaluations, exp, i)
+              return (
+                <div key={i} className="text-sm border-t border-[var(--line)] pt-3">
+                  <p className="font-medium">
+                    {[exp.designation, exp.company].filter(Boolean).join(' · ') || 'Role'}
+                  </p>
+                  <p className="text-xs text-[var(--ink-muted)]">
+                    {exp.start_date || '—'} – {exp.end_date || '—'}
+                  </p>
+                  <RelevanceBadge evaluation={evaluation} />
+                  <p className="mt-1 whitespace-pre-line text-[var(--ink-muted)]">{exp.description}</p>
+                </div>
+              )
+            })}
           </div>
           <div className="space-y-2">
             <h3 className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Education</h3>
@@ -245,11 +362,51 @@ export function CandidateDetailPage() {
           {(resume?.projects || []).length > 0 ? (
             <div className="space-y-2">
               <h3 className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Projects</h3>
-              {(resume?.projects || []).map((p, i) => (
-                <p key={i} className="text-sm text-[var(--ink-muted)] whitespace-pre-line">
-                  {p}
-                </p>
-              ))}
+              {(resume?.projects || []).map((p, i) => {
+                const match = findItemMatch(projectMatches, p)
+                return (
+                  <div key={i} className="text-sm border-t border-[var(--line)] pt-3">
+                    <p className="whitespace-pre-line text-[var(--ink-muted)]">{p}</p>
+                    <RelevanceBadge
+                      evaluation={
+                        match
+                          ? {
+                              is_relevant: match.is_relevant,
+                              reason: match.is_relevant ? 'relevant' : 'tech_below_threshold',
+                              match_percentage: match.match_percentage,
+                              tech_matches: match.tech_matches,
+                            }
+                          : undefined
+                      }
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          ) : null}
+          {(resume?.certifications || []).length > 0 ? (
+            <div className="space-y-2">
+              <h3 className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Certifications</h3>
+              {(resume?.certifications || []).map((cert, i) => {
+                const match = findItemMatch(certificationMatches, cert)
+                return (
+                  <div key={i} className="text-sm border-t border-[var(--line)] pt-3">
+                    <p className="whitespace-pre-line text-[var(--ink-muted)]">{cert}</p>
+                    <RelevanceBadge
+                      evaluation={
+                        match
+                          ? {
+                              is_relevant: match.is_relevant,
+                              reason: match.is_relevant ? 'relevant' : 'tech_below_threshold',
+                              match_percentage: match.match_percentage,
+                              tech_matches: match.tech_matches,
+                            }
+                          : undefined
+                      }
+                    />
+                  </div>
+                )
+              })}
             </div>
           ) : null}
         </Panel>
@@ -267,8 +424,24 @@ export function CandidateDetailPage() {
           {Array.isArray(row.explanation?.matched_skills) ? (
             <p className="text-sm">Matched skills: {(row.explanation.matched_skills as string[]).join(', ')}</p>
           ) : null}
+          {missingSkills.length > 0 ? (
+            <p className="text-sm text-[var(--danger)]">Missing skills: {missingSkills.join(', ')}</p>
+          ) : null}
           {(row.hard_filters?.failed_rules || []).length > 0 ? (
             <p className="text-sm text-[var(--danger)]">{row.hard_filters.failed_rules.join('; ')}</p>
+          ) : null}
+
+          {Object.values(verification).some(Boolean) ? (
+            <div className="rounded-lg border border-[var(--line)] bg-white/50 p-3 space-y-1">
+              <p className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Verification</p>
+              {Object.entries(verification).map(([key, value]) =>
+                value ? (
+                  <p key={key} className="text-xs text-[var(--ink-muted)]">
+                    <span className="font-medium capitalize text-[var(--ink)]">{key}:</span> {String(value)}
+                  </p>
+                ) : null,
+              )}
+            </div>
           ) : null}
 
           <div className="grid grid-cols-3 gap-2 border-t border-[var(--line)] pt-4">
@@ -279,6 +452,11 @@ export function CandidateDetailPage() {
                   ? `${numeric(row.rank_signals.relevant_work_years)!.toFixed(2)} years`
                   : '—'}
               </p>
+              {step3?.minimum_required != null ? (
+                <p className="mt-1 text-[10px] text-[var(--ink-muted)]">
+                  Required {Number(step3.minimum_required).toFixed(1)}y
+                </p>
+              ) : null}
             </div>
             <div className="rounded-lg bg-white/60 p-3">
               <p className="text-xs text-[var(--ink-muted)]">Total experience</p>
@@ -295,6 +473,30 @@ export function CandidateDetailPage() {
               </p>
             </div>
           </div>
+
+          {(row.rank_signals.gap_found || gaps.length > 0) ? (
+            <div className="rounded-lg border border-[var(--line)] bg-white/50 p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium">Experience gaps</p>
+                <Tag tone={row.rank_signals.gap_found ? 'warn' : 'ok'}>
+                  {row.rank_signals.gap_found ? 'Gap found' : 'No major gaps'}
+                </Tag>
+              </div>
+              {gaps.length === 0 ? (
+                <p className="text-xs text-[var(--ink-muted)]">No gap details recorded.</p>
+              ) : (
+                gaps.map((gap, index) => (
+                  <p key={index} className="text-xs text-[var(--ink-muted)]">
+                    {(gap.gap_months != null ? `${gap.gap_months.toFixed(1)} months` : 'Gap')} between{' '}
+                    {[gap.from_designation, gap.from_company].filter(Boolean).join(' at ') || 'prior role'}
+                    {gap.from_end ? ` (ended ${gap.from_end})` : ''} and{' '}
+                    {[gap.to_designation, gap.to_company].filter(Boolean).join(' at ') || 'next role'}
+                    {gap.to_start ? ` (started ${gap.to_start})` : ''}
+                  </p>
+                ))
+              )}
+            </div>
+          ) : null}
 
           {assessment?.steps?.length ? (
             <div className="border-t border-[var(--line)] pt-4 space-y-3">
@@ -313,6 +515,14 @@ export function CandidateDetailPage() {
                   </div>
                   {step.message ? (
                     <p className="mt-2 text-xs text-[var(--ink-muted)]">{step.message}</p>
+                  ) : null}
+                  {step.step === 3 && step.relevant_experience != null ? (
+                    <p className="mt-2 text-xs text-[var(--ink-muted)]">
+                      Relevant {Number(step.relevant_experience).toFixed(2)}y
+                      {step.minimum_required != null
+                        ? ` vs required ${Number(step.minimum_required).toFixed(1)}y`
+                        : ''}
+                    </p>
                   ) : null}
                   {(step.summary || []).map((line, index) => (
                     <p key={index} className="mt-1 text-xs text-[var(--ink-muted)]">{line}</p>

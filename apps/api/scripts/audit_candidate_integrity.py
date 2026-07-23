@@ -118,7 +118,7 @@ async def _audit_job(
     current_revision = int(job.get("jd_revision") or 1)
     stale = []
     for row in results:
-        if row.get("matcher_version") != "ats-agent.v2":
+        if row.get("matcher_version") not in {"ats-agent.v2", "ats-agent.v3"}:
             stale.append(str(row["_id"]))
             continue
         if int(row.get("jd_revision") or 0) != current_revision:

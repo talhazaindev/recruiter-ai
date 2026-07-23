@@ -45,6 +45,36 @@ export type Job = {
   active_rematch_batch_id: string | null
 }
 
+export type ExperienceEvaluation = {
+  company?: string
+  designation?: string
+  start_date?: string
+  end_date?: string
+  is_relevant: boolean
+  title_match?: boolean
+  tech_matches?: number
+  tech_stack_size?: number
+  match_percentage?: number
+  reason?: 'title_mismatch' | 'tech_below_threshold' | 'relevant' | 'invalid_dates' | string
+}
+
+export type ItemMatchDetail = {
+  tech_matches?: number
+  match_percentage?: number
+  is_relevant?: boolean
+}
+
+export type ExperienceGap = {
+  from_company?: string
+  from_designation?: string
+  from_end?: string
+  to_company?: string
+  to_designation?: string
+  to_start?: string
+  gap_months?: number
+  gap_years?: number
+}
+
 export type AssessmentStep = {
   step: number
   title: string
@@ -57,8 +87,15 @@ export type AssessmentStep = {
   projects_certificates_count?: number
   relevant_projects?: string[]
   relevant_certifications?: string[]
+  project_matches?: Record<string, ItemMatchDetail>
+  certification_matches?: Record<string, ItemMatchDetail>
+  experience_evaluations?: ExperienceEvaluation[]
+  total_projects_checked?: number
+  total_certifications_checked?: number
+  invalid_projects?: string[]
+  invalid_certifications?: string[]
   gap_found?: boolean
-  gaps?: unknown[]
+  gaps?: ExperienceGap[]
   comment?: string
   overall_status?: 'Pass' | 'Fail'
   failed_requirements?: { requirement: string; status?: string; reason?: string }[]
@@ -86,6 +123,13 @@ export type MatchRow = {
     projects_certificates_count?: number
     relevant_projects?: number
     relevant_certifications?: number
+    gap_found?: boolean
+    gaps?: ExperienceGap[]
+    found_skills?: string[]
+    missing_skills?: string[]
+    experience_evaluations?: ExperienceEvaluation[]
+    project_matches?: Record<string, ItemMatchDetail>
+    certification_matches?: Record<string, ItemMatchDetail>
     status?: 'Pass' | 'Fail'
     comment?: string
     [key: string]: unknown
@@ -103,6 +147,7 @@ export type MatchRow = {
   stale?: boolean
   jd_revision?: number
   parse_attempt_id?: string
+  matcher_version?: string
   candidate: {
     name: string
     emails: string[]
@@ -241,11 +286,36 @@ export const api = {
   driveStatus: () =>
     request<{ configured: boolean; connected: boolean }>('/v1/integrations/drive/status'),
   driveAuthUrl: () => request<{ url: string }>('/v1/integrations/drive/auth-url'),
-  listSkills: () => request<{ skills: string[] }>('/v1/reference/skills'),
+  listSkills: (q?: string, limit = 40) => {
+    const params = new URLSearchParams()
+    if (q?.trim()) params.set('q', q.trim())
+    params.set('limit', String(limit))
+    const qs = params.toString()
+    return request<CatalogListResponse & { skills: string[] }>(`/v1/reference/skills?${qs}`)
+  },
+  listTechStack: (q?: string, limit = 40) => {
+    const params = new URLSearchParams()
+    if (q?.trim()) params.set('q', q.trim())
+    params.set('limit', String(limit))
+    const qs = params.toString()
+    return request<CatalogListResponse & { tech: string[] }>(`/v1/reference/tech-stack?${qs}`)
+  },
   listDegrees: () => request<{ degrees: string[]; aliases: Record<string, string[]> }>('/v1/reference/degrees'),
   listDisciplines: () =>
     request<{ disciplines: string[]; aliases: Record<string, string[]> }>('/v1/reference/disciplines'),
   health: () => request<{ status: string }>('/v1/health'),
+}
+
+export type CatalogItem = {
+  id: string
+  label: string
+  matched_via?: string
+  kind?: 'tech' | 'compound' | string
+}
+
+export type CatalogListResponse = {
+  items: CatalogItem[]
+  aliases: Record<string, string[]>
 }
 
 export function emptyJd(): JobDescription {

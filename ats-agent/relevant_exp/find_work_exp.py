@@ -556,33 +556,35 @@ def detect_gaps(experiences: List[Dict[str, Any]]) -> Tuple[bool, List[Dict[str,
 def find_relevant_experience(
     job_json: Dict[str, Any], 
     resume_json: Dict[str, Any]
-) -> Tuple[float, bool, List[Dict[str, Any]]]:
+) -> Tuple[float, bool, List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Main function to calculate total relevant experience in years.
     Handles overlapping date ranges properly and detects gaps.
     
     Returns:
-        Tuple[float, bool, List[Dict]]:
+        Tuple[float, bool, List[Dict], List[Dict]]:
         - total_relevant_years: Total relevant experience in years
         - gap_found: True if gap > threshold detected
         - gaps: List of gap details
+        - experience_evaluations: Per-role relevance breakdown
     """
     job_title = job_json.get('job_title', '')
     tech_stack = job_json.get('tech_stack', [])
+    tech_stack_size = len(tech_stack) if isinstance(tech_stack, list) else 0
     
     if not job_title:
         print("Warning: No job title provided in JD")
-        return 0.0, False, []
+        return 0.0, False, [], []
     
     if not tech_stack:
         print("Warning: No tech stack provided in JD")
-        return 0.0, False, []
+        return 0.0, False, [], []
     
     experiences = resume_json.get('experience', [])
     
     if not experiences:
         print("No experience entries found in resume")
-        return 0.0, False, []
+        return 0.0, False, [], []
     
     # Check for gaps in complete work experience
     gap_found, gaps = detect_gaps(experiences)
@@ -590,6 +592,7 @@ def find_relevant_experience(
     # Collect relevant experiences
     relevant_experiences = []
     relevant_count = 0
+    experience_evaluations: List[Dict[str, Any]] = []
     
     print(f"\n🔍 Checking experiences for job title: '{job_title}'")
     print(f"Tech stack criteria: {tech_stack}")
@@ -603,11 +606,13 @@ def find_relevant_experience(
         
         exp_designation = exp.get('designation', '')
         exp_company = exp.get('company', '')
+        start_date = exp.get('start_date', '')
+        end_date = exp.get('end_date', '')
+        title_match = is_title_match(exp_designation, job_title)
+        match_percentage = (tech_matches / tech_stack_size * 100) if tech_stack_size else 0.0
+        reason = "title_mismatch"
         
         if is_relevant:
-            start_date = exp.get('start_date', '')
-            end_date = exp.get('end_date', '')
-            
             # Calculate months for display (simple calculation)
             start_float = get_date_as_float(start_date, is_end_date=False)
             end_float = get_date_as_float(end_date, is_end_date=True)
@@ -626,19 +631,38 @@ def find_relevant_experience(
                         'end_float': end_float
                     })
                     relevant_count += 1
-                    match_percentage = (tech_matches / len(tech_stack) * 100) if tech_stack else 0
+                    reason = "relevant"
                     print(f"✅ Relevant #{relevant_count}: {exp_designation} at {exp_company}")
                     print(f"   - Tech matches: {tech_matches}/{len(tech_stack)} ({match_percentage:.1f}%)")
                     print(f"   - Duration: {months/12:.2f} years")
+                else:
+                    is_relevant = False
+                    reason = "invalid_dates"
+                    print(f"⚠️  Relevant but invalid dates: {exp_designation} at {exp_company}")
             else:
+                is_relevant = False
+                reason = "invalid_dates"
                 print(f"⚠️  Relevant but invalid dates: {exp_designation} at {exp_company}")
         else:
-            title_match = is_title_match(exp_designation, job_title)
             if not title_match:
+                reason = "title_mismatch"
                 print(f"❌ {exp_designation} at {exp_company} - Title mismatch")
             else:
-                match_percentage = (tech_matches / len(tech_stack) * 100) if tech_stack else 0
+                reason = "tech_below_threshold"
                 print(f"❌ {exp_designation} at {exp_company} - Tech mismatch (matches: {tech_matches}/{len(tech_stack)}, {match_percentage:.1f}% < {MIN_TECH_STACK_MATCH_PERCENTAGE}%)")
+
+        experience_evaluations.append({
+            "company": exp_company,
+            "designation": exp_designation,
+            "start_date": start_date,
+            "end_date": end_date,
+            "is_relevant": bool(is_relevant and reason == "relevant"),
+            "title_match": bool(title_match),
+            "tech_matches": int(tech_matches or 0),
+            "tech_stack_size": tech_stack_size,
+            "match_percentage": round(float(match_percentage), 1),
+            "reason": reason,
+        })
     
     # Calculate relevant experience with overlap handling
     total_months = 0.0
@@ -755,7 +779,7 @@ def find_relevant_experience(
     print(f"\n📊 Total relevant experience: {total_years:.2f} years")
     print(f"📊 Number of relevant experiences: {relevant_count}")
     
-    return total_years, gap_found, gaps
+    return total_years, gap_found, gaps, experience_evaluations
 
 
 if __name__ == "__main__":
@@ -787,9 +811,10 @@ if __name__ == "__main__":
         print(f"\n{'='*80}")
         print(f"📝 Test Case {i}")
         print(f"{'='*80}")
-        result, gap_found, gaps = find_relevant_experience(test["job"], test["resume"])
+        result, gap_found, gaps, evaluations = find_relevant_experience(test["job"], test["resume"])
         print(f"\n🎯 Final Result: {result:.2f} years of relevant experience")
         print(f"🎯 Gap Found: {gap_found}")
+        print(f"🎯 Evaluations: {len(evaluations)}")
         if gaps:
             print(f"🎯 Number of gaps: {len(gaps)}")
     

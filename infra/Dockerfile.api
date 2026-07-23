@@ -19,6 +19,40 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY apps/api/requirements.txt /app/apps/api/requirements.txt
 RUN pip install --no-cache-dir -r /app/apps/api/requirements.txt
 
+# Prefetch Docling 2.15.0 layout/table artifacts (revision pinned by StandardPdfPipeline).
+# OCR models are not downloaded — do_ocr is disabled for born-digital resumes.
+# BuildKit cache mount: skip HF download on rebuild when models were already fetched.
+# This layer sits before app COPY so code-only edits keep it CACHED.
+ENV DOCLING_ARTIFACTS_PATH=/opt/docling/models
+RUN --mount=type=cache,id=docling-models-v2.15,target=/var/cache/docling \
+    mkdir -p /opt/docling/models /var/cache/docling \
+ && if [ ! -f /var/cache/docling/.docling-baked ]; then \
+      python -c "from pathlib import Path; from docling.pipeline.standard_pdf_pipeline import StandardPdfPipeline; StandardPdfPipeline.download_models_hf(local_dir=Path('/var/cache/docling')); Path('/var/cache/docling/.docling-baked').touch(); print('Docling models downloaded to cache')"; \
+    else \
+      echo "Docling models already in BuildKit cache — skipping download"; \
+    fi \
+ && cp -a /var/cache/docling/. /opt/docling/models/ \
+ && echo "Docling models baked at /opt/docling/models"
+
+# Fail closed: never hit Hugging Face after bake. Warm stays in this early layer
+# so code-only rebuilds do not re-run model load during image build.
+ENV DOCLING_DO_OCR=false
+ENV DOCLING_DO_TABLE_STRUCTURE=false
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+ENV HF_DATASETS_OFFLINE=1
+RUN python -c "\
+from docling.datamodel.base_models import InputFormat; \
+from docling.datamodel.pipeline_options import PdfPipelineOptions; \
+from docling.document_converter import DocumentConverter, PdfFormatOption; \
+opts = PdfPipelineOptions(); \
+opts.do_ocr = False; \
+opts.do_table_structure = False; \
+opts.artifacts_path = '/opt/docling/models'; \
+c = DocumentConverter(allowed_formats=[InputFormat.PDF], format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)}); \
+c.initialize_pipeline(InputFormat.PDF); \
+print('Docling offline warm OK')"
+
 COPY apps/api /app/apps/api
 COPY workers /app/workers
 COPY services /app/services
@@ -27,6 +61,13 @@ COPY ats-agent /app/ats-agent
 
 ENV PYTHONPATH=/app/apps/api:/app
 ENV PYTHONIOENCODING=utf-8
+ENV DOCLING_ARTIFACTS_PATH=/opt/docling/models
+ENV DOCLING_DO_OCR=false
+ENV DOCLING_DO_TABLE_STRUCTURE=false
+ENV HF_HUB_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+ENV HF_DATASETS_OFFLINE=1
+
 WORKDIR /app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "apps/api"]

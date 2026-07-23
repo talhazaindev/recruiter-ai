@@ -65,12 +65,15 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
     work_years = 0.0
     gap_found = False
     gaps: list[Any] = []
+    experience_evaluations: list[dict[str, Any]] = []
     project_result: dict[str, Any] = {}
 
     # ats-agent modules print emoji diagnostics; redirect to avoid Windows charmap errors
     try:
         with contextlib.redirect_stdout(io.StringIO()):
-            work_years, gap_found, gaps = find_relevant_experience(jd_data, resume_data)
+            work_years, gap_found, gaps, experience_evaluations = find_relevant_experience(
+                jd_data, resume_data
+            )
     except Exception as exc:
         logger.warning("find_relevant_experience failed: %s", exc)
 
@@ -82,6 +85,8 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
 
     relevant_projects = list(project_result.get("relevant_projects") or [])
     relevant_certifications = list(project_result.get("relevant_certifications") or [])
+    project_matches = project_result.get("project_matches") or {}
+    certification_matches = project_result.get("certification_matches") or {}
     projects_certificates_count = int(
         project_result.get("relevant_count")
         or len(relevant_projects) + len(relevant_certifications)
@@ -190,6 +195,7 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
                 "minimum_required": minimum_relevant,
                 "gap_found": gap_found,
                 "gaps": gaps if isinstance(gaps, list) else [],
+                "experience_evaluations": experience_evaluations,
             },
             {
                 "step": 4,
@@ -198,6 +204,15 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
                 "projects_certificates_count": projects_certificates_count,
                 "relevant_projects": relevant_projects,
                 "relevant_certifications": relevant_certifications,
+                "project_matches": project_matches,
+                "certification_matches": certification_matches,
+                "total_projects_checked": project_result.get("total_projects_checked"),
+                "total_certifications_checked": project_result.get(
+                    "total_certifications_checked"
+                ),
+                "invalid_projects": project_result.get("invalid_projects") or [],
+                "invalid_certifications": project_result.get("invalid_certifications")
+                or [],
             },
             {
                 "step": 5,
@@ -224,6 +239,9 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
             "missing_skills": missing_skills,
             "relevant_projects": len(relevant_projects),
             "relevant_certifications": len(relevant_certifications),
+            "experience_evaluations": experience_evaluations,
+            "project_matches": project_matches,
+            "certification_matches": certification_matches,
             "status": "Pass" if final_passed else "Fail",
             "comment": comment,
         },
@@ -238,5 +256,5 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
             },
             "details": assessment_details,
         },
-        "matcher_version": "ats-agent.v2",
+        "matcher_version": "ats-agent.v3",
     }

@@ -144,8 +144,24 @@ async def ingest_drive_folder(
     folder_id: str,
 ) -> int:
     """List PDF/DOCX in a Drive folder, store files, enqueue parse. Returns file count."""
-    token = await get_access_token(org_id, user_id)
     db = get_db()
+    batch = await db.ingest_batches.find_one({"_id": ObjectId(batch_id)})
+    if batch:
+        status = batch.get("status")
+        total = int((batch.get("counters") or {}).get("total", 0) or 0)
+        if status in {"completed", "completed_with_errors", "failed"}:
+            logger.info("Skipping Drive ingest batch %s; status=%s", batch_id, status)
+            return 0
+        # Discovery already finished and parse tasks were enqueued — do not re-list.
+        if status in {"queued", "processing"} and total > 0:
+            logger.info(
+                "Skipping Drive ingest batch %s; discovery already finished (total=%s)",
+                batch_id,
+                total,
+            )
+            return 0
+
+    token = await get_access_token(org_id, user_id)
     if not token:
         # Stub mode: mark batch with instructional error so UI stays useful in demos
         await db.ingest_batches.update_one(
@@ -208,6 +224,17 @@ async def ingest_drive_folder(
         for f in files:
             file_id = f["id"]
             name = f["name"]
+            # Skip known Drive files before downloading media (recovery / re-ingest).
+            if await db.resumes.find_one(
+                {
+                    "org_id": org_id,
+                    "job_id": job_id,
+                    "source_ref.drive_file_id": file_id,
+                },
+                {"_id": 1},
+            ):
+                skipped_count += 1
+                continue
             dl = await client.get(
                 f"{DRIVE_FILES}/{file_id}?alt=media",
                 headers={"Authorization": f"Bearer {token}"},
@@ -220,10 +247,7 @@ async def ingest_drive_folder(
                 {
                     "org_id": org_id,
                     "job_id": job_id,
-                    "$or": [
-                        {"source_ref.drive_file_id": file_id},
-                        {"source_ref.source_sha256": source_sha256},
-                    ],
+                    "source_ref.source_sha256": source_sha256,
                 },
                 {"_id": 1},
             ):

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { api, emptyJd, type JobDescription } from '../api/client'
+import { CatalogChipInput } from '../components/CatalogChipInput'
 import { Button, Input, Panel, Tag, TextArea } from '../components/ui'
 
 const STEPS = ['Summary', 'Must-have', 'Tech', 'Nice-to-have', 'Keywords', 'Review'] as const
@@ -39,7 +40,6 @@ export function JdEditorPage() {
   const { jobId } = useParams()
   const qc = useQueryClient()
   const job = useQuery({ queryKey: ['job', jobId], queryFn: () => api.getJob(jobId!), enabled: Boolean(jobId) })
-  const skillsRef = useQuery({ queryKey: ['ref-skills'], queryFn: () => api.listSkills() })
   const degreesRef = useQuery({ queryKey: ['ref-degrees'], queryFn: () => api.listDegrees() })
   const disciplinesRef = useQuery({ queryKey: ['ref-disciplines'], queryFn: () => api.listDisciplines() })
 
@@ -47,6 +47,16 @@ export function JdEditorPage() {
   const [jd, setJd] = useState<JobDescription>(emptyJd())
   const [saved, setSaved] = useState(false)
   const [skillQuery, setSkillQuery] = useState('')
+  const [techQuery, setTechQuery] = useState('')
+
+  const skillsRef = useQuery({
+    queryKey: ['ref-skills', skillQuery],
+    queryFn: () => api.listSkills(skillQuery || undefined),
+  })
+  const techRef = useQuery({
+    queryKey: ['ref-tech', techQuery],
+    queryFn: () => api.listTechStack(techQuery || undefined),
+  })
 
   useEffect(() => {
     if (job.data) setJd(job.data.jd)
@@ -73,29 +83,6 @@ export function JdEditorPage() {
       requirements_must_have: { ...prev.requirements_must_have, skills },
     }))
   }
-
-  function addSkill(skill: string) {
-    const key = skill.trim()
-    if (!key) return
-    const existing = jd.requirements_must_have.skills
-    if (existing.some((s) => s.toLowerCase() === key.toLowerCase())) return
-    setMustSkills([...existing, key])
-    setSkillQuery('')
-  }
-
-  function removeSkill(skill: string) {
-    setMustSkills(jd.requirements_must_have.skills.filter((s) => s !== skill))
-  }
-
-  const filteredSkills = useMemo(() => {
-    const all = skillsRef.data?.skills || []
-    const q = skillQuery.trim().toLowerCase()
-    const selected = new Set(jd.requirements_must_have.skills.map((s) => s.toLowerCase()))
-    return all
-      .filter((s) => !selected.has(s.toLowerCase()))
-      .filter((s) => !q || s.toLowerCase().includes(q))
-      .slice(0, 40)
-  }, [skillsRef.data, skillQuery, jd.requirements_must_have.skills])
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -161,66 +148,18 @@ export function JdEditorPage() {
 
         {step === 1 && (
           <>
-            <div className="space-y-2">
-              <span className="text-sm text-[var(--ink-muted)]">Must-have skills</span>
-              <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
-                {jd.requirements_must_have.skills.map((skill) => (
-                  <button
-                    key={skill}
-                    type="button"
-                    onClick={() => removeSkill(skill)}
-                    className="inline-flex items-center gap-1 rounded-md border border-[var(--line)] bg-white/80 px-2 py-1 text-xs"
-                    title="Remove"
-                  >
-                    {skill}
-                    <span aria-hidden>×</span>
-                  </button>
-                ))}
-                {jd.requirements_must_have.skills.length === 0 ? (
-                  <span className="text-xs text-[var(--ink-muted)]">No skills selected yet</span>
-                ) : null}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  className="flex-1"
-                  placeholder="Search skills catalog…"
-                  value={skillQuery}
-                  onChange={(e) => setSkillQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      if (filteredSkills[0]) addSkill(filteredSkills[0])
-                      else if (skillQuery.trim()) addSkill(skillQuery.trim())
-                    }
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    if (skillQuery.trim()) addSkill(skillQuery.trim())
-                  }}
-                >
-                  Add
-                </Button>
-              </div>
-              {filteredSkills.length > 0 ? (
-                <div className="max-h-40 overflow-y-auto rounded-md border border-[var(--line)] bg-white/70 p-2">
-                  <div className="flex flex-wrap gap-1.5">
-                    {filteredSkills.map((skill) => (
-                      <button
-                        key={skill}
-                        type="button"
-                        onClick={() => addSkill(skill)}
-                        className="rounded-md px-2 py-1 text-xs hover:bg-[var(--signal)]/10"
-                      >
-                        {skill}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
+            <CatalogChipInput
+              label="Must-have skills"
+              values={jd.requirements_must_have.skills}
+              onChange={setMustSkills}
+              items={skillsRef.data?.items || []}
+              aliases={skillsRef.data?.aliases}
+              placeholder="Search skills or aliases (e.g. py, reactjs)…"
+              emptyHint="No skills selected yet"
+              query={skillQuery}
+              onQueryChange={setSkillQuery}
+              loading={skillsRef.isFetching}
+            />
 
             <div className="grid sm:grid-cols-2 gap-3">
               <label className="block text-sm">
@@ -311,14 +250,18 @@ export function JdEditorPage() {
 
         {step === 2 && (
           <>
-            <label className="block text-sm">
-              <span className="text-[var(--ink-muted)]">Tech stack</span>
-              <TextArea
-                className="mt-1"
-                value={jd.tech_stack.join('\n')}
-                onChange={(e) => update('tech_stack', listFromLines(e.target.value))}
-              />
-            </label>
+            <CatalogChipInput
+              label="Tech stack"
+              values={jd.tech_stack}
+              onChange={(tech_stack) => update('tech_stack', tech_stack)}
+              items={techRef.data?.items || []}
+              aliases={techRef.data?.aliases}
+              placeholder="Search tech or aliases (e.g. nodejs, mern)…"
+              emptyHint="No tech stack selected yet"
+              query={techQuery}
+              onQueryChange={setTechQuery}
+              loading={techRef.isFetching}
+            />
             <label className="block text-sm">
               <span className="text-[var(--ink-muted)]">Preferred skills</span>
               <TextArea

@@ -2,22 +2,126 @@
 
 from __future__ import annotations
 
+import logging
+import os
+import time
 from collections import defaultdict
+from pathlib import Path
 from typing import Any
 
-from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
 
 from parser.parser import _is_person_name, extract_basic_info, normalize_heading
 
+logger = logging.getLogger(__name__)
+
 _converter: DocumentConverter | None = None
+_pipeline_initialized: bool = False
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    """Parse a boolean environment variable."""
+    raw = os.getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _settings_docling() -> dict[str, Any] | None:
+    """Load Docling knobs from app Settings when the API package is importable."""
+    try:
+        from app.config import get_settings
+
+        s = get_settings()
+        return {
+            "artifacts_path": (s.docling_artifacts_path or "").strip() or None,
+            "do_ocr": bool(s.docling_do_ocr),
+            "do_table_structure": bool(s.docling_do_table_structure),
+        }
+    except Exception:
+        return None
+
+
+def _resolve_artifacts_path(configured: str | None = None) -> str | None:
+    """Return absolute artifacts path, or None for Docling HF default cache."""
+    raw = (configured if configured is not None else os.getenv("DOCLING_ARTIFACTS_PATH") or "").strip()
+    if not raw:
+        return None
+    path = Path(raw).expanduser().resolve()
+    if not path.is_dir():
+        raise FileNotFoundError(
+            f"DOCLING_ARTIFACTS_PATH={path} does not exist or is not a directory. "
+            "Bake models into the image (see infra/Dockerfile.api) or unset the variable."
+        )
+    return str(path)
+
+
+def build_pdf_pipeline_options() -> PdfPipelineOptions:
+    """Build PDF pipeline options (OCR/tables off by default for born-digital resumes)."""
+    from_settings = _settings_docling()
+    if from_settings is not None:
+        do_ocr = from_settings["do_ocr"]
+        do_table = from_settings["do_table_structure"]
+        artifacts = _resolve_artifacts_path(from_settings["artifacts_path"])
+    else:
+        do_ocr = _env_bool("DOCLING_DO_OCR", False)
+        do_table = _env_bool("DOCLING_DO_TABLE_STRUCTURE", False)
+        artifacts = _resolve_artifacts_path()
+
+    opts = PdfPipelineOptions()
+    opts.do_ocr = do_ocr
+    opts.do_table_structure = do_table
+    if artifacts:
+        opts.artifacts_path = artifacts
+    return opts
+
+
+def create_docling_converter() -> DocumentConverter:
+    """Create a DocumentConverter configured for born-digital resume PDFs."""
+    opts = build_pdf_pipeline_options()
+    return DocumentConverter(
+        allowed_formats=[InputFormat.PDF],
+        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)},
+    )
 
 
 def get_docling_converter() -> DocumentConverter:
-    """Return one lazy converter per worker process."""
+    """Return one lazy converter per process."""
     global _converter
     if _converter is None:
-        _converter = DocumentConverter()
+        _converter = create_docling_converter()
     return _converter
+
+
+def initialize_docling_pipeline(*, warm: bool = True) -> DocumentConverter:
+    """Create (or reuse) the converter and optionally load the PDF pipeline eagerly.
+
+    Call at parse-worker startup so model load cost is paid before the first task.
+    """
+    global _pipeline_initialized
+    converter = get_docling_converter()
+    if warm and not _pipeline_initialized:
+        opts = build_pdf_pipeline_options()
+        t0 = time.perf_counter()
+        logger.info(
+            "Initializing Docling PDF pipeline (artifacts=%s, ocr=%s, tables=%s)",
+            opts.artifacts_path or "(huggingface default)",
+            opts.do_ocr,
+            opts.do_table_structure,
+        )
+        converter.initialize_pipeline(InputFormat.PDF)
+        _pipeline_initialized = True
+        logger.info("Docling PDF pipeline ready in %.3fs", time.perf_counter() - t0)
+    return converter
+
+
+def reset_docling_converter() -> None:
+    """Clear the process-local converter (tests only)."""
+    global _converter, _pipeline_initialized
+    _converter = None
+    _pipeline_initialized = False
 
 HEADING_MAP = {
     # =========================

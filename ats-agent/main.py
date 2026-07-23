@@ -277,7 +277,7 @@ def process_resumes() -> Tuple[List[Tuple[str, float, float, int, str, str]], Li
         detail_breakdown['steps'].append(step2)
         
         # Step 3: Find relevant work experience
-        years, gap_found, gaps = find_relevant_experience(jd, resume)
+        years, gap_found, gaps, experience_evaluations = find_relevant_experience(jd, resume)
         relevant_experience = float(years) if years else 0.0
         print(f"  Relevant Work Experience: {relevant_experience:.2f} years")
         
@@ -298,6 +298,7 @@ def process_resumes() -> Tuple[List[Tuple[str, float, float, int, str, str]], Li
             'minimum_required': min_relevant_years,
             'gap_found': gap_found,
             'gaps': gaps if gap_found else [],
+            'experience_evaluations': experience_evaluations,
             'passed': relevant_exp_passed,
             'requirement': relevant_exp_requirement
         }

@@ -34,6 +34,12 @@ services:
       MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+      # Baked into the image at build time — do not override from .env.
+      DOCLING_ARTIFACTS_PATH: /opt/docling/models
+      DOCLING_DO_OCR: "false"
+      DOCLING_DO_TABLE_STRUCTURE: "false"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
     ports:
       - "8000:8000"
     depends_on:
@@ -54,6 +60,12 @@ services:
       MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
       MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
       REDIS_URL: redis://redis:6379/0
+      # Baked into the image at build time — do not override from .env.
+      DOCLING_ARTIFACTS_PATH: /opt/docling/models
+      DOCLING_DO_OCR: "false"
+      DOCLING_DO_TABLE_STRUCTURE: "false"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
     depends_on:
       redis:
         condition: service_healthy

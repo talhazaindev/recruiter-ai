@@ -127,6 +127,26 @@ Return shape: `hard_filters`, `score`, `rank_signals`, `explanation`, `matcher_v
 - Mongo indexes are created on API/worker startup (`org_id`, job score, shortlist, review).
 - Add `org_id` sharding later for multi-tenant SaaS; v1 uses `DEFAULT_ORG_ID=default`.
 
+## Docling models (Docker)
+
+Multi-column resumes use Docling. Model weights are **baked into the image at build time** (`infra/Dockerfile.api`), not downloaded on first parse or ingest.
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `DOCLING_ARTIFACTS_PATH` | `/opt/docling/models` | Pre-downloaded model directory inside the image |
+| `DOCLING_DO_OCR` | `false` | OCR off — resumes are born-digital PDFs |
+| `DOCLING_DO_TABLE_STRUCTURE` | `false` | TableFormer off for resume layout |
+| `HF_HUB_OFFLINE` | `1` | Block runtime Hugging Face downloads |
+
+Caching behavior:
+
+- **First build** downloads models from Hugging Face once into `/opt/docling/models` (and a BuildKit cache).
+- **Code-only rebuilds** (`parser/`, `apps/api/`, `workers/`) reuse the cached model layer — no re-download.
+- **BuildKit cache mount** (`docling-models-v2.15`) skips the network even when the model layer must rebuild (e.g. after a `requirements.txt` change), as long as the local BuildKit cache still has the weights.
+- **Runtime** never hits Hugging Face. Weights are already on disk; the parse worker loads them into RAM at boot (tens of seconds once per container start — not a download).
+- **Upgrading `docling`** should bump the cache mount id in `Dockerfile.api` and rebuild; never reuse model artifacts across unverified Docling versions.
+- Scanned / image-only CVs stay on the custom-parser + review path while OCR is disabled.
+
 ## Repo layout
 
 ```
