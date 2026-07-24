@@ -8,6 +8,10 @@ import pymupdf.layout  # activate PyMuPDF-Layout in pymupdf
 import pymupdf4llm
 import pathlib
 from pathlib import Path
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 HEADING_MAP = {
@@ -24,7 +28,7 @@ HEADING_MAP = {
     "education & training": "education",
     "education and training": "education",
     "education:": "education",
-
+    "education and certifications":"education",
     # =========================
     # EXPERIENCE
     # =========================
@@ -70,6 +74,7 @@ HEADING_MAP = {
 "technical strengths": "skills",
 "technicalskills":"skills",
 "coreskills":"skills",
+"additional skills":"skills",
 
 
     # =========================
@@ -831,6 +836,8 @@ def normalize_heading(text: str) -> str:
     #print("Normalizing heading:", text)
     text=text.lower().strip()
     text = text.replace("&", "and")
+    text = text.replace("/", " ")
+    text = text.replace("-", " ")
     text = re.sub(r"[^\w\s]", "", text)
     text = re.sub(r"\s+", " ", text)
     words = text.split()
@@ -886,6 +893,7 @@ def build_sections(spans, current_font_size=None):
             
         else:
             # Add content to current section
+                        
             if current_heading is not None:
                 current_content.append({
                     "text": text,
@@ -896,6 +904,7 @@ def build_sections(spans, current_font_size=None):
 
     # Save last section if it has content
     if current_heading is not None and current_content:
+                    
         if current_heading not in sections:
             sections[current_heading] = []
         sections[current_heading].extend(current_content)
@@ -1227,11 +1236,12 @@ def parse_cv(path):
     print("Parsing CV from path:", path)
     raw_text = extract_raw_text(path)
     email,phone=extract_basic_info(raw_text)
-    
+    #logger.info(raw_text)
     sections,min_font,name = find_headers(path)
-    #print(sections)
+    
     for section_name, items in sections.items():
         sections[section_name] = group_section(items,min_font)
+    
     sections["email"]=email
     sections["phone"]=phone
     sections["name"]=name
@@ -1239,6 +1249,7 @@ def parse_cv(path):
 
     #print(sections)
     merged_sections = merge_lists(sections)
+    #logger.info(merged_sections)
     #print(merged_sections)
     merged_sections = merge_empty_keys(merged_sections)
     #print(type(merged_sections))
