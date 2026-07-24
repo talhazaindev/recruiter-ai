@@ -15,6 +15,8 @@ from difflib import SequenceMatcher
 import sys
 from pathlib import Path
 
+MIN_TECH_STACK_MATCH_PERCENTAGE = 5  # Minimum percentage of tech stack matches (0-100)
+
 # Find tech_aliases_db.py by going up the directory tree
 current = Path(__file__).parent.absolute()
 for _ in range(5):
@@ -25,7 +27,6 @@ for _ in range(5):
 
 
 from tech_aliases_db import (
-        MIN_TECH_STACK_MATCH_PERCENTAGE,
         FUZZY_MATCH_THRESHOLD,
         TECH_STACK_ALIASES,
         COMPOUND_TECH_ALIASES,

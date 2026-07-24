@@ -19,7 +19,7 @@ from pathlib import Path
 
 # Configuration
 GAP_THRESHOLD_MONTHS = 3  # Maximum allowed gap in months before flagging
-MIN_TECH_STACK_MATCH_PERCENTAGE = 20  # Minimum percentage of tech stack matches (0-100)
+MIN_TECH_STACK_MATCH_PERCENTAGE = 10  # Minimum percentage of tech stack matches (0-100)
 FUZZY_MATCH_THRESHOLD = 0.85  # Threshold for fuzzy matching (0.0 to 1.0)
 JOB_TITLE_TOKEN_WEIGHT = 0.7  # Minimum token overlap ratio for partial matches
 
@@ -326,6 +326,11 @@ def is_experience_relevant(
     if not title_match:
         return False, 0
     
+    
+    if not tech_stack:
+        print("Warning: No tech stack provided in JD")
+        return True, 0
+    
     description = experience.get('description', '')
     tech_matches = extract_tech_stack_from_description(description, tech_stack)
     
@@ -574,10 +579,6 @@ def find_relevant_experience(
     
     if not job_title:
         print("Warning: No job title provided in JD")
-        return 0.0, False, [], []
-    
-    if not tech_stack:
-        print("Warning: No tech stack provided in JD")
         return 0.0, False, [], []
     
     experiences = resume_json.get('experience', [])
