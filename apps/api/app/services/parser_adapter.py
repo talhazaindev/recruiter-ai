@@ -158,6 +158,7 @@ def parse_resume_bytes(
 
         logging.basicConfig(level=logging.INFO)
         logger = logging.getLogger(__name__)
+        #use_docling=False
         if use_docling:
             logger.info("========== DOCLING 1START ==========")
             t = perf_counter()
@@ -185,7 +186,7 @@ def parse_resume_bytes(
 
         structured = _normalize_sections(sections)
         alternative_flow=_should_run_custom_parser(structured)
-
+        #alternative_flow=False
         if alternative_flow==True:
             if parser_id=="docling":
                 logger.info("========== CUSTOM PARSER 2START ==========")
@@ -215,9 +216,9 @@ def parse_resume_bytes(
                 
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
-
+        #logger.info(sections)
         structured = _normalize_sections(sections)
-        
+        #logger.info(structured)
         if os.getenv("GROQ_API_KEY"):
             logger.info("========== GROQ START ==========")
             t = perf_counter()
@@ -295,7 +296,8 @@ def parse_resume_bytes(
 
 def _run_parse_cv(path: str) -> dict[str, Any]:
     """Call custom parse_cv; redirect form_json to a temp file."""
-    from parser import parser as parser_mod  # type: ignore
+    #from parser import parser as parser_mod  # type: ignore
+    from parser import parser2 as parser_mod
 
     out_file = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
     out_path = out_file.name
@@ -309,7 +311,8 @@ def _run_parse_cv(path: str) -> dict[str, Any]:
 
     parser_mod.form_json = _form_json
     try:
-        result = parser_mod.parse_cv(path)
+        #result = parser_mod.parse_cv(path)
+        result=parser_mod.parse_cv2(path)
         if isinstance(result, dict) and result:
             return result
         with open(out_path, encoding="utf-8") as f:
@@ -376,7 +379,7 @@ def _flatten_skills(value: Any) -> list[str]:
     seen: set[str] = set()
     for chunk in chunks:
         s = chunk.strip(" -:\t")
-        if not s or len(s) > 80:
+        if not s:# or len(s) > 80:
             continue
         if s.lower().endswith(":") or s.lower() in {
             "languages",
