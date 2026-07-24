@@ -816,6 +816,10 @@ COMMON_VARIATIONS: Dict[str, List[str]] = {
     'tableau': ['tableau', 'tableau visualization', 'tableau dashboard', 'tableau desktop', 'tableau server'],
     'power bi': ['power bi', 'microsoft power bi', 'powerbi', 'power bi dashboard', 'power query', 'dax'],
     'looker': ['looker', 'google looker', 'looker dashboard', 'looker studio', 'lookml'],
+    'excel':['excel', 'microsoft excel', 'excel formulas', 'excel pivot tables', 'excel charts'],
+    'microsoft sql server': ['microsoft sql server', 'sql server', 'mssql', 'tsql', 'sql server management studio'],
+    'oracle database': ['oracle database', 'oracle db', 'oracle sql', 'pl/sql', 'oracle sql developer'],
+    'google sheets': ['google sheets', 'gsheets', 'google spreadsheet', 'google docs spreadsheet'],
 }
 
 # ============================================================

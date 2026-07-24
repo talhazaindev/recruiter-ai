@@ -6,7 +6,6 @@ job title mappings, and title prefixes for use across different modules.
 """
 
 # Configuration for matching
-MIN_TECH_STACK_MATCH_PERCENTAGE = 10  # Minimum percentage of tech stack matches (0-100)
 FUZZY_MATCH_THRESHOLD = 0.85  # Threshold for fuzzy matching (0.0 to 1.0)
 JOB_TITLE_TOKEN_WEIGHT = 0.7  # Minimum token overlap ratio for partial matches
 
@@ -78,8 +77,11 @@ JOB_TITLE_PREFIXES = [
     "engineering director ",
     
     # Head
-    "head ",
     "head of ",
+    "head ",
+    
+    "B2B ", "B2C ", "B2B2C ", "B2G ", "B2E ", "B2B SaaS ", "B2C SaaS ","b2b ", "b2c ", "b2b2c ", "b2g ", "b2e ", "b2b saas ", "b2c saas ",
+    
     
     # Chief
     "chief ",
@@ -185,7 +187,6 @@ TECH_STACK_ALIASES = {
     # ============================================================
     # 1. PROGRAMMING LANGUAGES
     # ============================================================
-    
     "python": [
         "python", "py", "python3", "python 3", "cpython", 
         "anaconda", "jupyter", "ipython", "python2", "python 2",
@@ -1958,7 +1959,3740 @@ TECH_STACK_ALIASES = {
         "altair", "ggplot2", "matplotlib", "seaborn", "bokeh", "plotly dash",
         "dashboarding", "data storytelling", "visual analytics", "bi dashboards",
         "reporting tools", "data exploration", "interactive dashboards"
-    ]
+    ],
+    
+    
+    
+    # ============================================================
+    # FRONTEND BACKEND & FULL STACK SKILLS START
+    # ============================================================
+    
+    
+    "html": [
+    "html",
+    "html5",
+    "hypertext markup language",
+    "xhtml"
+  ],
+  "css": [
+    "css",
+    "css3",
+    "cascading style sheets",
+    "css preprocessors"
+  ],
+  "sass": [
+    "sass",
+    "scss",
+    "syntactically awesome stylesheets"
+  ],
+  "less": [
+    "less",
+    "less css"
+  ],
+  "tailwind_css": [
+    "tailwind",
+    "tailwind css",
+    "tailwindcss"
+  ],
+  "bootstrap": [
+    "bootstrap",
+    "bootstrap 4",
+    "bootstrap 5",
+    "twitter bootstrap"
+  ],
+  "material_ui": [
+    "material ui",
+    "mui",
+    "material design"
+  ],
+  "chakra_ui": [
+    "chakra ui",
+    "chakra"
+  ],
+  "ant_design": [
+    "ant design",
+    "antd"
+  ],
+  "bulma": [
+    "bulma"
+  ],
+  "foundation": [
+    "foundation",
+    "zurb foundation"
+  ],
+  "semantic_ui": [
+    "semantic ui",
+    "semantic"
+  ],
+  "javascript": [
+    "javascript",
+    "js",
+    "vanilla js",
+    "es5",
+    "es6",
+    "ecmascript",
+    "ecmascript 6",
+    "es2015",
+    "es2016",
+    "es2017",
+    "es2018",
+    "es2019",
+    "es2020",
+    "es2021",
+    "es2022",
+    "es2023"
+  ],
+  "typescript": [
+    "typescript",
+    "ts"
+  ],
+  "react": [
+    "react",
+    "react js",
+    "reactjs",
+    "react.js"
+  ],
+  "react_native": [
+    "react native",
+    "rn"
+  ],
+  "next_js": [
+    "next.js",
+    "nextjs",
+    "next"
+  ],
+  "gatsby": [
+    "gatsby",
+    "gatsby js"
+  ],
+  "vue": [
+    "vue.js",
+    "vuejs",
+    "vue",
+    "vue 2",
+    "vue 3"
+  ],
+  "nuxt": [
+    "nuxt.js",
+    "nuxtjs",
+    "nuxt"
+  ],
+  "angular": [
+    "angular",
+    "angular 2",
+    "angular 4",
+    "angular 5",
+    "angular 6",
+    "angular 7",
+    "angular 8",
+    "angular 9",
+    "angular 10",
+    "angular 11",
+    "angular 12",
+    "angular 13",
+    "angular 14",
+    "angular 15",
+    "angular 16",
+    "angular 17"
+  ],
+  "angularjs": [
+    "angularjs",
+    "angular 1",
+    "angular 1.x"
+  ],
+  "svelte": [
+    "svelte",
+    "svelte js"
+  ],
+  "sveltekit": [
+    "sveltekit",
+    "svelte kit"
+  ],
+  "solid_js": [
+    "solidjs",
+    "solid js",
+    "solid"
+  ],
+  "qwik": [
+    "qwik",
+    "qwik js"
+  ],
+  "ember": [
+    "ember.js",
+    "emberjs",
+    "ember"
+  ],
+  "backbone": [
+    "backbone.js",
+    "backbonejs",
+    "backbone"
+  ],
+  "jquery": [
+    "jquery",
+    "jquery ui",
+    "jquery mobile"
+  ],
+  "node_js": [
+    "node.js",
+    "nodejs",
+    "node",
+    "node runtime"
+  ],
+  "express": [
+    "express",
+    "express.js",
+    "expressjs",
+    "express framework"
+  ],
+  "nestjs": [
+    "nestjs",
+    "nest js",
+    "nest"
+  ],
+  "fastify": [
+    "fastify",
+    "fastify js"
+  ],
+  "koa": [
+    "koa",
+    "koa.js",
+    "koajs"
+  ],
+  "meteor": [
+    "meteor",
+    "meteor js",
+    "meteor framework"
+  ],
+  "adonis": [
+    "adonis",
+    "adonis js",
+    "adonisjs"
+  ],
+  "loopback": [
+    "loopback",
+    "loopback js"
+  ],
+  "python": [
+    "python",
+    "python 3",
+    "python2"
+  ],
+  "django": [
+    "django",
+    "django framework"
+  ],
+  "flask": [
+    "flask",
+    "flask python"
+  ],
+  "fastapi": [
+    "fastapi",
+    "fast api"
+  ],
+  "pyramid": [
+    "pyramid",
+    "pyramid framework"
+  ],
+  "tornado": [
+    "tornado",
+    "tornado python"
+  ],
+  "java": [
+    "java",
+    "java 8",
+    "java 11",
+    "java 17",
+    "java 21"
+  ],
+  "spring_boot": [
+    "spring boot",
+    "springboot",
+    "spring framework"
+  ],
+  "spring_mvc": [
+    "spring mvc",
+    "spring web"
+  ],
+  "hibernate": [
+    "hibernate",
+    "hibernate orm"
+  ],
+  "jpa": [
+    "jpa",
+    "java persistence api"
+  ],
+  "java_ee": [
+    "java ee",
+    "jakarta ee",
+    "j2ee"
+  ],
+  "csharp": [
+    "c#",
+    "csharp",
+    "c sharp"
+  ],
+  "dotnet": [
+    "dotnet",
+    ".net",
+    ".net core",
+    "asp.net",
+    "asp.net core",
+    "dotnet core"
+  ],
+  "php": [
+    "php",
+    "php 7",
+    "php 8",
+    "php 8.1",
+    "php 8.2",
+    "php 8.3"
+  ],
+  "laravel": [
+    "laravel",
+    "laravel framework"
+  ],
+  "symfony": [
+    "symfony",
+    "symfony framework"
+  ],
+  "codeigniter": [
+    "codeigniter",
+    "code igniter"
+  ],
+  "cakephp": [
+    "cakephp",
+    "cake php"
+  ],
+  "yii": [
+    "yii",
+    "yii2",
+    "yii framework"
+  ],
+  "zend": [
+    "zend",
+    "zend framework",
+    "laminas"
+  ],
+  "ruby": [
+    "ruby",
+    "ruby programming"
+  ],
+  "rails": [
+    "rails",
+    "ruby on rails",
+    "ror"
+  ],
+  "sinatra": [
+    "sinatra",
+    "sinatra ruby"
+  ],
+  "golang": [
+    "go",
+    "golang",
+    "go language"
+  ],
+  "rust": [
+    "rust",
+    "rust language"
+  ],
+  "cplusplus": [
+    "c++",
+    "cpp",
+    "c plus plus"
+  ],
+  "c": [
+    "c",
+    "c programming"
+  ],
+  "elixir": [
+    "elixir",
+    "elixir language"
+  ],
+  "phoenix": [
+    "phoenix",
+    "phoenix framework"
+  ],
+  "kotlin": [
+    "kotlin",
+    "kotlin language"
+  ],
+  "kotlin_spring": [
+    "kotlin spring",
+    "spring with kotlin"
+  ],
+  "scala": [
+    "scala",
+    "scala language"
+  ],
+  "play_framework": [
+    "play",
+    "play framework"
+  ],
+  "perl": [
+    "perl",
+    "perl language"
+  ],
+  "swift": [
+    "swift",
+    "swift language"
+  ],
+  "vapor": [
+    "vapor",
+    "vapor swift"
+  ],
+  "graphql": [
+    "graphql",
+    "graph ql",
+    "gql"
+  ],
+  "apollo_graphql": [
+    "apollo",
+    "apollo graphql",
+    "apollo client",
+    "apollo server"
+  ],
+  "relay": [
+    "relay",
+    "relay graphql"
+  ],
+  "rest_api": [
+    "rest",
+    "rest api",
+    "restful",
+    "restful api",
+    "restful web services"
+  ],
+  "soap": [
+    "soap",
+    "soap api",
+    "soap web services"
+  ],
+  "websocket": [
+    "websocket",
+    "websockets",
+    "ws protocol"
+  ],
+  "socket_io": [
+    "socket.io",
+    "socketio",
+    "socket"
+  ],
+  "web_rtc": [
+    "webrtc",
+    "web rtc",
+    "rtc"
+  ],
+  "json": [
+    "json",
+    "javascript object notation"
+  ],
+  "xml": [
+    "xml",
+    "extensible markup language"
+  ],
+  "yaml": [
+    "yaml",
+    "yml"
+  ],
+  "toml": [
+    "toml",
+    "toml configuration"
+  ],
+  "postgresql": [
+    "postgresql",
+    "postgres",
+    "pg",
+    "pgsql"
+  ],
+  "mysql": [
+    "mysql",
+    "my sql",
+    "mariadb",
+    "maria db"
+  ],
+  "mongodb": [
+    "mongodb",
+    "mongo",
+    "mongo db"
+  ],
+  "redis": [
+    "redis",
+    "redis cache"
+  ],
+  "elasticsearch": [
+    "elasticsearch",
+    "elastic search",
+    "es"
+  ],
+  "cassandra": [
+    "cassandra",
+    "apache cassandra"
+  ],
+  "dynamodb": [
+    "dynamodb",
+    "aws dynamodb",
+    "dynamo db"
+  ],
+  "couchdb": [
+    "couchdb",
+    "couch db"
+  ],
+  "neo4j": [
+    "neo4j",
+    "neo4j graph"
+  ],
+  "sqlite": [
+    "sqlite",
+    "sql lite"
+  ],
+  "firebase_firestore": [
+    "firestore",
+    "firebase firestore",
+    "cloud firestore"
+  ],
+  "firebase_realtime": [
+    "firebase realtime",
+    "realtime database",
+    "firebase rtbd"
+  ],
+  "sqlalchemy": [
+    "sqlalchemy",
+    "sql alchemy"
+  ],
+  "sequelize": [
+    "sequelize",
+    "sequelize orm"
+  ],
+  "mongoose": [
+    "mongoose",
+    "mongoose odm"
+  ],
+  "typeorm": [
+    "typeorm",
+    "type orm"
+  ],
+  "prisma": [
+    "prisma",
+    "prisma orm"
+  ],
+  "drizzle": [
+    "drizzle",
+    "drizzle orm"
+  ],
+  "knex": [
+    "knex",
+    "knex js"
+  ],
+  "redis_cache": [
+    "redis cache",
+    "caching with redis"
+  ],
+  "memcached": [
+    "memcached",
+    "mem cache"
+  ],
+  "rabbitmq": [
+    "rabbitmq",
+    "rabbit mq"
+  ],
+  "kafka": [
+    "kafka",
+    "apache kafka"
+  ],
+  "aws_sqs": [
+    "sqs",
+    "aws sqs",
+    "simple queue service"
+  ],
+  "celery": [
+    "celery",
+    "celery python"
+  ],
+  "bull": [
+    "bull",
+    "bull queue",
+    "bullmq"
+  ],
+  "docker": [
+    "docker",
+    "docker container",
+    "docker engine"
+  ],
+  "kubernetes": [
+    "kubernetes",
+    "k8s",
+    "kube"
+  ],
+  "helm": [
+    "helm",
+    "helm charts"
+  ],
+  "jenkins": [
+    "jenkins",
+    "jenkins ci",
+    "jenkins pipeline"
+  ],
+  "gitlab_ci": [
+    "gitlab ci",
+    "gitlab pipeline"
+  ],
+  "github_actions": [
+    "github actions",
+    "gh actions"
+  ],
+  "circleci": [
+    "circleci",
+    "circle ci"
+  ],
+  "travis_ci": [
+    "travis",
+    "travis ci"
+  ],
+  "argocd": [
+    "argocd",
+    "argo cd"
+  ],
+  "terraform": [
+    "terraform",
+    "tf"
+  ],
+  "ansible": [
+    "ansible",
+    "ansible automation"
+  ],
+  "prometheus": [
+    "prometheus",
+    "prometheus monitoring"
+  ],
+  "grafana": [
+    "grafana",
+    "grafana dashboards"
+  ],
+  "datadog": [
+    "datadog",
+    "data dog"
+  ],
+  "newrelic": [
+    "newrelic",
+    "new relic"
+  ],
+  "sentry": [
+    "sentry",
+    "sentry error tracking"
+  ],
+  "aws": [
+    "aws",
+    "amazon web services"
+  ],
+  "ec2": [
+    "ec2",
+    "aws ec2",
+    "elastic compute cloud"
+  ],
+  "s3": [
+    "s3",
+    "aws s3",
+    "simple storage service"
+  ],
+  "lambda": [
+    "lambda",
+    "aws lambda",
+    "serverless function"
+  ],
+  "api_gateway": [
+    "api gateway",
+    "aws api gateway"
+  ],
+  "rds": [
+    "rds",
+    "aws rds",
+    "relational database service"
+  ],
+  "ecs": [
+    "ecs",
+    "aws ecs",
+    "elastic container service"
+  ],
+  "eks": [
+    "eks",
+    "aws eks",
+    "elastic kubernetes service"
+  ],
+  "cloudfront": [
+    "cloudfront",
+    "aws cloudfront",
+    "cdn"
+  ],
+  "route53": [
+    "route53",
+    "aws route 53"
+  ],
+  "iam": [
+    "iam",
+    "aws iam",
+    "identity and access management"
+  ],
+  "cloudformation": [
+    "cloudformation",
+    "aws cloudformation"
+  ],
+  "azure": [
+    "azure",
+    "microsoft azure",
+    "azure cloud"
+  ],
+  "azure_devops": [
+    "azure devops",
+    "azure pipelines"
+  ],
+  "gcp": [
+    "gcp",
+    "google cloud platform",
+    "google cloud"
+  ],
+  "gce": [
+    "gce",
+    "google compute engine"
+  ],
+  "gke": [
+    "gke",
+    "google kubernetes engine"
+  ],
+  "cloud_run": [
+    "cloud run",
+    "google cloud run"
+  ],
+  "firebase": [
+    "firebase",
+    "firebase platform"
+  ],
+  "heroku": [
+    "heroku",
+    "heroku platform"
+  ],
+  "netlify": [
+    "netlify",
+    "netlify hosting"
+  ],
+  "vercel": [
+    "vercel",
+    "vercel hosting"
+  ],
+  "render": [
+    "render",
+    "render hosting"
+  ],
+  "digitalocean": [
+    "digitalocean",
+    "digital ocean",
+    "do"
+  ],
+  "nginx": [
+    "nginx",
+    "nginx server"
+  ],
+  "apache": [
+    "apache",
+    "apache server",
+    "httpd"
+  ],
+  "traefik": [
+    "traefik",
+    "traefik proxy"
+  ],
+  "haproxy": [
+    "haproxy",
+    "ha proxy"
+  ],
+  "linux": [
+    "linux",
+    "linux os",
+    "ubuntu",
+    "centos",
+    "redhat",
+    "debian",
+    "fedora"
+  ],
+  "windows_server": [
+    "windows server",
+    "windows os",
+    "iis"
+  ],
+  "git": [
+    "git",
+    "git version control"
+  ],
+  "github": [
+    "github",
+    "gh"
+  ],
+  "gitlab": [
+    "gitlab",
+    "git lab"
+  ],
+  "bitbucket": [
+    "bitbucket",
+    "bit bucket"
+  ],
+  "webpack": [
+    "webpack",
+    "webpack bundler"
+  ],
+  "vite": [
+    "vite",
+    "vite bundler"
+  ],
+  "rollup": [
+    "rollup",
+    "rollup.js"
+  ],
+  "parcel": [
+    "parcel",
+    "parcel bundler"
+  ],
+  "babel": [
+    "babel",
+    "babeljs"
+  ],
+  "eslint": [
+    "eslint",
+    "es lint"
+  ],
+  "prettier": [
+    "prettier",
+    "prettier code formatter"
+  ],
+  "jest": [
+    "jest",
+    "jest testing"
+  ],
+  "mocha": [
+    "mocha",
+    "mocha js"
+  ],
+  "chai": [
+    "chai",
+    "chai assertion"
+  ],
+  "jasmine": [
+    "jasmine",
+    "jasmine testing"
+  ],
+  "cypress": [
+    "cypress",
+    "cypress testing"
+  ],
+  "playwright": [
+    "playwright",
+    "playwright testing"
+  ],
+  "puppeteer": [
+    "puppeteer",
+    "puppeteer testing"
+  ],
+  "selenium": [
+    "selenium",
+    "selenium webdriver"
+  ],
+  "storybook": [
+    "storybook",
+    "storybook js"
+  ],
+  "redux": [
+    "redux",
+    "redux state",
+    "react redux"
+  ],
+  "mobx": [
+    "mobx",
+    "mobx state"
+  ],
+  "zustand": [
+    "zustand",
+    "zustand state"
+  ],
+  "jotai": [
+    "jotai",
+    "jotai state"
+  ],
+  "recoil": [
+    "recoil",
+    "recoil state"
+  ],
+  "context_api": [
+    "context api",
+    "react context"
+  ],
+  "react_query": [
+    "react query",
+    "tanstack query"
+  ],
+  "swr": [
+    "swr",
+    "swr react"
+  ],
+  "axios": [
+    "axios",
+    "axios http"
+  ],
+  "fetch_api": [
+    "fetch",
+    "fetch api",
+    "window.fetch"
+  ],
+  "react_hook_form": [
+    "react hook form",
+    "rhf"
+  ],
+  "formik": [
+    "formik",
+    "formik forms"
+  ],
+  "react_router": [
+    "react router",
+    "react-router"
+  ],
+  "vue_router": [
+    "vue router",
+    "vue-router"
+  ],
+  "react_navigation": [
+    "react navigation",
+    "react-navigation"
+  ],
+  "next_router": [
+    "next router",
+    "app router",
+    "pages router"
+  ],
+  "react_i18n": [
+    "react i18n",
+    "i18next"
+  ],
+  "dayjs": [
+    "dayjs",
+    "day.js"
+  ],
+  "moment": [
+    "moment",
+    "moment.js"
+  ],
+  "date_fns": [
+    "date fns",
+    "date-fns"
+  ],
+  "lodash": [
+    "lodash",
+    "lodash library"
+  ],
+  "underscore": [
+    "underscore",
+    "underscore.js"
+  ],
+  "ramda": [
+    "ramda",
+    "ramda js"
+  ],
+  "swagger": [
+    "swagger",
+    "openapi",
+    "swagger ui",
+    "swagger docs"
+  ],
+  "postman": [
+    "postman",
+    "postman api"
+  ],
+  "insomnia": [
+    "insomnia",
+    "insomnia api"
+  ],
+  "conventional_commits": [
+    "conventional commits",
+    "semantic commits"
+  ],
+  "jwt": [
+    "jwt",
+    "json web token",
+    "jsonwebtoken"
+  ],
+  "oauth": [
+    "oauth",
+    "oauth2",
+    "oauth 2.0"
+  ],
+  "openid_connect": [
+    "openid",
+    "openid connect",
+    "oidc"
+  ],
+  "saml": [
+    "saml",
+    "saml 2.0"
+  ],
+  "bcrypt": [
+    "bcrypt",
+    "bcrypt hashing"
+  ],
+  "argon2": [
+    "argon2",
+    "argon2 hashing"
+  ],
+  "passport": [
+    "passport",
+    "passport.js"
+  ],
+  "next_auth": [
+    "nextauth",
+    "next auth",
+    "auth.js"
+  ],
+  "auth0": [
+    "auth0",
+    "auth0 authentication"
+  ],
+  "firebase_auth": [
+    "firebase auth",
+    "firebase authentication"
+  ],
+  "supabase": [
+    "supabase",
+    "supabase platform"
+  ],
+  "pocketbase": [
+    "pocketbase",
+    "pocket base"
+  ],
+  "deno": [
+    "deno",
+    "deno runtime"
+  ],
+  "bun": [
+    "bun",
+    "bun runtime"
+  ],
+  "npm": [
+    "npm",
+    "node package manager"
+  ],
+  "yarn": [
+    "yarn",
+    "yarn package manager"
+  ],
+  "pnpm": [
+    "pnpm",
+    "pnpm package manager"
+  ],
+  "junit": [
+    "junit",
+    "junit testing"
+  ],
+  "pytest": [
+    "pytest",
+    "py test"
+  ],
+  "unittest": [
+    "unittest",
+    "python unittest"
+  ],
+  "xunit": [
+    "xunit",
+    "xunit testing"
+  ],
+  "nunit": [
+    "nunit",
+    "nunit testing"
+  ],
+  "codeceptjs": [
+    "codeceptjs",
+    "codecept js"
+  ],
+  "testcafe": [
+    "testcafe",
+    "test cafe"
+  ],
+  "react_testing_library": [
+    "react testing library",
+    "testing library"
+  ],
+  "vitest": [
+    "vitest",
+    "vite test"
+  ],
+  "jwt_auth": [
+    "jwt auth",
+    "token based auth"
+  ],
+  "session_auth": [
+    "session auth",
+    "cookie based auth"
+  ],
+  "microservices": [
+    "microservices",
+    "microservice architecture"
+  ],
+  "monolithic": [
+    "monolithic",
+    "monolith architecture"
+  ],
+  "serverless": [
+    "serverless",
+    "serverless architecture"
+  ],
+  "event_driven": [
+    "event driven",
+    "event driven architecture"
+  ],
+  "tdd": [
+    "tdd",
+    "test driven development"
+  ],
+  "bdd": [
+    "bdd",
+    "behavior driven development"
+  ],
+  "ddd": [
+    "ddd",
+    "domain driven design"
+  ],
+  "clean_code": [
+    "clean code",
+    "clean architecture"
+  ],
+  "solid": [
+    "solid",
+    "solid principles",
+    "solid design"
+  ],
+  "design_patterns": [
+    "design patterns",
+    "software design patterns",
+    "gang of four"
+  ],
+  "caching": [
+    "caching",
+    "cache strategy"
+  ],
+  "message_queue": [
+    "message queue",
+    "mq",
+    "message broker"
+  ],
+  "api_design": [
+    "api design",
+    "rest api design",
+    "api architecture"
+  ],
+  "load_balancing": [
+    "load balancing",
+    "load balancer"
+  ],
+  "distributed_systems": [
+    "distributed systems",
+    "distributed computing"
+  ],
+  "monitoring": [
+    "monitoring",
+    "system monitoring",
+    "application monitoring"
+  ],
+  "logging": [
+    "logging",
+    "application logging",
+    "log management"
+  ],
+  "debugging": [
+    "debugging",
+    "debugger",
+    "chrome devtools"
+  ],
+  "testing": [
+    "testing",
+    "unit testing",
+    "integration testing",
+    "e2e testing",
+    "end to end testing"
+  ],
+  "ci_cd": [
+    "ci/cd",
+    "continuous integration",
+    "continuous delivery",
+    "continuous deployment",
+    "cicd"
+  ],
+  "performance_optimization": [
+    "performance",
+    "performance optimization",
+    "web performance",
+    "app performance",
+    "perf"
+  ],
+  "seo": [
+    "seo",
+    "search engine optimization"
+  ],
+  "a11y": [
+    "a11y",
+    "accessibility",
+    "web accessibility"
+  ],
+  "responsive_design": [
+    "responsive design",
+    "responsive web design",
+    "mobile first",
+    "rwd"
+  ],
+  "cross_browser": [
+    "cross browser",
+    "cross browser compatibility"
+  ],
+  "code_review": [
+    "code review",
+    "code review process"
+  ],
+  "collaboration": [
+    "collaboration",
+    "team collaboration"
+  ],
+  "agile": [
+    "agile",
+    "agile methodology",
+    "agile development"
+  ],
+  "scrum": [
+    "scrum",
+    "scrum framework"
+  ],
+  "kanban": [
+    "kanban",
+    "kanban methodology"
+  ],
+  "jira_tracking": [
+    "jira tracking",
+    "jira software",
+    "atlassian jira"
+  ],
+  "confluence_docs": [
+    "confluence docs",
+    "atlassian confluence"
+  ],
+  "linear": [
+    "linear",
+    "linear app"
+  ],
+  "github_projects": [
+    "github projects",
+    "projects"
+  ],
+  "notion_docs": [
+    "notion docs",
+    "notion project management"
+  ],
+  
+    # ============================================================
+    # FRONTEND BACKEND & FULL STACK SKILLS END
+    # ============================================================
+    
+    # ============================================================
+    # UI/UX Skills Start
+    # ============================================================
+    
+    
+    "ui_design": [
+    "ui design",
+    "user interface design",
+    "interface design"
+  ],
+  "ux_design": [
+    "ux design",
+    "user experience design",
+    "experience design"
+  ],
+  "ui_ux_design": [
+    "ui/ux design",
+    "ui ux",
+    "ui ux design",
+    "product design"
+  ],
+  "user_research": [
+    "user research",
+    "ux research",
+    "user experience research",
+    "design research",
+    "qualitative research",
+    "quantitative research"
+  ],
+  "usability_testing": [
+    "usability testing",
+    "user testing",
+    "ux testing",
+    "usability study"
+  ],
+  "user_personas": [
+    "user personas",
+    "personas",
+    "buyer personas",
+    "customer personas"
+  ],
+  "user_journey": [
+    "user journey",
+    "journey mapping",
+    "customer journey map",
+    "user journey map",
+    "experience mapping"
+  ],
+  "user_flows": [
+    "user flows",
+    "user flow diagrams",
+    "flowcharts",
+    "task flows"
+  ],
+  "wireframing": [
+    "wireframing",
+    "wireframes",
+    "wireframe design",
+    "low fidelity wireframes"
+  ],
+  "prototyping": [
+    "prototyping",
+    "prototypes",
+    "interactive prototypes",
+    "high fidelity prototypes",
+    "clickable prototypes"
+  ],
+  "mockups": [
+    "mockups",
+    "ui mockups",
+    "visual mockups",
+    "design mockups"
+  ],
+  "visual_design": [
+    "visual design",
+    "visual communication",
+    "graphic design",
+    "visual hierarchy"
+  ],
+  "interaction_design": [
+    "interaction design",
+    "ixd",
+    "interaction design",
+    "microinteractions"
+  ],
+  "information_architecture": [
+    "information architecture",
+    "ia",
+    "information design",
+    "content architecture"
+  ],
+  "design_systems": [
+    "design systems",
+    "design system",
+    "component library",
+    "ui kit",
+    "pattern library"
+  ],
+  "design_tokens": [
+    "design tokens",
+    "design system tokens",
+    "style tokens"
+  ],
+  "atomic_design": [
+    "atomic design",
+    "atomic methodology",
+    "atoms molecules organisms"
+  ],
+  "material_design": [
+    "material design",
+    "google material design",
+    "material guidelines"
+  ],
+  "human_interface_guidelines": [
+    "human interface guidelines",
+    "hgi",
+    "apple design guidelines"
+  ],
+  "gestalt_principles": [
+    "gestalt",
+    "gestalt principles",
+    "gestalt laws"
+  ],
+  "typography": [
+    "typography",
+    "font design",
+    "typeface",
+    "typography design"
+  ],
+  "color_theory": [
+    "color theory",
+    "color palette",
+    "color scheme",
+    "color psychology"
+  ],
+  "branding": [
+    "branding",
+    "brand identity",
+    "brand design",
+    "visual identity"
+  ],
+  "logo_design": [
+    "logo design",
+    "logo creation",
+    "brand marks"
+  ],
+  "illustration": [
+    "illustration",
+    "digital illustration",
+    "vector illustration",
+    "custom illustration"
+  ],
+  "iconography": [
+    "iconography",
+    "icon design",
+    "icons",
+    "icon system"
+  ],
+  "animation": [
+    "animation",
+    "ui animation",
+    "motion design",
+    "micro animations",
+    "transitions"
+  ],
+  "motion_design": [
+    "motion design",
+    "motion graphics",
+    "ui motion",
+    "interaction animation"
+  ],
+  "responsive_design": [
+    "responsive design",
+    "responsive ui",
+    "adaptive design",
+    "multi-device design",
+    "mobile first design"
+  ],
+  "accessibility_design": [
+    "accessibility",
+    "a11y design",
+    "inclusive design",
+    "accessible design",
+    "wcag"
+  ],
+  "figma": [
+    "figma",
+    "figma design",
+    "figma tool"
+  ],
+  "adobe_xd": [
+    "adobe xd",
+    "adobe experience design",
+    "xd"
+  ],
+  "sketch": [
+    "sketch",
+    "sketch app",
+    "sketch design"
+  ],
+  "framer": [
+    "framer",
+    "framer design",
+    "framer prototyping"
+  ],
+  "invision": [
+    "invision",
+    "invision studio",
+    "invision app"
+  ],
+  "marvel": [
+    "marvel",
+    "marvel app",
+    "marvel prototyping"
+  ],
+  "zeplin": [
+    "zeplin",
+    "zeplin design"
+  ],
+  "abstract": [
+    "abstract",
+    "abstract design"
+  ],
+  "balsamiq": [
+    "balsamiq",
+    "balsamiq wireframes"
+  ],
+  "axure": [
+    "axure",
+    "axure rp",
+    "axure prototyping"
+  ],
+  "proto_pie": [
+    "proto pie",
+    "protopie",
+    "proto pie design"
+  ],
+  "principle": [
+    "principle",
+    "principle app",
+    "principle animation"
+  ],
+  "after_effects": [
+    "after effects",
+    "adobe after effects",
+    "ae"
+  ],
+  "photoshop": [
+    "photoshop",
+    "adobe photoshop",
+    "ps"
+  ],
+  "illustrator": [
+    "illustrator",
+    "adobe illustrator",
+    "ai"
+  ],
+  "indesign": [
+    "indesign",
+    "adobe indesign",
+    "id"
+  ],
+  "figjam": [
+    "figjam",
+    "figjam whiteboard",
+    "figma jam"
+  ],
+  "miro": [
+    "miro",
+    "miro whiteboard",
+    "miro board"
+  ],
+  "mural": [
+    "mural",
+    "mural whiteboard"
+  ],
+  "whimsical": [
+    "whimsical",
+    "whimsical design"
+  ],
+  "ux_research_tools": [
+    "user research tools",
+    "usability hub",
+    "userzoom",
+    "lookback",
+    "optimal workshop",
+    "dovetail",
+    "userinterviews"
+  ],
+  "hotjar_ux": [
+    "hotjar",
+    "hotjar analytics",
+    "user recordings",
+    "heatmaps"
+  ],
+  "crazyegg_ux": [
+    "crazyegg",
+    "crazy egg heatmaps"
+  ],
+  "fullstory_ux": [
+    "fullstory",
+    "fullstory analytics"
+  ],
+  "usabilityhub": [
+    "usabilityhub",
+    "usability hub"
+  ],
+  "userbrain": [
+    "userbrain",
+    "userbrain testing"
+  ],
+  "lookback": [
+    "lookback",
+    "lookback research"
+  ],
+  "userzoom": [
+    "userzoom",
+    "user zoom"
+  ],
+  "dovetail": [
+    "dovetail",
+    "dovetail research"
+  ],
+  "userinterviews": [
+    "userinterviews",
+    "user interviews"
+  ],
+  "optimal_workshop": [
+    "optimal workshop",
+    "optimalworkshop"
+  ],
+  "customer_journey": [
+    "customer journey",
+    "customer journey mapping",
+    "user journey"
+  ],
+  "service_design": [
+    "service design",
+    "service blueprint",
+    "blueprinting"
+  ],
+  "empathy_maps": [
+    "empathy maps",
+    "empathy mapping"
+  ],
+  "sitemaps": [
+    "sitemaps",
+    "site maps",
+    "website sitemap"
+  ],
+  "storyboarding": [
+    "storyboarding",
+    "storyboard design",
+    "user storyboards"
+  ],
+  "heuristic_evaluation": [
+    "heuristic evaluation",
+    "heuristic analysis",
+    "usability heuristics"
+  ],
+  "a_b_testing_design": [
+    "a/b testing",
+    "ab testing design",
+    "split testing design"
+  ],
+  "card_sorting": [
+    "card sorting",
+    "card sort",
+    "information architecture sorting"
+  ],
+  "tree_testing": [
+    "tree testing",
+    "tree test",
+    "information architecture testing"
+  ],
+  "surveys": [
+    "surveys",
+    "user surveys",
+    "survey design",
+    "questionnaire design"
+  ],
+  "interviews": [
+    "interviews",
+    "user interviews",
+    "stakeholder interviews",
+    "one-on-one interviews"
+  ],
+  "focus_groups": [
+    "focus groups",
+    "focus group research"
+  ],
+  "design_thinking": [
+    "design thinking",
+    "design thinking methodology",
+    "human centered design"
+  ],
+  "lean_ux": [
+    "lean ux",
+    "lean user experience"
+  ],
+  "agile_ux": [
+    "agile ux",
+    "agile user experience"
+  ],
+  "ui_patterns": [
+    "ui patterns",
+    "user interface patterns",
+    "design patterns ui"
+  ],
+  "ux_writing": [
+    "ux writing",
+    "microcopy",
+    "copywriting",
+    "ui copy",
+    "content design"
+  ],
+  "content_strategy": [
+    "content strategy",
+    "content design",
+    "content planning"
+  ],
+  "data_visualization": [
+    "data visualization",
+    "data viz",
+    "dashboard design",
+    "infographics"
+  ],
+  "dashboard_design": [
+    "dashboard design",
+    "admin dashboard ui",
+    "data dashboard"
+  ],
+  "mobile_app_design": [
+    "mobile design",
+    "app design",
+    "ios design",
+    "android design",
+    "mobile ui"
+  ],
+  "web_design": [
+    "web design",
+    "website design",
+    "web ui design",
+    "landing page design"
+  ],
+  "ecommerce_design": [
+    "ecommerce design",
+    "e-commerce ui",
+    "store design",
+    "product page design"
+  ],
+  "saas_design": [
+    "saas design",
+    "saas ui",
+    "software as a service design"
+  ],
+  "design_handoff": [
+    "design handoff",
+    "handoff to development",
+    "design to code"
+  ],
+  "developer_handoff": [
+    "developer handoff",
+    "design to dev",
+    "dev handoff"
+  ],
+  "design_specs": [
+    "design specs",
+    "specifications",
+    "design documentation"
+  ],
+  "style_guides": [
+    "style guides",
+    "styleguide",
+    "brand style guide"
+  ],
+  "prototyping_tools": [
+    "prototyping tools",
+    "prototype tools",
+    "interactive design"
+  ],
+  "ux_strategy": [
+    "ux strategy",
+    "user experience strategy",
+    "design strategy"
+  ],
+  "product_management": [
+    "product management",
+    "product strategy",
+    "product owner"
+  ],
+  "stakeholder_management": [
+    "stakeholder management",
+    "stakeholder communication"
+  ],
+  "user_centric_design": [
+    "user centered design",
+    "human centered design",
+    "ucd"
+  ],
+  "conversational_design": [
+    "conversational design",
+    "chatbot design",
+    "voice ux",
+    "voice interface"
+  ],
+  "vr_ar_design": [
+    "vr design",
+    "ar design",
+    "virtual reality design",
+    "augmented reality design",
+    "spatial design"
+  ],
+  "game_ui": [
+    "game ui",
+    "game interface design",
+    "video game ui"
+  ],
+  "design_leadership": [
+    "design leadership",
+    "lead designer",
+    "design director"
+  ],
+  "mentoring": [
+    "mentoring",
+    "design mentoring",
+    "coaching design"
+  ],
+  "design_sprint": [
+    "design sprint",
+    "google design sprint",
+    "sprint methodology"
+  ],
+  "workshop_facilitation": [
+    "workshop facilitation",
+    "design workshops",
+    "facilitation"
+  ],
+  "jira_design": [
+    "jira",
+    "jira for design",
+    "atlassian jira"
+  ],
+  "trello_design": [
+    "trello",
+    "trello boards"
+  ],
+  "asana_design": [
+    "asana",
+    "asana project management"
+  ],
+  "clickup_design": [
+    "clickup",
+    "click up tasks"
+  ],
+  "notion_design": [
+    "notion",
+    "notion for design"
+  ],
+  "confluence_design": [
+    "confluence",
+    "confluence documentation"
+  ],
+  "slack_design": [
+    "slack",
+    "slack communication"
+  ],
+  "teams_design": [
+    "teams",
+    "microsoft teams"
+  ],
+  "zoom_design": [
+    "zoom",
+    "zoom meetings"
+  ],
+  "google_meet_design": [
+    "google meet",
+    "meet"
+  ],
+  "google_drive_design": [
+    "google drive",
+    "drive storage"
+  ],
+  "dropbox_design": [
+    "dropbox",
+    "dropbox storage"
+  ],
+  "portfolio_design": [
+    "portfolio design",
+    "design portfolio"
+  ],
+  "case_studies": [
+    "case studies",
+    "design case studies",
+    "project cases"
+  ],
+  "creative_cloud": [
+    "creative cloud",
+    "adobe creative cloud",
+    "adobe cc"
+  ],
+  "creative_direction": [
+    "creative direction",
+    "creative director"
+  ],
+  "art_direction": [
+    "art direction",
+    "art director"
+  ],
+  "ux_audit": [
+    "ux audit",
+    "user experience audit",
+    "design audit"
+  ],
+  "ux_analytics": [
+    "ux analytics",
+    "user analytics",
+    "behavior analytics"
+  ],
+  "user_metrics": [
+    "user metrics",
+    "ux metrics",
+    "key performance indicators",
+    "kpis"
+  ],
+        
+        
+    # ============================================================
+    # UI/UX skills END
+    # ============================================================    
+    
+    # ============================================================
+    # Business Developer START
+    # ============================================================
+    
+    
+    "sales": [
+    "sales", "selling", "sold", "salesmanship", "sales experience", "sales background", "sales work", 
+    "sales activities", "sales function", "sales role", "sales job", "sales career", "sales profession",
+    "merchandising", "merchandise", "retail sales", "wholesale sales", "direct sales", "indirect sales",
+    "field sales", "inside sales", "outside sales", "territory sales", "regional sales", "national sales",
+    "global sales", "international sales", "domestic sales", "local sales", "consumer sales", "b2b sales",
+    "b2c sales", "business to business sales", "business to consumer sales", "b2g sales", "government sales",
+    "institutional sales", "corporate sales", "commercial sales", "enterprise sales", "sme sales",
+    "mid-market sales", "key account sales", "strategic sales", "solution sales", "product sales",
+    "service sales", "consultative sales", "hard sales", "soft sales", "face to face sales", "f2f sales",
+    "phone sales", "telephone sales", "telemarketing", "telesales", "door to door sales", "d2d sales",
+    "car sales", "automotive sales", "real estate sales", "property sales", "insurance sales",
+    "financial sales", "banking sales", "tech sales", "software sales", "saas sales", "it sales",
+    "pharma sales", "pharmaceutical sales", "medical sales", "equipment sales", "machinery sales",
+    "industrial sales", "manufacturing sales", "fmcg sales", "fast moving consumer goods sales",
+    "cpg sales", "consumer packaged goods sales", "retail sales associate", "sales assistant",
+    "sales officer", "sales executive", "sales manager", "sales director", "sales head", "sales lead",
+    "sales specialist", "sales professional", "sales guru", "sales ninja", "sales rockstar",
+    "sales warrior", "sales hunter", "sales closer", "deal closer", "closer"
+  ],
+
+  "negotiation": [
+    "negotiation", "negotiating", "negotiate", "negotiated", "negotiator", "negotiations",
+    "commercial negotiation", "contract negotiation", "deal negotiation", "price negotiation",
+    "pricing negotiation", "terms negotiation", "procurement negotiation", "vendor negotiation",
+    "supplier negotiation", "buyer negotiation", "sales negotiation", "strategic negotiation",
+    "complex negotiation", "high-stakes negotiation", "win-win negotiation", "negotiation skills",
+    "negotiation tactics", "negotiation techniques", "negotiation strategy", "negotiation expertise",
+    "negotiation experience", "negotiation mastery", "negotiation professional", "negotiation lead",
+    "bargaining", "bargain", "haggle", "haggling", "mediation", "conciliation", "arbitration",
+    "conflict resolution", "dispute resolution", "compromise", "trade-off", "concession",
+    "deal-making", "dealmaking", "deal maker", "deal broker", "barter", "trade negotiation",
+    "price negotiation", "cost negotiation", "rate negotiation", "fee negotiation", "salary negotiation",
+    "contract discussion", "terms discussion", "agreement negotiation"
+  ],
+
+  "lead_generation": [
+    "lead generation", "lead gen", "leadgeneration", "leadg gen", "leads generation",
+    "generating leads", "generate leads", "lead sourcing", "lead acquisition", "lead accumulation",
+    "lead building", "lead creation", "lead development", "lead identification", "lead mining",
+    "lead prospecting", "lead qualification", "lead research", "lead discovery", "lead outreach",
+    "cold lead generation", "warm lead generation", "hot lead generation", "inbound lead generation",
+    "outbound lead generation", "b2b lead generation", "b2c lead generation", "digital lead generation",
+    "online lead generation", "offline lead generation", "marketing qualified leads", "mql",
+    "sales qualified leads", "sql", "product qualified leads", "pql", "service qualified leads",
+    "lead scoring", "lead nurturing", "lead conversion", "lead pipeline", "lead funnel",
+    "lead management", "lead tracking", "lead follow-up", "lead response", "lead capture",
+    "lead magnet", "lead bait", "lead list", "lead database", "lead enrichment", "lead verification",
+    "prospecting", "prospect generation", "prospecting calls", "prospecting emails", "cold outreach",
+    "cold calling", "cold emailing", "cold mailing", "cold messaging", "cold dming", "cold linkedin",
+    "warm outreach", "warm calling", "referral generation", "referral leads", "network leads",
+    "conference leads", "exhibition leads", "trade show leads", "event leads", "webinar leads",
+    "landing page leads", "ppc leads", "seo leads", "social media leads", "content leads",
+    "inbound marketing", "outbound marketing", "demand generation", "demand gen"
+  ],
+
+  "pipeline": [
+    "pipeline", "sales pipeline", "pipelining", "pipeline development", "pipeline generation",
+    "pipeline management", "pipeline building", "pipeline creation", "pipeline growth",
+    "pipeline acceleration", "pipeline expansion", "pipeline forecasting", "pipeline analysis",
+    "pipeline review", "pipeline hygiene", "pipeline health", "pipeline coverage", "pipeline velocity",
+    "opportunity pipeline", "deal pipeline", "revenue pipeline", "lead pipeline", "prospect pipeline",
+    "pipeline stage", "pipeline progression", "pipeline conversion", "pipeline drop-off",
+    "pipeline leak", "pipeline plug", "pipeline report", "pipeline dashboard", "pipeline crm",
+    "pipe", "sales pipe", "deal flow", "dealflow", "opportunity flow", "lead flow", "inquiry flow"
+  ],
+
+  "client_relationship": [
+    "client relationship", "customer relationship", "relationship management",
+    "relationship building", "relationship cultivation", "relationship development",
+    "relationship maintenance", "relationship retention", "relationship expansion",
+    "client management", "customer management", "account management", "key account management",
+    "strategic account management", "global account management", "regional account management",
+    "client servicing", "customer servicing", "client handling", "customer handling",
+    "client interaction", "customer interaction", "client communication", "customer communication",
+    "client engagement", "customer engagement", "client retention", "customer retention",
+    "client loyalty", "customer loyalty", "client satisfaction", "customer satisfaction",
+    "csat", "net promoter score", "nps", "client success", "customer success", "client advocacy",
+    "customer advocacy", "client reference", "customer reference", "client testimonials",
+    "case studies", "client partnership", "customer partnership", "stakeholder management",
+    "stakeholder engagement", "stakeholder relationship", "client facing", "customer facing",
+    "frontline", "relationship officer", "relationship manager", "rm", "customer relationship officer",
+    "cro", "client relationship executive", "relationship executive", "client success manager",
+    "csm", "customer success manager"
+  ],
+
+  "strategic_planning": [
+    "strategic planning", "strategy planning", "strategy development", "strategy formulation",
+    "strategic development", "strategic thinking", "strategic analysis", "strategic execution",
+    "strategic implementation", "strategic management", "strategic direction", "strategic vision",
+    "strategic roadmap", "roadmap creation", "roadmap development", "go-to-market strategy",
+    "gtm strategy", "gtm plan", "market entry strategy", "market expansion strategy",
+    "growth strategy", "business strategy", "commercial strategy", "sales strategy",
+    "revenue strategy", "pricing strategy", "product strategy", "channel strategy",
+    "partnership strategy", "alliance strategy", "global strategy", "regional strategy",
+    "local strategy", "competitive strategy", "differentiation strategy", "cost leadership",
+    "focus strategy", "blue ocean strategy", "market penetration", "market development",
+    "product development", "diversification", "strategic initiatives", "strategic projects",
+    "strategic programs", "strategic portfolio", "strategy consulting", "strategic advisory"
+  ],
+
+  "partnership": [
+    "partnership", "partnerships", "partnering", "partner", "partnered", "partners",
+    "strategic partnerships", "strategic partners", "strategic partnering", "alliances",
+    "strategic alliances", "alliance management", "alliance building", "alliance development",
+    "partner ecosystem", "partner network", "partner relationship", "partner management",
+    "partner enablement", "partner success", "channel partnerships", "channel partners",
+    "channel management", "channel sales", "channel development", "indirect sales",
+    "reseller partnerships", "reseller management", "distributor partnerships",
+    "distributor management", "dealer partnerships", "dealer network", "franchise partnerships",
+    "franchise development", "licensing partnerships", "licensing agreements", "oem partnerships",
+    "original equipment manufacturer", "system integrator", "si partnerships", "value-added reseller",
+    "var", "technology partnerships", "technology alliances", "co-marketing partnerships",
+    "co-branding partnerships", "joint ventures", "jv", "jv partnerships", "strategic cooperation",
+    "collaboration", "collaborative partnerships", "industry partnerships", "government partnerships",
+    "ngo partnerships", "academic partnerships", "research partnerships", "innovation partnerships",
+    "equity partnerships", "profit-sharing partnerships", "referral partnerships", "affiliate partnerships"
+  ],
+
+  "proposal": [
+    "proposal", "proposals", "proposal writing", "proposal creation", "proposal development",
+    "proposal management", "proposal coordination", "proposal submission", "proposal response",
+    "rfp response", "rfp submission", "request for proposal", "rfq response", "request for quotation",
+    "rfi response", "request for information", "bid management", "bid writing", "bid preparation",
+    "bid submission", "tender management", "tender response", "tender submission", "tender writing",
+    "public tender", "government tender", "private tender", "commercial proposal", "technical proposal",
+    "financial proposal", "combined proposal", "solicited proposal", "unsolicited proposal",
+    "proposal pitch", "proposal presentation", "proposal defense", "bid defense", "tender defense",
+    "contract proposal", "project proposal", "service proposal", "product proposal", "solution proposal",
+    "proposal drafting", "proposal template", "proposal content", "proposal strategy", "bid strategy",
+    "bid pricing", "bid winning", "win strategy", "win theme", "competitive bidding", "e-tendering",
+    "electronic tendering", "ppra", "public procurement", "procurement proposal"
+  ],
+
+  "networking": [
+    "networking", "network", "networked", "networking skills", "professional networking",
+    "business networking", "social networking", "online networking", "offline networking",
+    "digital networking", "in-person networking", "virtual networking", "linkedin networking",
+    "linkedin outreach", "linkedin connection", "linkedin networking", "event networking",
+    "conference networking", "trade show networking", "exhibition networking", "seminar networking",
+    "webinar networking", "alumni networking", "referral networking", "introduction networking",
+    "relationship building", "connection building", "business connections", "professional connections",
+    "industry connections", "network expansion", "network development", "network cultivation",
+    "network leverage", "network utilization", "network growth", "network mapping", "contact building",
+    "contacts development", "rolodex", "address book", "database building", "contact list",
+    "warm introductions", "cold introductions", "referral generation", "word of mouth",
+    "personal branding", "professional branding", "visibility", "thought leadership",
+    "community building", "community engagement", "community networking", "council membership",
+    "board membership", "committee participation", "chamber of commerce", "trade association",
+    "industry body", "professional body", "pakistan chamber", "karachi chamber", "lahore chamber",
+    "islamabad chamber", "fpcci", "pasha", "pseb", "tdap"
+  ],
+
+  "market_research": [
+    "market research", "market analysis", "market assessment", "market evaluation",
+    "market study", "market survey", "market intelligence", "competitive intelligence",
+    "competitor analysis", "competitor research", "industry research", "industry analysis",
+    "sector analysis", "trend analysis", "trend spotting", "market trends", "market dynamics",
+    "market sizing", "tam analysis", "total addressable market", "sam analysis",
+    "serviceable addressable market", "som analysis", "serviceable obtainable market",
+    "market segmentation", "segment analysis", "target market", "target audience",
+    "customer research", "buyer research", "buyer persona", "customer profiling",
+    "client profiling", "demographic analysis", "psychographic analysis", "behavioral analysis",
+    "swot analysis", "strengths weaknesses opportunities threats", "pestel analysis",
+    "political economic social technological legal environmental", "porter's five forces",
+    "porter five forces", "gap analysis", "needs analysis", "requirements gathering",
+    "data gathering", "data collection", "primary research", "secondary research",
+    "qualitative research", "quantitative research", "focus groups", "surveys", "questionnaires",
+    "interviews", "field research", "desk research", "online research", "google trends",
+    "keyword research", "seo research", "analytics research", "consumer insights",
+    "customer insights", "voice of customer", "voc", "feedback analysis", "sentiment analysis"
+  ],
+
+  "closing": [
+    "closing", "close deals", "closing deals", "closed deals", "closer", "deal closer",
+    "closing skills", "closing techniques", "closing strategies", "closing tactics",
+    "closing ability", "closing expertise", "closing experience", "closing ratio",
+    "closing rate", "closing percentage", "win rate", "conversion rate", "conversion skills",
+    "conversion optimization", "deal completion", "deal finalization", "deal sealing",
+    "signing deals", "agreement signing", "contract execution", "deal closure", "deal sign-off",
+    "commitment closing", "decision closing", "objection handling", "objection resolution",
+    "overcoming objections", "stall prevention", "procrastination handling", "hurdle removal",
+    "last mile closing", "trial close", "assumptive close", "alternative close",
+    "urgency close", "scarcity close", "summary close", "question close", "benefit close",
+    "now or never close", "soft close", "hard close", "close rate", "win-loss ratio",
+    "successful closing", "effective closing", "closing performance", "closing achievements"
+  ],
+
+  "crm": [
+    "crm", "customer relationship management", "client relationship management",
+    "crm software", "crm platform", "crm tool", "crm system", "crm solution",
+    "salesforce", "salesforce crm", "sfdc", "sales cloud", "hubspot", "hubspot crm",
+    "zoho", "zoho crm", "pipedrive", "pipedrive crm", "freshsales", "freshworks",
+    "close crm", "close", "copper crm", "copper", "nimble", "nimble crm", "insightly",
+    "monday crm", "monday.com", "dynamics", "microsoft dynamics", "dynamics 365",
+    "oracle crm", "netsuite", "sugarcrm", "keap", "infusionsoft", "activecampaign",
+    "capsule crm", "capsule", "folk", "streak", "streak crm", "salesflare", "bigin",
+    "less annoying crm", "crm administration", "crm management", "crm implementation",
+    "crm customization", "crm data", "crm reporting", "crm dashboards", "crm analytics",
+    "crm migration", "crm integration", "crm automation", "crm adoption", "crm training",
+    "crm user", "crm superuser", "crm champion", "crm specialist", "crm administrator",
+    "crm consultant", "crm strategist", "crm manager", "salesforce administrator",
+    "salesforce admin", "hubspot admin", "zoho admin", "pipedrive admin"
+  ],
+
+  "forecasting": [
+    "forecasting", "forecast", "forecasts", "forecasted", "sales forecasting",
+    "sales forecast", "revenue forecasting", "revenue forecast", "pipeline forecasting",
+    "pipeline forecast", "opportunity forecasting", "demand forecasting", "demand forecast",
+    "financial forecasting", "financial forecast", "budget forecasting", "budget forecast",
+    "projection", "projections", "projected", "predictive analytics", "prediction",
+    "predictions", "trend analysis", "trend forecasting", "market forecasting",
+    "quarterly forecast", "monthly forecast", "annual forecast", "rolling forecast",
+    "top-down forecast", "bottom-up forecast", "statistical forecast", "data-driven forecast",
+    "accuracy", "forecast accuracy", "forecast precision", "forecast reliability",
+    "forecast confidence", "forecast review", "forecast update", "forecast adjustment",
+    "forecast variance", "forecast gap", "forecast methodology", "forecast model",
+    "forecast tool", "forecast dashboard", "forecast reporting", "forecast meeting",
+    "sales projection", "revenue projection", "growth projection", "target projection",
+    "goal projection", "outlook", "business outlook", "market outlook", "economic outlook"
+  ],
+
+  "revenue": [
+    "revenue", "revenues", "revenue growth", "revenue generation", "revenue development",
+    "revenue expansion", "revenue acceleration", "revenue optimization", "revenue management",
+    "revenue strategy", "revenue planning", "revenue forecasting", "revenue reporting",
+    "revenue analysis", "revenue performance", "revenue targets", "revenue goals",
+    "revenue metrics", "revenue kpis", "revenue pipeline", "revenue funnel", "revenue streams",
+    "revenue diversification", "revenue maximization", "topline growth", "top-line growth",
+    "topline", "top line", "sales revenue", "service revenue", "product revenue",
+    "subscription revenue", "recurring revenue", "mrr", "monthly recurring revenue",
+    "arr", "annual recurring revenue", "acv", "annual contract value", "tcv",
+    "total contract value", "new revenue", "net new revenue", "expansion revenue",
+    "retention revenue", "renewal revenue", "upsell revenue", "cross-sell revenue",
+    "gross revenue", "net revenue", "adjusted revenue", "deferred revenue",
+    "unearned revenue", "revenue recognition", "revenue realization", "revenue assurance",
+    "revenue protection", "recovery", "collection", "accounts receivable", "ar",
+    "invoice", "invoicing", "billing", "payment collection", "payment terms"
+  ],
+
+  "contract": [
+    "contract", "contracts", "contracting", "contract management", "contract administration",
+    "contract negotiation", "contract execution", "contract signing", "contract finalization",
+    "contract review", "contract analysis", "contract drafting", "contract preparation",
+    "contract renewal", "contract extension", "contract amendment", "contract modification",
+    "contract termination", "contract closeout", "master agreement", "service agreement",
+    "service contract", "product agreement", "supply agreement", "purchase agreement",
+    "sales agreement", "distribution agreement", "licensing agreement", "franchise agreement",
+    "joint venture agreement", "partnership agreement", "alliance agreement", "nda",
+    "non-disclosure agreement", "confidentiality agreement", "mou", "memorandum of understanding",
+    "moa", "memorandum of agreement", "letter of intent", "loi", "term sheet", "statement of work",
+    "sow", "scope of work", "sla", "service level agreement", "kpi agreement", "performance agreement",
+    "employment contract", "consultancy agreement", "vendor contract", "supplier contract",
+    "subcontract", "prime contract", "government contract", "public contract", "private contract",
+    "commercial contract", "legal agreement", "binding agreement", "enforceable contract",
+    "contract lifecycle", "contract compliance", "contract governance", "contract risk"
+  ],
+
+  "account_management": [
+    "account management", "account manager", "strategic account management",
+    "key account management", "global account management", "national account management",
+    "regional account management", "major account management", "enterprise account management",
+    "corporate account management", "sme account management", "mid-market account management",
+    "account planning", "account strategy", "account growth", "account expansion",
+    "account retention", "account renewal", "account profitability", "account revenue",
+    "account penetration", "account coverage", "account mapping", "account organization",
+    "account team", "account leadership", "account coordinator", "account specialist",
+    "account executive", "account director", "account lead", "account owner",
+    "account stewardship", "account advocacy", "account health", "account score",
+    "account analysis", "account review", "account qbr", "quarterly business review",
+    "annual account review", "client account", "customer account", "accounts receivable",
+    "credit management", "collections", "account reconciliation", "account auditing"
+  ],
+
+  "presentation": [
+    "presentation", "presentations", "presenting", "presenter", "presentation skills",
+    "public speaking", "speaking", "speaker", "keynote", "keynote speaker", "panelist",
+    "moderator", "host", "facilitator", "presentation creation", "presentation development",
+    "presentation design", "slide deck", "slide creation", "powerpoint", "ppt", "google slides",
+    "slides", "canva", "prezi", "visual aids", "data visualization", "chart creation",
+    "graph creation", "infographics", "storytelling", "narrative", "pitch deck", "investor deck",
+    "board presentation", "executive presentation", "client presentation", "sales presentation",
+    "product presentation", "service presentation", "proposal presentation", "bid presentation",
+    "team presentation", "training presentation", "workshop presentation", "conference presentation",
+    "webinar presentation", "virtual presentation", "remote presentation", "stand-up presentation",
+    "formal presentation", "informal presentation", "impromptu presentation", "extemporaneous",
+    "persuasive presentation", "informative presentation", "demonstration", "demo", "product demo",
+    "live demo", "recorded demo", "screen share", "walkthrough", "showcase"
+  ],
+
+  "communication": [
+    "communication", "communicating", "communicator", "verbal communication",
+    "written communication", "oral communication", "interpersonal communication",
+    "business communication", "professional communication", "client communication",
+    "customer communication", "internal communication", "external communication",
+    "upward communication", "downward communication", "lateral communication",
+    "formal communication", "informal communication", "email communication",
+    "phone communication", "video communication", "face-to-face communication",
+    "virtual communication", "remote communication", "cross-cultural communication",
+    "multilingual communication", "persuasive communication", "influential communication",
+    "clear communication", "concise communication", "effective communication",
+    "active listening", "listening skills", "questioning skills", "probing",
+    "clarification", "summarizing", "paraphrasing", "feedback", "constructive feedback",
+    "report writing", "business writing", "technical writing", "proposal writing",
+    "reporting", "briefing", "debriefing", "collaboration", "team communication",
+    "cross-functional communication", "stakeholder communication", "board communication",
+    "executive communication", "c-suite communication", "correspondence", "memo",
+    "email drafting", "letter writing", "message crafting", "social media communication",
+    "linkedin communication", "networking communication"
+  ],
+
+  "team_leadership": [
+    "team leadership", "leadership", "leading teams", "team management", "people management",
+    "staff management", "employee management", "team development", "team building",
+    "team culture", "team motivation", "team inspiration", "team direction", "team vision",
+    "team strategy", "team operations", "team performance", "team kpis", "team goals",
+    "team targets", "team review", "team feedback", "team coaching", "team mentoring",
+    "talent development", "career development", "skill development", "training", "onboarding",
+    "team onboarding", "cross-training", "upskilling", "reskilling", "succession planning",
+    "performance management", "performance reviews", "performance improvement", "pip",
+    "conflict resolution", "team conflict", "mediating", "team harmony", "employee retention",
+    "retention strategy", "employee engagement", "culture building", "inclusive culture",
+    "diversity", "inclusion", "remote team", "distributed team", "hybrid team", "virtual team",
+    "team meetings", "stand-ups", "sprint planning", "retrospectives", "team building activities",
+    "offsite", "team retreat", "recognition", "team rewards", "delegation", "empowerment",
+    "trust building", "accountability", "ownership", "responsibility", "decision making"
+  ],
+
+  "problem_solving": [
+    "problem solving", "problem solver", "problem-solving", "problem analysis", "issue resolution",
+    "issue management", "challenge solving", "complex problem solving", "analytical problem solving",
+    "creative problem solving", "structured problem solving", "root cause analysis", "rca",
+    "diagnosis", "troubleshooting", "resolution", "solution development", "solution architecture",
+    "solution designing", "solution implementation", "critical thinking", "analytical thinking",
+    "logic", "reasoning", "deduction", "induction", "abduction", "hypothesis testing",
+    "data analysis", "data interpretation", "evidence-based decisions", "decision making",
+    "sound judgment", "strategic thinking", "systems thinking", "lateral thinking", "out-of-box thinking",
+    "innovation", "resourcefulness", "adaptability", "flexibility", "resilience", "persistence",
+    "compromise", "negotiation", "mediation", "facilitation", "brainstorming", "ideation",
+    "synthesis", "prioritization", "trade-off analysis", "cost-benefit analysis", "risk analysis",
+    "risk mitigation", "contingency planning", "what-if analysis", "scenario planning"
+  ],
+
+  "time_management": [
+    "time management", "time management skills", "managing time", "priority setting",
+    "prioritization", "task management", "task prioritization", "task organization",
+    "workload management", "workload balancing", "multitasking", "focus", "attention",
+    "deadline management", "deadline achievement", "meeting deadlines", "on-time delivery",
+    "punctuality", "reliability", "dependability", "scheduling", "schedule management",
+    "calendar management", "calendar planning", "agenda setting", "planning", "forethought",
+    "organization", "organized", "systematic", "methodical", "structured", "efficient",
+    "productivity", "productive", "effective", "goal setting", "goal orientation",
+    "target setting", "milestone achievement", "progress tracking", "progress monitoring",
+    "time tracking", "timesheet", "task automation", "delegation", "outsourcing",
+    "resource allocation", "resource management", "utilization", "optimization",
+    "efficiency improvement", "process improvement", "lean", "agile", "scrum", "kanban"
+  ],
+
+  "financial_acumen": [
+    "financial acumen", "financial literacy", "financial understanding", "financial skills",
+    "budget management", "budgeting", "budget planning", "budget development", "budget control",
+    "cost management", "cost control", "cost optimization", "cost reduction", "expense management",
+    "expense tracking", "p&l management", "profit and loss", "p&l", "income statement",
+    "balance sheet", "cash flow", "cash flow management", "financial modeling", "financial projection",
+    "financial forecasting", "financial analysis", "financial reporting", "financial review",
+    "roi analysis", "return on investment", "irr", "internal rate of return", "npv",
+    "net present value", "payback period", "break-even analysis", "break even", "ebitda",
+    "earnings before interest taxes depreciation amortization", "gross margin", "net margin",
+    "profit margin", "operating margin", "contribution margin", "unit economics", "customer lifetime value",
+    "clv", "customer acquisition cost", "cac", "clv:cac ratio", "payback", "payback period",
+    "value-based pricing", "cost-plus pricing", "competitive pricing", "price elasticity",
+    "discounting", "volume discount", "tiered pricing", "bundling", "upsell", "cross-sell"
+  ],
+
+  "business_development": [
+    "business development", "bd", "biz dev", "business dev", "new business development",
+    "new biz dev", "business growth", "growth development", "market development",
+    "opportunity development", "opportunity creation", "opportunity identification",
+    "opportunity pipeline", "deal sourcing", "deal origination", "deal flow", "inorganic growth",
+    "organic growth", "expansion", "market expansion", "geographic expansion", "global expansion",
+    "international expansion", "regional expansion", "local expansion", "sector expansion",
+    "product expansion", "service expansion", "innovation", "growth hacking", "growth strategy",
+    "scalability", "scale-up", "startup growth", "sme growth", "enterprise growth",
+    "corporate development", "corp dev", "m&a", "mergers and acquisitions", "joint ventures",
+    "strategic investments", "equity investments", "minority stake", "majority stake",
+    "holding company", "subsidiary", "spin-off", "divestiture", "asset acquisition", "talent acquisition",
+    "white space", "white space analysis", "untapped market", "greenfield", "brownfield"
+  ],
+
+  "sales_operations": [
+    "sales operations", "sales ops", "sales administration", "sales support", "sales enablement",
+    "sales excellence", "sales optimization", "sales efficiency", "sales effectiveness",
+    "sales transformation", "sales process improvement", "sales workflow", "sales automation",
+    "sales technology", "sales tools", "sales stack", "sales analytics", "sales insights",
+    "sales reporting", "sales dashboards", "sales metrics", "sales kpis", "sales scoring",
+    "sales territory planning", "territory alignment", "sales quota", "quota management",
+    "sales compensation", "sales incentives", "sales commission", "spiff", "sales bonus",
+    "sales performance", "sales productivity", "sales capacity planning", "sales coverage",
+    "sales routing", "sales cadence", "sales playbook", "sales script", "sales talk track",
+    "sales objection handling", "sales training", "sales coaching", "sales onboarding",
+    "sales certification", "sales methodology", "sales best practices", "sales standard",
+    "sales compliance", "sales audit", "sales quality", "sales governance", "sales policy"
+  ],
+
+  "marketing": [
+    "marketing", "digital marketing", "online marketing", "offline marketing", "traditional marketing",
+    "inbound marketing", "outbound marketing", "content marketing", "social media marketing",
+    "email marketing", "sms marketing", "mobile marketing", "video marketing", "seo", "search engine optimization",
+    "sem", "search engine marketing", "ppc", "pay per click", "google ads", "meta ads", "facebook ads",
+    "instagram ads", "linkedin ads", "twitter ads", "tiktok ads", "display ads", "banner ads",
+    "affiliate marketing", "influencer marketing", "brand marketing", "product marketing",
+    "service marketing", "b2b marketing", "b2c marketing", "b2g marketing", "growth marketing",
+    "performance marketing", "guerrilla marketing", "viral marketing", "word of mouth",
+    "referral marketing", "event marketing", "trade show marketing", "conference marketing",
+    "webinar marketing", "podcast marketing", "public relations", "pr", "brand awareness",
+    "brand positioning", "brand management", "brand strategy", "brand storytelling",
+    "brand identity", "brand equity", "brand loyalty", "brand advocacy", "market positioning",
+    "unique selling proposition", "usp", "value proposition", "differentiation", "messaging",
+    "copywriting", "content creation", "blogging", "thought leadership", "whitepaper",
+    "case study", "e-book", "infographic", "newsletter", "campaign management", "campaign strategy"
+  ],
+
+  "analytics": [
+    "analytics", "analysis", "data analysis", "business analytics", "sales analytics",
+    "marketing analytics", "financial analytics", "predictive analytics", "descriptive analytics",
+    "diagnostic analytics", "prescriptive analytics", "data interpretation", "data synthesis",
+    "data visualization", "reporting", "dashboards", "scorecards", "kpi tracking", "metric analysis",
+    "trend analysis", "pattern recognition", "correlation", "causation", "regression", "cohort analysis",
+    "funnel analysis", "conversion analysis", "retention analysis", "churn analysis", "lifetime value",
+    "attribution", "multi-touch attribution", "a/b testing", "split testing", "multivariate testing",
+    "optimization", "experimentation", "data-driven decisions", "evidence-based", "business intelligence",
+    "bi", "tableau", "power bi", "looker", "metabase", "google analytics", "ga4", "amplitude",
+    "mixpanel", "heap", "pendo", "fullstory", "hotjar", "crazyegg", "semrush", "ahrefs", "similarweb"
+  ],
+
+  "software": [
+    "software", "saas", "software as a service", "crm", "sales software", "marketing software",
+    "outreach", "salesloft", "apollo", "zoominfo", "lusha", "clearbit", "hunter", "snov", "lemlist",
+    "reply", "mailshake", "woodpecker", "instantly", "smartlead", "yesware", "mixmax", "gmass",
+    "salesforce", "hubspot", "zoho", "pipedrive", "dynamics", "slack", "teams", "zoom", "google meet",
+    "calendly", "notion", "trello", "asana", "clickup", "jira", "monday", "airtable", "excel", "sheets",
+    "powerpoint", "word", "docs", "pandadoc", "docusign", "hellosign", "zapier", "make", "chatgpt",
+    "gemini", "claude", "copilot", "perplexity", "wordpress", "shopify", "sales navigator", 
+    "linkedin recruiter", "crunchbase", "pitchbook", "owler", "g2", "clutch", "capterra"
+  ],
+
+  "export": [
+    "export", "exports", "exporting", "export management", "export development", "international trade",
+    "cross-border trade", "global trade", "foreign trade", "trade facilitation", "trade compliance",
+    "customs", "customs clearance", "customs brokerage", "shipping", "international shipping",
+    "logistics", "supply chain", "freight", "freight forwarding", "cargo", "air freight", "sea freight",
+    "land freight", "courier", "dhl", "fedex", "ups", "tnt", "aramex", "pakistan exports",
+    "textile export", "garment export", "leather export", "sports goods export", "surgical goods export",
+    "rice export", "basmati export", "mango export", "fruit export", "vegetable export", "pharma export",
+    "chemical export", "steel export", "cement export", "marble export", "carpet export", "handicraft export",
+    "export to usa", "export to eu", "export to uk", "export to uae", "export to saudi", "export to gcc",
+    "export to china", "export to japan", "export to korea", "export to africa", "export to central asia",
+    "export documentation", "export license", "export permit", "exporter", "export house",
+    "export oriented", "export incentives", "export subsidies", "duty drawback", "export processing zone",
+    "epz", "special economic zone", "sez", "free trade agreement", "fta", "gsp", "generalized system of preferences",
+    "certificate of origin", "bill of lading", "letter of credit", "lc", "export finance", "export credit"
+  ],
+    
+    "linkedin": [
+    "linkedin",
+    "linked in",
+    "linkedin sales navigator",
+    "sales navigator",
+    "linkedin recruiter",
+    "linkedin premium",
+    "linkedin jobs",
+    "linkedin talent solutions",
+    "linkedin learning",
+    "linkedin live",
+    "linkedin ads",
+    "linkedin marketing solutions",
+    "linkedin sales insights",
+    "sales insights",
+    "linkedin service marketplace",
+    "linkedin pages"
+  ],
+  "upwork": [
+    "upwork",
+    "up work"
+  ],
+  "fiverr": [
+    "fiverr",
+    "fiveer",
+    "fiverr pro"
+  ],
+  "peopleperhour": [
+    "peopleperhour",
+    "people per hour",
+    "pph"
+  ],
+  "freelancer": [
+    "freelancer",
+    "freelancer.com"
+  ],
+  "guru": [
+    "guru",
+    "guru.com"
+  ],
+  "toptal": [
+    "toptal"
+  ],
+  "contra": [
+    "contra"
+  ],
+  "truelancer": [
+    "truelancer"
+  ],
+  "workana": [
+    "workana"
+  ],
+  "outsourcely": [
+    "outsourcely",
+    "outsourcely.com"
+  ],
+  "remoteok": [
+    "remoteok",
+    "remote ok"
+  ],
+  "wellfound": [
+    "wellfound",
+    "angellist",
+    "angel list",
+    "angel.co",
+    "well found"
+  ],
+  "arc.dev": [
+    "arc.dev",
+    "arc"
+  ],
+  "codementor": [
+    "codementor"
+  ],
+  "hireable": [
+    "hireable"
+  ],
+  "working_nomads": [
+    "working nomads"
+  ],
+  "flexjobs": [
+    "flexjobs",
+    "flex jobs"
+  ],
+  "simplyhired": [
+    "simplyhired",
+    "simply hired"
+  ],
+  "kwork": [
+    "kwork"
+  ],
+  "envato_studio": [
+    "envato studio"
+  ],
+  "fivesquid": [
+    "fivesquid"
+  ],
+  "twine": [
+    "twine"
+  ],
+  "kolabtree": [
+    "kolabtree"
+  ],
+  "clutch": [
+    "clutch",
+    "clutch.co"
+  ],
+  "goodfirms": [
+    "goodfirms",
+    "good firms"
+  ],
+  "designrush": [
+    "designrush",
+    "design rush"
+  ],
+  "g2": [
+    "g2",
+    "g2.com"
+  ],
+  "capterra": [
+    "capterra"
+  ],
+  "software_advice": [
+    "software advice"
+  ],
+  "sourceforge": [
+    "sourceforge"
+  ],
+  "trustpilot": [
+    "trustpilot",
+    "trust pilot"
+  ],
+  "glassdoor": [
+    "glassdoor"
+  ],
+  "yelp": [
+    "yelp",
+    "yelp for business"
+  ],
+  "yellow_pages": [
+    "yellow pages",
+    "yp",
+    "yp.com"
+  ],
+  "manta": [
+    "manta"
+  ],
+  "angi": [
+    "angie's list",
+    "angi"
+  ],
+  "bbb": [
+    "better business bureau",
+    "bbb"
+  ],
+  "sitejabber": [
+    "sitejabber"
+  ],
+  "producthunt": [
+    "product hunt",
+    "producthunt"
+  ],
+  "betalist": [
+    "betalist",
+    "betalist.com"
+  ],
+  "saasworthy": [
+    "saasworthy",
+    "saas worthy"
+  ],
+  "getapp": [
+    "getapp",
+    "get app"
+  ],
+  "financesonline": [
+    "financesonline"
+  ],
+  "crozdesk": [
+    "crozdesk"
+  ],
+  "salesforce_appexchange": [
+    "appexchange",
+    "salesforce appexchange"
+  ],
+  "zapier_marketplace": [
+    "zapier marketplace"
+  ],
+  "make_marketplace": [
+    "make marketplace"
+  ],
+  "apollo": [
+    "apollo",
+    "apollo.io",
+    "apollo io"
+  ],
+  "zoominfo": [
+    "zoominfo",
+    "zoom info",
+    "zoominfo salesos"
+  ],
+  "lusha": [
+    "lusha"
+  ],
+  "rocketreach": [
+    "rocketreach",
+    "rocket reach"
+  ],
+  "leadiq": [
+    "leadiq",
+    "lead iq"
+  ],
+  "cognism": [
+    "cognism"
+  ],
+  "seamless.ai": [
+    "seamless.ai",
+    "seamless ai",
+    "seamless"
+  ],
+  "hunter": [
+    "hunter",
+    "hunter.io",
+    "email hunter",
+    "hunter campaigns"
+  ],
+  "snov": [
+    "snov",
+    "snov.io",
+    "snov campaigns"
+  ],
+  "kaspr": [
+    "kaspr"
+  ],
+  "adapt": [
+    "adapt",
+    "adapt.io"
+  ],
+  "uplead": [
+    "uplead",
+    "up lead"
+  ],
+  "salesintel": [
+    "salesintel",
+    "sales intel"
+  ],
+  "clearbit": [
+    "clearbit"
+  ],
+  "contactout": [
+    "contactout",
+    "contact out"
+  ],
+  "datanyze": [
+    "datanyze"
+  ],
+  "echobot": [
+    "echobot"
+  ],
+  "convince_convert": [
+    "convince & convert"
+  ],
+  "skrapp": [
+    "skrapp",
+    "skrapp.io"
+  ],
+  "aero_leads": [
+    "aero leads"
+  ],
+  "leadsift": [
+    "leadsift"
+  ],
+  "truelane": [
+    "truelane"
+  ],
+  "bound": [
+    "bound",
+    "bound.io"
+  ],
+  "salesgenie": [
+    "salesgenie"
+  ],
+  "infousa": [
+    "infousa"
+  ],
+  "discoverorg": [
+    "discoverorg"
+  ],
+  "teckler": [
+    "teckler"
+  ],
+  "prospect.io": [
+    "prospect.io",
+    "prospect"
+  ],
+  "signalhire": [
+    "signalhire",
+    "signal hire"
+  ],
+  "connectifier": [
+    "connectifier"
+  ],
+  "snapbird": [
+    "snapbird"
+  ],
+  "leadfeeder": [
+    "leadfeeder",
+    "lead feeder"
+  ],
+  "dealfront": [
+    "dealfront",
+    "front lead"
+  ],
+  "nymeria": [
+    "nymeria"
+  ],
+  "anymail_finder": [
+    "anymail finder"
+  ],
+  "dropcontact": [
+    "dropcontact",
+    "drop contact"
+  ],
+  "tomba": [
+    "tomba.io",
+    "tomba"
+  ],
+  "verifalia": [
+    "verifalia"
+  ],
+  "email_verifier": [
+    "email verifier"
+  ],
+  "neverbounce": [
+    "neverbounce"
+  ],
+  "zero_bounce": [
+    "zero bounce"
+  ],
+  "kickbox": [
+    "kickbox"
+  ],
+  "bulkemailchecker": [
+    "bulkemailchecker"
+  ],
+  "crunchbase": [
+    "crunchbase",
+    "crunch base"
+  ],
+  "pitchbook": [
+    "pitchbook",
+    "pitch book"
+  ],
+  "owler": [
+    "owler"
+  ],
+  "cb_insights": [
+    "cb insights",
+    "cbinsights"
+  ],
+  "dealroom": [
+    "dealroom",
+    "deal room"
+  ],
+  "bloomberg": [
+    "bloomberg"
+  ],
+  "reuters": [
+    "reuters"
+  ],
+  "yahoo_finance": [
+    "yahoo finance"
+  ],
+  "google_finance": [
+    "google finance"
+  ],
+  "sec_edgar": [
+    "sec edgar",
+    "edgar"
+  ],
+  "hoovers": [
+    "hoovers"
+  ],
+  "dun_bradstreet": [
+    "dun & bradstreet",
+    "dnb"
+  ],
+  "moodys": [
+    "moody's"
+  ],
+  "sp_global": [
+    "s&p global"
+  ],
+  "capital_iq": [
+    "capital iq"
+  ],
+  "factiva": [
+    "factiva"
+  ],
+  "lexisnexis": [
+    "lexisnexis",
+    "lexis nexis"
+  ],
+  "marketline": [
+    "marketline"
+  ],
+  "statista": [
+    "statista"
+  ],
+  "ibisworld": [
+    "ibisworld"
+  ],
+  "garter": [
+    "garter"
+  ],
+  "forrester": [
+    "forrester"
+  ],
+  "pwc": [
+    "pwc"
+  ],
+  "deloitte_insights": [
+    "deloitte insights"
+  ],
+  "kpmg": [
+    "kpmg"
+  ],
+  "ey": [
+    "ey"
+  ],
+  "mckinsey": [
+    "mckinsey"
+  ],
+  "bcg": [
+    "bcg"
+  ],
+  "bain": [
+    "bain"
+  ],
+  "glassnode": [
+    "glassnode"
+  ],
+  "coinmarketcap": [
+    "coinmarketcap"
+  ],
+  "coingecko": [
+    "coingecko"
+  ],
+  "salesforce": [
+    "salesforce",
+    "sfdc",
+    "sales cloud",
+    "salesforce cpq"
+  ],
+  "hubspot": [
+    "hubspot",
+    "hub spot",
+    "hubspot sales hub"
+  ],
+  "zoho_crm": [
+    "zoho crm",
+    "zoho",
+    "zoho bigin"
+  ],
+  "pipedrive": [
+    "pipedrive",
+    "pipe drive"
+  ],
+  "freshsales": [
+    "freshsales",
+    "fresh sales"
+  ],
+  "close_crm": [
+    "close",
+    "close crm"
+  ],
+  "copper": [
+    "copper",
+    "copper crm"
+  ],
+  "nimble": [
+    "nimble",
+    "nimble crm"
+  ],
+  "insightly": [
+    "insightly"
+  ],
+  "monday_crm": [
+    "monday crm",
+    "monday.com",
+    "monday"
+  ],
+  "nocrm": [
+    "no crm",
+    "nocrm"
+  ],
+  "microsoft_dynamics": [
+    "microsoft dynamics",
+    "dynamics 365",
+    "ms dynamics"
+  ],
+  "oracle_crm": [
+    "oracle crm",
+    "oracle netsuite",
+    "netsuite"
+  ],
+  "sugarcrm": [
+    "sugarcrm",
+    "sugar crm"
+  ],
+  "salesloft": [
+    "salesloft",
+    "sales loft"
+  ],
+  "keap": [
+    "keap"
+  ],
+  "infusionsoft": [
+    "infusionsoft"
+  ],
+  "activecampaign": [
+    "activecampaign",
+    "active campaign"
+  ],
+  "crm_generic": [
+    "crm"
+  ],
+  "less_annoying_crm": [
+    "less annoying crm"
+  ],
+  "capsule": [
+    "capsule",
+    "capsule crm"
+  ],
+  "bigin": [
+    "bigin"
+  ],
+  "freshworks": [
+    "freshworks"
+  ],
+  "folk": [
+    "folk",
+    "folk crm"
+  ],
+  "streak": [
+    "streak",
+    "streak crm"
+  ],
+  "salesflare": [
+    "salesflare"
+  ],
+  "net_hunt": [
+    "net hunt"
+  ],
+  "outreach": [
+    "outreach",
+    "outreach.io"
+  ],
+  "reply": [
+    "reply.io",
+    "reply"
+  ],
+  "lemlist": [
+    "lemlist"
+  ],
+  "mailshake": [
+    "mailshake"
+  ],
+  "woodpecker": [
+    "woodpecker",
+    "woodpecker.co"
+  ],
+  "instantly": [
+    "instantly",
+    "instantly.ai"
+  ],
+  "smartlead": [
+    "smartlead",
+    "smartlead.ai"
+  ],
+  "yesware": [
+    "yesware"
+  ],
+  "mixmax": [
+    "mixmax"
+  ],
+  "gmass": [
+    "gmass",
+    "gmass.io"
+  ],
+  "warmbox": [
+    "warmbox"
+  ],
+  "warm_up": [
+    "warm up"
+  ],
+  "quickmail": [
+    "quickmail",
+    "quick mail"
+  ],
+  "autoklose": [
+    "autoklose"
+  ],
+  "groove": [
+    "groove",
+    "groove.co"
+  ],
+  "xant": [
+    "xant"
+  ],
+  "cirrus_insight": [
+    "cirrus insight"
+  ],
+  "ebsta": [
+    "ebsta"
+  ],
+  "vanillasoft": [
+    "vanillasoft"
+  ],
+  "leadfwd": [
+    "leadfwd"
+  ],
+  "saleshandy": [
+    "saleshandy",
+    "sales handy"
+  ],
+  "briefly": [
+    "briefly"
+  ],
+  "outfunnel": [
+    "outfunnel"
+  ],
+  "amocrm": [
+    "amocrm",
+    "amo crm"
+  ],
+  "mailchimp": [
+    "mailchimp",
+    "mail chimp"
+  ],
+  "brevo": [
+    "brevo",
+    "sendinblue",
+    "send in blue"
+  ],
+  "constant_contact": [
+    "constant contact"
+  ],
+  "convertkit": [
+    "convertkit",
+    "kit"
+  ],
+  "mailerlite": [
+    "mailerlite",
+    "mailer lite"
+  ],
+  "getresponse": [
+    "getresponse",
+    "get response"
+  ],
+  "aweber": [
+    "aweber",
+    "awber"
+  ],
+  "campaign_monitor": [
+    "campaign monitor"
+  ],
+  "drip": [
+    "drip",
+    "drip email"
+  ],
+  "klaviyo": [
+    "klaviyo"
+  ],
+  "omnisend": [
+    "omnisend"
+  ],
+  "moosend": [
+    "moosend"
+  ],
+  "mailjet": [
+    "mailjet"
+  ],
+  "sendgrid": [
+    "sendgrid",
+    "twilio sendgrid"
+  ],
+  "postmark": [
+    "postmark"
+  ],
+  "resend": [
+    "resend"
+  ],
+  "beehiiv": [
+    "beehiiv"
+  ],
+  "substack": [
+    "substack"
+  ],
+  "medium": [
+    "medium"
+  ],
+  "ghost": [
+    "ghost"
+  ],
+  "buttondown": [
+    "buttondown"
+  ],
+  "letterhead": [
+    "letterhead"
+  ],
+  "systeme": [
+    "systeme.io",
+    "systeme"
+  ],
+  "gmail": [
+    "gmail",
+    "google workspace",
+    "google mail"
+  ],
+  "outlook": [
+    "outlook",
+    "microsoft outlook",
+    "office365",
+    "office 365"
+  ],
+  "slack": [
+    "slack",
+    "slack communities"
+  ],
+  "discord": [
+    "discord",
+    "discord servers"
+  ],
+  "microsoft_teams": [
+    "microsoft teams",
+    "ms teams",
+    "teams"
+  ],
+  "zoom": [
+    "zoom"
+  ],
+  "google_meet": [
+    "google meet",
+    "meet",
+    "gmeet"
+  ],
+  "calendly": [
+    "calendly"
+  ],
+  "cal.com": [
+    "cal.com",
+    "cal"
+  ],
+  "savvycal": [
+    "savvycal",
+    "savvy"
+  ],
+  "acuity": [
+    "acuity scheduling",
+    "acuity"
+  ],
+  "vocus": [
+    "vocus"
+  ],
+  "gotomeeting": [
+    "gotomeeting",
+    "go to meeting"
+  ],
+  "webex": [
+    "webex",
+    "cisco webex"
+  ],
+  "whereby": [
+    "whereby"
+  ],
+  "jitsi": [
+    "jitsi"
+  ],
+  "telegram": [
+    "telegram"
+  ],
+  "signal": [
+    "signal"
+  ],
+  "whatsapp": [
+    "whatsapp",
+    "whatsapp business"
+  ],
+  "wechat": [
+    "wechat"
+  ],
+  "line": [
+    "line"
+  ],
+  "skype": [
+    "skype",
+    "microsoft skype"
+  ],
+  "notion": [
+    "notion"
+  ],
+  "trello": [
+    "trello"
+  ],
+  "asana": [
+    "asana"
+  ],
+  "clickup": [
+    "clickup",
+    "click up"
+  ],
+  "jira": [
+    "jira"
+  ],
+  "airtable": [
+    "airtable",
+    "air table"
+  ],
+  "wrike": [
+    "wrike"
+  ],
+  "basecamp": [
+    "basecamp"
+  ],
+  "smartsheet": [
+    "smartsheet",
+    "smart sheet"
+  ],
+  "teamwork": [
+    "teamwork",
+    "teamwork.com"
+  ],
+  "confluence": [
+    "confluence"
+  ],
+  "milanote": [
+    "milanote"
+  ],
+  "coda": [
+    "coda",
+    "coda.io"
+  ],
+  "fibery": [
+    "fibery"
+  ],
+  "anytype": [
+    "anytype"
+  ],
+  "obsidian": [
+    "obsidian"
+  ],
+  "roam_research": [
+    "roam research",
+    "roam"
+  ],
+  "workflowy": [
+    "workflowy"
+  ],
+  "google_docs": [
+    "google docs",
+    "docs"
+  ],
+  "google_sheets": [
+    "google sheets",
+    "sheets"
+  ],
+  "microsoft_excel": [
+    "microsoft excel",
+    "ms excel",
+    "excel"
+  ],
+  "microsoft_word": [
+    "microsoft word",
+    "ms word",
+    "word"
+  ],
+  "powerpoint": [
+    "powerpoint",
+    "microsoft powerpoint"
+  ],
+  "google_drive": [
+    "google drive",
+    "drive"
+  ],
+  "dropbox": [
+    "dropbox",
+    "dropbox sign"
+  ],
+  "onedrive": [
+    "onedrive",
+    "one drive"
+  ],
+  "box": [
+    "box",
+    "box.com"
+  ],
+  "google_slides": [
+    "google slides",
+    "slides"
+  ],
+  "google_forms": [
+    "google forms",
+    "forms"
+  ],
+  "evernote": [
+    "evernote"
+  ],
+  "bear_notes": [
+    "bear notes"
+  ],
+  "apple_notes": [
+    "apple notes"
+  ],
+  "findings": [
+    "findings"
+  ],
+  "pandadoc": [
+    "pandadoc",
+    "panda doc"
+  ],
+  "docusign": [
+    "docusign",
+    "docu sign"
+  ],
+  "hellosign": [
+    "hellosign",
+    "hello sign"
+  ],
+  "proposify": [
+    "proposify"
+  ],
+  "better_proposals": [
+    "better proposals"
+  ],
+  "qwilr": [
+    "qwilr"
+  ],
+  "bidsketch": [
+    "bidsketch"
+  ],
+  "panda": [
+    "panda"
+  ],
+  "concord": [
+    "concord"
+  ],
+  "congasign": [
+    "congasign"
+  ],
+  "esignlive": [
+    "esignlive"
+  ],
+  "adobe_sign": [
+    "adobe sign",
+    "adobe acrobat sign"
+  ],
+  "signnow": [
+    "signnow",
+    "sign now"
+  ],
+  "getaccept": [
+    "getaccept"
+  ],
+  "dealhub": [
+    "dealhub"
+  ],
+  "quote_roller": [
+    "quote roller"
+  ],
+  "conga_composer": [
+    "conga composer"
+  ],
+  "catalyst": [
+    "catalyst"
+  ],
+  "x": [
+    "x",
+    "twitter"
+  ],
+  "facebook": [
+    "facebook",
+    "meta",
+    "facebook groups"
+  ],
+  "instagram": [
+    "instagram"
+  ],
+  "youtube": [
+    "youtube"
+  ],
+  "reddit": [
+    "reddit",
+    "reddit communities"
+  ],
+  "quora": [
+    "quora"
+  ],
+  "tiktok": [
+    "tiktok"
+  ],
+  "pinterest": [
+    "pinterest"
+  ],
+  "snapchat": [
+    "snapchat"
+  ],
+  "weibo": [
+    "weibo"
+  ],
+  "vkontakte": [
+    "vkontakte",
+    "vk"
+  ],
+  "tumblr": [
+    "tumblr"
+  ],
+  "twitch": [
+    "twitch"
+  ],
+  "flickr": [
+    "flickr"
+  ],
+  "behance": [
+    "behance"
+  ],
+  "dribbble": [
+    "dribbble"
+  ],
+  "clubhouse": [
+    "clubhouse"
+  ],
+  "mastodon": [
+    "mastodon"
+  ],
+  "bluesky": [
+    "bluesky"
+  ],
+  "threads": [
+    "threads"
+  ],
+  "indeed": [
+    "indeed"
+  ],
+  "ziprecruiter": [
+    "ziprecruiter",
+    "zip recruiter"
+  ],
+  "monster": [
+    "monster",
+    "monster jobs"
+  ],
+  "dice": [
+    "dice"
+  ],
+  "we_work_remotely": [
+    "we work remotely"
+  ],
+  "himalayas": [
+    "himalayas"
+  ],
+  "otta": [
+    "otta"
+  ],
+  "y_combinator": [
+    "y combinator",
+    "y combinator jobs",
+    "yc"
+  ],
+  "startup.jobs": [
+    "startup.jobs",
+    "startup jobs"
+  ],
+  "recruiter_generic": [
+    "recruiter"
+  ],
+  "talentlyft": [
+    "talentlyft"
+  ],
+  "lever": [
+    "lever"
+  ],
+  "greenhouse": [
+    "greenhouse"
+  ],
+  "ashby": [
+    "ashby"
+  ],
+  "bamboohr": [
+    "bamboohr"
+  ],
+  "hiring_cafe": [
+    "hiring.cafe"
+  ],
+  "nodesk": [
+    "nodesk"
+  ],
+  "eon": [
+    "eon"
+  ],
+  "shopify": [
+    "shopify",
+    "shopify plus"
+  ],
+  "woocommerce": [
+    "woocommerce"
+  ],
+  "amazon_seller": [
+    "amazon seller central"
+  ],
+  "etsy": [
+    "etsy"
+  ],
+  "ebay": [
+    "ebay"
+  ],
+  "alibaba": [
+    "alibaba"
+  ],
+  "aliexpress": [
+    "aliexpress"
+  ],
+  "walmart_marketplace": [
+    "walmart marketplace"
+  ],
+  "target_plus": [
+    "target plus"
+  ],
+  "best_buy": [
+    "best buy"
+  ],
+  "wayfair": [
+    "wayfair"
+  ],
+  "magento": [
+    "magento",
+    "adobe commerce"
+  ],
+  "bigcommerce": [
+    "bigcommerce",
+    "big commerce"
+  ],
+  "square": [
+    "square"
+  ],
+  "squarespace": [
+    "squarespace"
+  ],
+  "wix": [
+    "wix"
+  ],
+  "stripe": [
+    "stripe"
+  ],
+  "paypal": [
+    "paypal"
+  ],
+  "braintree": [
+    "braintree"
+  ],
+  "recurly": [
+    "recurly"
+  ],
+  "chargebee": [
+    "chargebee"
+  ],
+  "paddle": [
+    "paddle"
+  ],
+  "gumroad": [
+    "gumroad"
+  ],
+  "google_business_profile": [
+    "google business profile",
+    "google my business",
+    "gmb"
+  ],
+  "bing_places": [
+    "bing places"
+  ],
+  "foursquare": [
+    "foursquare"
+  ],
+  "citysearch": [
+    "citysearch"
+  ],
+  "mapquest": [
+    "mapquest"
+  ],
+  "apple_maps": [
+    "apple maps"
+  ],
+  "here_we_go": [
+    "here we go"
+  ],
+  "tripadvisor": [
+    "tripadvisor"
+  ],
+  "google_local_services": [
+    "google local services"
+  ],
+  "thumbtack": [
+    "thumbtack"
+  ],
+  "homeadvisor": [
+    "homeadvisor"
+  ],
+  "porch": [
+    "porch"
+  ],
+  "zapier": [
+    "zapier"
+  ],
+  "make": [
+    "make",
+    "make.com",
+    "integromat"
+  ],
+  "n8n": [
+    "n8n"
+  ],
+  "pipedream": [
+    "pipedream"
+  ],
+  "tray": [
+    "tray.io",
+    "tray"
+  ],
+  "workato": [
+    "workato"
+  ],
+  "celigo": [
+    "celigo"
+  ],
+  "tines": [
+    "tines"
+  ],
+  "automate.io": [
+    "automate.io"
+  ],
+  "power_automate": [
+    "power automate",
+    "microsoft power automate"
+  ],
+  "ifttt": [
+    "ifttt",
+    "if this then that"
+  ],
+  "appsmith": [
+    "appsmith"
+  ],
+  "retool": [
+    "retool"
+  ],
+  "airbyte": [
+    "airbyte"
+  ],
+  "fivetran": [
+    "fivetran"
+  ],
+  "estuary": [
+    "estuary"
+  ],
+  "super.ai": [
+    "super.ai"
+  ],
+  "relevance_ai": [
+    "relevance ai"
+  ],
+  "chatgpt": [
+    "chatgpt"
+  ],
+  "claude": [
+    "claude"
+  ],
+  "gemini": [
+    "gemini"
+  ],
+  "copilot": [
+    "copilot"
+  ],
+  "perplexity": [
+    "perplexity"
+  ],
+  "midjourney": [
+    "midjourney"
+  ],
+  "stable_diffusion": [
+    "stable diffusion"
+  ],
+  "runway_ml": [
+    "runway ml"
+  ],
+  "hugging_face": [
+    "hugging face"
+  ],
+  "openai": [
+    "openai"
+  ],
+  "anthropic": [
+    "anthropic"
+  ],
+  "mistral": [
+    "mistral"
+  ],
+  "llama": [
+    "llama"
+  ],
+  "groq": [
+    "groq"
+  ],
+  "lamaindex": [
+    "lamaindex"
+  ],
+  "langchain": [
+    "langchain"
+  ],
+  "google_analytics": [
+    "google analytics",
+    "ga4",
+    "universal analytics"
+  ],
+  "hotjar": [
+    "hotjar"
+  ],
+  "semrush": [
+    "semrush"
+  ],
+  "ahrefs": [
+    "ahrefs"
+  ],
+  "similarweb": [
+    "similarweb",
+    "similar web"
+  ],
+  "moz": [
+    "moz"
+  ],
+  "spyfu": [
+    "spyfu"
+  ],
+  "serpstat": [
+    "serpstat"
+  ],
+  "majestic": [
+    "majestic"
+  ],
+  "surfer_seo": [
+    "surfer seo",
+    "surferseo"
+  ],
+  "keyword_planner": [
+    "keyword planner",
+    "google keyword planner"
+  ],
+  "search_console": [
+    "search console",
+    "google search console"
+  ],
+  "google_trends": [
+    "google trends",
+    "trends"
+  ],
+  "amplitude": [
+    "amplitude"
+  ],
+  "mixpanel": [
+    "mixpanel"
+  ],
+  "heap": [
+    "heap"
+  ],
+  "pendo": [
+    "pendo"
+  ],
+  "fullstory": [
+    "fullstory"
+  ],
+  "clarity": [
+    "clarity",
+    "microsoft clarity"
+  ],
+  "logrocket": [
+    "logrocket"
+  ],
+  "crazy_egg": [
+    "crazy egg",
+    "crazyegg"
+  ],
+  "optimizely": [
+    "optimizely"
+  ],
+  "vwo": [
+    "vwo",
+    "visual website optimizer"
+  ],
+  "google_optimize": [
+    "google optimize"
+  ],
+  "ab_tasty": [
+    "ab tasty"
+  ]
 }
 
 # Dictionary of job title mappings (canonical -> list of variations/aliases)
@@ -2044,6 +5778,18 @@ JOB_TITLE_MAPPINGS = {
     "machine_learning_engineer": [
         "machine learning engineer", "machine learning developer",
         "ml engineer", "ml developer", "machine learning specialist"
+    ],
+    "agentic_ai_engineer": [
+        "agentic ai engineer", "agentic ai developer",
+        "agentic ai specialist", "agentic ai researcher",
+        "agentic ai architect", "agentic ai consultant"
+    ],
+    "gen_ai_engineer": [
+        "generative ai engineer", "generative ai developer",
+        "gen ai engineer", "gen ai developer",
+        "gen ai specialist", "gen ai researcher",
+        "gen ai architect", "gen ai consultant","genai engineer", "genai developer",
+        "genai specialist", "genai researcher",
     ],
     "ai_engineer": [
         "ai engineer", "artificial intelligence engineer",
@@ -2170,5 +5916,27 @@ JOB_TITLE_MAPPINGS = {
     ],
     "technical_writer": [
         "technical writer", "documentation specialist"
-    ]
+    ],
+    "business_development": [
+        "business development", "bd", "sales engineer", "pre-sales engineer", "business development executive", "bd executive", "sales executive",
+        "business development representative", "bd representative", "sales representative", "business development manager", "bd manager", "sales manager",
+        "sales and marketing", "sales & marketing", "marketing and sales", "sales specialist", "marketing specialist", "sales associate", "marketing associate",
+        "sales consultant", "marketing consultant", "sales coordinator", "marketing coordinator", "sales director", "marketing director", "sales lead", "marketing lead", "sales strategist", "marketing strategist",
+        "sales strategist", "marketing strategist", "sales analyst", "marketing analyst", "sales executive", "marketing executive", "sales representative", "marketing representative",
+        "upwork growth specialist", "upwork growth manager", "upwork growth consultant", "upwork growth coordinator", "upwork growth director", "upwork growth lead",
+        "upwork growth strategist", "upwork growth analyst", "upwork growth associate", "upwork growth specialist",
+        "upwork growth manager", "upwork growth consultant", "upwork growth coordinator", "upwork growth director",
+        "upwork growth lead", "upwork growth strategist", "upwork growth analyst", "business development specialist", "business development manager", "business development consultant", "business development coordinator", "business development director", "business development lead", "business development strategist", "business development analyst"
+        "upwork", "upwork specialist", "upwork manager", "upwork consultant", "upwork coordinator", "upwork director", "upwork lead", "upwork strategist", "upwork analyst",
+        "lead generation", "lead generation specialist", "lead generation manager", "lead generation consultant", "lead generation coordinator", "lead generation director", "lead generation lead",
+        "lead generation strategist", "lead generation analyst", "account executive", "account manager", "account coordinator", "account director", "account lead", "account strategist", "account analyst",
+        "sales development representative", "sales development specialist", "sales development manager", "sales development consultant", "sales development coordinator", "sales development director", "sales development lead", "sales development strategist", "sales development analyst",
+        "upwork account executive", "upwork account manager", "upwork account coordinator", "upwork account director", "upwork account lead", "upwork account strategist", "upwork account analyst", "upwork account operator",
+        "upwork profile operator", "upwork profile specialist", "upwork profile manager", "upwork profile consultant", "upwork profile coordinator", "upwork profile director", "upwork profile lead",
+        "upwork profile strategist", "upwork profile analyst"
+    ],
+    
+
+    
+    
 }
