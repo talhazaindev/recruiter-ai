@@ -20,8 +20,65 @@ from pathlib import Path
 # Configuration
 GAP_THRESHOLD_MONTHS = 3  # Maximum allowed gap in months before flagging
 MIN_TECH_STACK_MATCH_PERCENTAGE = 10  # Minimum percentage of tech stack matches (0-100)
-FUZZY_MATCH_THRESHOLD = 0.85  # Threshold for fuzzy matching (0.0 to 1.0)
-JOB_TITLE_TOKEN_WEIGHT = 0.7  # Minimum token overlap ratio for partial matches
+FUZZY_MATCH_THRESHOLD = 0.95  # Threshold for fuzzy matching (0.0 to 1.0)
+
+# Common title suffixes to remove during normalization
+COMMON_TITLE_SUFFIXES = [
+    # Employment Type
+    "intern",
+    "internee",
+    "internship",
+    "trainee",
+    "apprentice",
+    "contract",
+    "contractor",
+    "freelance",
+    "freelancer",
+    "consultant",
+    "temporary",
+    "temp",
+    "volunteer",
+    
+    # Levels
+    "i",
+    "ii",
+    "iii",
+    "iv",
+    "v",
+    "l1",
+    "l2",
+    "l3",
+    "l4",
+    "l5",
+    "level 1",
+    "level 2",
+    "level 3",
+    "level 4",
+    "level 5",
+    
+    # Work Arrangement
+    "remote",
+    "hybrid",
+    "onsite",
+    "on-site",
+    "wfh",
+    "work from home",
+    
+    # Employment Status
+    "full time",
+    "full-time",
+    "part time",
+    "part-time",
+    "permanent",
+    "fixed term",
+    "fixed-term",
+    "ftc",
+    "fte",
+    "ft",
+    "pt",
+    
+    
+]
 
 # Find tech_aliases_db.py by going up the directory tree
 current = Path(__file__).parent.absolute()
@@ -165,13 +222,54 @@ def is_tech_match(description: str, tech: str) -> bool:
     
     return False
 
+def remove_suffixes(title: str) -> str:
+    """
+    Remove common suffixes from a job title.
+    Handles suffixes at the end of the title after removing prefixes.
+    """
+    if not title:
+        return title
+    
+    words = title.split()
+    if len(words) <= 1:
+        return title
+    
+    # Sort suffixes by length (longest first) to avoid partial matches
+    sorted_suffixes = sorted(COMMON_TITLE_SUFFIXES, key=len, reverse=True)
+    
+    # Check from the end of the title
+    for i in range(len(words), 0, -1):
+        suffix_candidate = ' '.join(words[i-1:])
+        if suffix_candidate in sorted_suffixes:
+            # Remove the suffix
+            words = words[:i-1]
+            break
+        
+        # Check if any suffix is a substring at the end
+        for suffix in sorted_suffixes:
+            if suffix in suffix_candidate:
+                # Check if it's at the end (after removing any whitespace)
+                candidate_words = suffix_candidate.split()
+                suffix_words = suffix.split()
+                if len(candidate_words) >= len(suffix_words):
+                    # Check if the last words match the suffix
+                    if ' '.join(candidate_words[-len(suffix_words):]) == suffix:
+                        words = words[:i-1]
+                        break
+            if len(words) < len(' '.join(words[:i-1]).split()):
+                break
+    
+    return ' '.join(words)
+
 def normalize_title(title: str) -> str:
     """
     Normalize a job title by:
     1. Converting to lowercase
     2. Removing common prefixes (senior, junior, lead, etc.)
-    3. Removing special characters
-    4. Stripping extra whitespace
+    3. Removing common suffixes (intern, contract, remote, etc.)
+    4. Replacing separators with spaces
+    5. Removing special characters
+    6. Stripping extra whitespace
     """
     if not title:
         return ""
@@ -183,15 +281,24 @@ def normalize_title(title: str) -> str:
     for prefix in JOB_TITLE_PREFIXES:
         if title.startswith(prefix):
             title = title[len(prefix):]
+            break
     
-    # Preserve both sides of compound titles. "AI/ML Engineer" becomes
-    # "ai ml engineer", not the dangerously broad title "ai".
+    # Replace common separators with spaces
     title = title.replace("/", " ")
-
+    title = title.replace("&", " ")
+    title = title.replace(" and ", " ")
+    title = title.replace("|", " ")
+    
     # Remove special characters except spaces and hyphens
     title = re.sub(r'[^\w\s\-]', '', title)
     
     # Remove extra spaces
+    title = ' '.join(title.split())
+    
+    # Remove suffixes (after prefix removal and cleanup)
+    title = remove_suffixes(title)
+    
+    # Final cleanup - remove multiple spaces and trim
     title = ' '.join(title.split())
     
     return title
@@ -228,11 +335,58 @@ def extract_compound_titles(title: str) -> List[str]:
             else:
                 variations.append(combined)
     
+    # Handle "and" and "&" separators
+    if ' and ' in title or ' & ' in title:
+        separators = [' and ', ' & ']
+        for sep in separators:
+            if sep in title:
+                parts = [p.strip() for p in title.split(sep) if p.strip()]
+                if len(parts) >= 2:
+                    # Add each part as a variation
+                    for part in parts:
+                        variations.append(part)
+                    # Add combined version
+                    combined = ' '.join(parts)
+                    variations.append(combined)
+                    break
+    
     return list(set(variations))
+
+def find_job_title_keys(normalized_job_title: str, verbose: bool = False) -> List[str]:
+    """
+    Find all canonical keys that match a job title by checking all aliases in JOB_TITLE_MAPPINGS.
+    Returns a list of keys if found, empty list otherwise.
+    """
+    matched_keys = []
+    
+    # Check if the job title matches any key or alias
+    for key, aliases in JOB_TITLE_MAPPINGS.items():
+        # Check against the key itself
+        key_normalized = key.replace('_', ' ')
+        if fuzzy_match(normalized_job_title, key_normalized):
+            if verbose:
+                print(f"      Found key directly: '{key}'")
+            matched_keys.append(key)
+            continue
+        
+        # Check against all aliases for this key
+        for alias in aliases:
+            if fuzzy_match(normalized_job_title, alias):
+                if verbose:
+                    print(f"      Found key via alias '{alias}': '{key}'")
+                matched_keys.append(key)
+                break
+    
+    return list(set(matched_keys))  # Remove duplicates
 
 def is_title_match(experience_title: str, job_title: str, verbose: bool = False) -> bool:
     """
-    Check if an experience designation matches the job title using fuzzy matching.
+    Check if an experience designation matches the job title using:
+    1. Normalize both titles
+    2. Check if job title is compound, extract variations
+    3. Fuzzy match experience with each job variation
+    4. Find all job title keys in JOB_TITLE_MAPPINGS
+    5. Fuzzy match experience with all aliases of all matching keys
     """
     if not experience_title or not job_title:
         if verbose:
@@ -244,6 +398,7 @@ def is_title_match(experience_title: str, job_title: str, verbose: bool = False)
         print(f"      Experience: '{experience_title}'")
         print(f"      Job Title:  '{job_title}'")
     
+    # Step 1: Normalize both titles
     normalized_exp = normalize_title(experience_title)
     normalized_job = normalize_title(job_title)
     
@@ -251,149 +406,74 @@ def is_title_match(experience_title: str, job_title: str, verbose: bool = False)
         print(f"      Normalized exp: '{normalized_exp}'")
         print(f"      Normalized job: '{normalized_job}'")
     
-    # Step 1: Direct fuzzy match (highest confidence)
-    if fuzzy_match(normalized_exp, normalized_job):
-        if verbose:
-            print(f"      ✅ MATCH: Direct fuzzy match between '{normalized_exp}' and '{normalized_job}'")
-        return True
-    
-    if verbose:
-        print(f"      ⏭️  No direct fuzzy match, trying compound title variations...")
-    
-    # Step 2: Check compound title variations
+    # Step 2: Check if job title is compound and extract variations
     job_variations = extract_compound_titles(job_title)
-    exp_variations = extract_compound_titles(experience_title)
     
-    if verbose:
+    if verbose and len(job_variations) > 1:
         print(f"      Job variations: {job_variations}")
-        print(f"      Exp variations: {exp_variations}")
     
-    # Check direct matches first (higher confidence)
+    # Step 3: Fuzzy match experience with each job variation
     for job_var in job_variations:
         norm_job_var = normalize_title(job_var)
-        for exp_var in exp_variations:
-            norm_exp_var = normalize_title(exp_var)
-            if fuzzy_match(norm_exp_var, norm_job_var):
-                if verbose:
-                    print(f"      ✅ MATCH: Compound title match between '{norm_exp_var}' and '{norm_job_var}'")
-                return True
-    
-    if verbose:
-        print(f"      ⏭️  No compound title match, checking canonical mappings...")
-    
-    # Step 3: Check canonical mappings
-    # Get canonical keys for the job title (only once)
-    job_canonical_keys = []
-    for key, aliases in JOB_TITLE_MAPPINGS.items():
-        if fuzzy_match(normalized_job, key) or any(fuzzy_match(normalized_job, alias) for alias in aliases):
-            job_canonical_keys.append(key)
-    
-    # Also check variations
-    for job_var in job_variations:
-        norm_job_var = normalize_title(job_var)
-        for key, aliases in JOB_TITLE_MAPPINGS.items():
-            if fuzzy_match(norm_job_var, key) or any(fuzzy_match(norm_job_var, alias) for alias in aliases):
-                if key not in job_canonical_keys:
-                    job_canonical_keys.append(key)
-    
-    if verbose and job_canonical_keys:
-        print(f"      Found canonical keys for job: {job_canonical_keys}")
-    
-    # Get canonical keys for the experience title
-    exp_canonical_keys = []
-    for key, aliases in JOB_TITLE_MAPPINGS.items():
-        if fuzzy_match(normalized_exp, key) or any(fuzzy_match(normalized_exp, alias) for alias in aliases):
-            exp_canonical_keys.append(key)
-    
-    # Check variations
-    for exp_var in exp_variations:
-        norm_exp_var = normalize_title(exp_var)
-        for key, aliases in JOB_TITLE_MAPPINGS.items():
-            if fuzzy_match(norm_exp_var, key) or any(fuzzy_match(norm_exp_var, alias) for alias in aliases):
-                if key not in exp_canonical_keys:
-                    exp_canonical_keys.append(key)
-    
-    if verbose and exp_canonical_keys:
-        print(f"      Found canonical keys for experience: {exp_canonical_keys}")
-    
-    # If both have canonical keys and they intersect, it's a match
-    common_canonical_keys = set(job_canonical_keys) & set(exp_canonical_keys)
-    if common_canonical_keys:
-        if verbose:
-            print(f"      ✅ MATCH: Common canonical key(s): {common_canonical_keys}")
-        return True
-    
-    # Step 4: Check word overlap with canonical mappings (using threshold)
-    if verbose:
-        print(f"      ⏭️  No canonical key match, checking word overlap...")
-    
-    # Check if experience title words overlap with canonical key/aliases
-    exp_words = set(normalized_exp.split())
-    if not exp_words:
-        return False
-    
-    # Check all canonical keys and their aliases
-    for key, aliases in JOB_TITLE_MAPPINGS.items():
-        # Check against key
-        key_words = set(normalize_title(key).split())
-        common_words = exp_words.intersection(key_words)
-        if len(common_words) > 0:
-            overlap_ratio = len(common_words) / len(key_words)
-            if overlap_ratio >= JOB_TITLE_TOKEN_WEIGHT:
-                if verbose:
-                    print(f"      ✅ MATCH: Word overlap with key '{key}': {common_words} (ratio: {overlap_ratio:.2f})")
-                return True
-        
-        # Check against aliases
-        for alias in aliases:
-            alias_words = set(normalize_title(alias).split())
-            common_words = exp_words.intersection(alias_words)
-            if len(common_words) > 0:
-                overlap_ratio = len(common_words) / len(alias_words)
-                if overlap_ratio >= JOB_TITLE_TOKEN_WEIGHT:
-                    if verbose:
-                        print(f"      ✅ MATCH: Word overlap with alias '{alias}': {common_words} (ratio: {overlap_ratio:.2f})")
-                    return True
-    
-    if verbose:
-        print(f"      ⏭️  No canonical word overlap, checking final word overlap...")
-    
-    # Step 5: Final word overlap check (direct comparison)
-    job_words = set(normalized_job.split())
-    
-    if verbose:
-        print(f"      Exp words: {exp_words}")
-        print(f"      Job words: {job_words}")
-    
-    # Check direct word overlap
-    common_words = exp_words.intersection(job_words)
-    if len(common_words) > 0:
-        overlap_ratio = len(common_words) / len(job_words)
-        if overlap_ratio >= JOB_TITLE_TOKEN_WEIGHT:
+        if fuzzy_match(normalized_exp, norm_job_var):
             if verbose:
-                print(f"      ✅ MATCH: Direct word overlap: {common_words} (ratio: {overlap_ratio:.2f})")
+                print(f"      ✅ MATCH: Fuzzy match with job variation '{job_var}'")
             return True
     
-    # Check variations
-    for job_var in job_variations:
-        norm_job_var = normalize_title(job_var)
-        job_var_words = set(norm_job_var.split())
+    if verbose:
+        print(f"      ⏭️  No direct fuzzy match with job variations")
+    
+    # Step 4: Find all canonical keys for the job title
+    job_keys = find_job_title_keys(normalized_job, verbose)
+    
+    if not job_keys:
+        # Also check variations for keys
+        for job_var in job_variations:
+            norm_job_var = normalize_title(job_var)
+            variation_keys = find_job_title_keys(norm_job_var, verbose)
+            if variation_keys:
+                job_keys.extend(variation_keys)
         
-        if len(job_var_words) > 0 and len(exp_words) > 0:
-            common_words = exp_words.intersection(job_var_words)
-            if len(common_words) > 0:
-                overlap_ratio = len(common_words) / len(job_var_words)
-                
-                if verbose:
-                    print(f"      Checking '{job_var}': common words = {common_words}, overlap ratio = {overlap_ratio:.2f}")
-                
-                if overlap_ratio >= JOB_TITLE_TOKEN_WEIGHT:
-                    if verbose:
-                        print(f"      ✅ MATCH: Word overlap with variation '{job_var}' (ratio: {overlap_ratio:.2f})")
-                    return True
+        # Remove duplicates
+        job_keys = list(set(job_keys))
+    
+    if not job_keys:
+        if verbose:
+            print(f"      ❌ NO MATCH: Job title not found in JOB_TITLE_MAPPINGS")
+        return False
     
     if verbose:
-        print(f"      ❌ NO MATCH: All matching strategies failed")
+        print(f"      Found job keys: {job_keys}")
+    
+    # Step 5: Get all aliases from all matching keys and fuzzy match with experience
+    all_aliases_to_check = []
+    
+    for key in job_keys:
+        # Get aliases for this key
+        aliases = JOB_TITLE_MAPPINGS.get(key, [])
+        
+        # Add the key itself (without underscores)
+        key_title = key.replace('_', ' ')
+        all_aliases_to_check.append(key_title)
+        
+        # Add all aliases
+        all_aliases_to_check.extend(aliases)
+    
+    # Remove duplicates
+    all_aliases_to_check = list(set(all_aliases_to_check))
+    
+    if verbose:
+        print(f"      Checking all aliases from {len(job_keys)} key(s): {all_aliases_to_check}")
+    
+    # Check experience against all aliases
+    for alias in all_aliases_to_check:
+        if fuzzy_match(normalized_exp, alias):
+            if verbose:
+                print(f"      ✅ MATCH: Fuzzy match with alias '{alias}'")
+            return True
+    
+    if verbose:
+        print(f"      ❌ NO MATCH: No alias matched the experience")
     
     return False
 
@@ -1018,54 +1098,37 @@ def find_relevant_experience(
 if __name__ == "__main__":
     # Test Case: Multiple gaps with some during education and some not
     test_case_1 = {
-    "job": {
-        "job_title": "Full Stack Developer",
-        "tech_stack": ["JavaScript", "React", "Node.js", "MongoDB", "Express"]
-    },
-    "resume": {
-        "experience": [
-            {
-                "company": "Startup Inc",
-                "designation": "AI Solutions Developer",
-                "start_date": "Jan 2017",
-                "end_date": "Dec 2018",
-                "description": "Built React applications"
-            },
-            # Gap 1: Jan 2019 - Aug 2020 (during Bachelor's) - should be ignored
-            {
-                "company": "Tech Solutions",
-                "designation": "Full Stack Developer",
-                "start_date": "Sep 2020",
-                "end_date": "Dec 2021",
-                "description": "Developed MERN stack applications"
-            },
-            # Gap 2: Jan 2022 - Aug 2023 (NOT during education) - should be detected
-            {
-                "company": "Enterprise Systems",
-                "designation": "Senior Developer",
-                "start_date": "Sep 2023",
-                "end_date": "present",
-                "description": "Leading full stack development team"
-            }
-        ],
-        "education": [
-            {
-                "degree": "Bachelor of Science in Computer Science",
-                "institution": "UC Berkeley",
-                "cgpa": "3.7",
-                "graduation_date": "Aug 2020"  # Bachelor's takes 4 years, started ~Aug 2016
-                # Gap 1 (Jan 2019 - Aug 2020) is during Bachelor's
-                # Gap 2 (Jan 2022 - Aug 2023) is after education completed
-            },
-            {
-                "degree": "Master of Science in Computer Science",
-                "institution": "UC Berkeley",
-                "cgpa": "3.8",
-                "graduation_date": "Aug 2023"  # Master's takes 2 years, started ~Aug 2020
-            }
-        ]
+        "job": {
+            "job_title": "Junior Full stack Engineer",
+            "tech_stack": ["JavaScript", "React", "Node.js", "MongoDB", "Express"]
+        },
+        "resume": {
+            "experience": [
+                {
+                    "company": "Startup Inc",
+                    "designation": "AI Developer",
+                    "start_date": "Aug 2025",
+                    "end_date": "Nov 2025",
+                    "description": "Built React applications"
+                },
+                {
+                    "company": "Startup Inc",
+                    "designation": "AI Developer",
+                    "start_date": "July 2026",
+                    "end_date": "Present",
+                    "description": "Built React applications"
+                }
+            ],
+            "education": [
+                {
+                    "degree": "Bachelor of Science in Computer Science",
+                    "institution": "UC Berkeley",
+                    "cgpa": "3.7",
+                    "graduation_date": "Aug 2026"
+                }
+            ]
+        }
     }
-}
     
     print("🧪 Running Test Case\n" + "="*80)
     
