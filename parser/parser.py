@@ -834,6 +834,7 @@ def normalize_heading(text: str) -> str:
         
      #   print("Normalizing heading:", text)
     #print("Normalizing heading:", text)
+    
     text=text.lower().strip()
     text = text.replace("&", "and")
     text = text.replace("/", " ")
@@ -849,6 +850,7 @@ def normalize_heading(text: str) -> str:
     #print("Normalized heading:", text)
     #if xd=="T E C H N I C A L S K I L L S":
      #   print("Normalized heading:", text)
+    
     return text
 
 #v2

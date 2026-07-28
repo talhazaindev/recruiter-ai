@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 EMAIL_RE = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 PHONE_RE = re.compile(r"(?:\+92|0)?3\d{2}[-\s]?\d{7}")
 URL_RE = re.compile(r"https?://[^\s|]+|(?:www\.)?(?:linkedin|github)\.com/[^\s|]+", re.I)
+MAX_SINGLE_LETTER_RATIO = 0.1
+MIN_WORD_COVERAGE = 0.65
 
 
 def _ensure_repo_root_on_path() -> Path:
@@ -40,25 +42,104 @@ def _ensure_repo_root_on_path() -> Path:
     return root
 
 
+
+
+def _section_metrics(section) -> dict:
+    """
+    Compute quality metrics for a section.
+    """
+
+    def extract_text(value):
+        if value is None:
+            return ""
+
+        if isinstance(value, str):
+            return value
+
+        if isinstance(value, list):
+            return " ".join(extract_text(v) for v in value)
+
+        if isinstance(value, dict):
+            return " ".join(extract_text(v) for v in value.values())
+
+        return str(value)
+
+    text = extract_text(section)
+
+    words = re.findall(r"\b\w+\b", text)
+
+    word_count = len(words)
+    single_letter_words = sum(
+        1
+        for w in words
+        if len(w) == 1 and w.lower() not in {"a", "i"}
+    )
+
+    return {
+        "word_count": word_count,
+        "single_letter_words": single_letter_words,
+    }
+
 def merge_sections(
     first: dict[str, Any],
     second: dict[str, Any],
 ) -> dict[str, Any]:
+
     required_sections = [
         "education",
         "experience",
         "skills",
     ]
 
-    merged = {}
-
     for section in required_sections:
-        if section in first:
-            first[section] = first[section]
-        elif section in second:
-            first[section] = second[section]
+        if section not in second:
+            continue
 
+        if section not in first:
+            first[section] = second[section]
+            continue
+
+        first_metrics = _section_metrics(first[section])
+        second_metrics = _section_metrics(second[section])
+
+        #logger.info(first_metrics[""])
+        # Priority 1: fewer single-letter words
+        if (
+            second_metrics["single_letter_words"]
+            < first_metrics["single_letter_words"]
+        ):
+            first[section] = second[section]
+            continue
+
+        # Priority 2: if equal, prefer more words
+        if (
+            second_metrics["word_count"]
+            > first_metrics["word_count"]
+        ):
+            first[section] = second[section]
+        
     return first
+
+# def merge_sections(
+#     first: dict[str, Any],
+#     second: dict[str, Any],
+# ) -> dict[str, Any]:
+#     required_sections = [
+#         "education",
+#         "experience",
+#         "skills",
+#     ]
+
+#     merged = {}
+
+#     for section in required_sections:
+#         if section in first:
+#             first[section] = first[section]
+#         elif section in second:
+#             first[section] = second[section]
+
+#     return first
+
 
 def _should_run_custom_parser(resume: dict) -> bool:
     """
@@ -67,16 +148,17 @@ def _should_run_custom_parser(resume: dict) -> bool:
     Conditions:
     - A required section is missing.
     - A required section is empty.
-    - A required section contains only empty strings / empty values.
+    - Parsed word coverage is too low compared to raw_resume_text.
+    - Parsed output contains too many single-letter words
+      (excluding 'a' and 'i').
     """
 
     required_sections = [
         "education",
         "experience",
-        #"projects",
         "skills",
     ]
-    #print(resume)
+
     def has_meaningful_data(value):
         if value is None:
             return False
@@ -96,19 +178,62 @@ def _should_run_custom_parser(resume: dict) -> bool:
 
         return True
 
-    issue=False
+    issue = False
+
+    # Existing section checks
     for section in required_sections:
         if section not in resume:
             logger.info(f"{section} not found")
-            issue= True
+            issue = True
+            continue
 
         if not has_meaningful_data(resume[section]):
             logger.info(f"{section} not meaningful data found")
+            issue = True
 
-            issue= True
+    # Word coverage and single-letter ratio checks
+    parsed_resume = resume.copy()
+    raw_text = parsed_resume.pop("raw_resume_text", "")
+
+    raw_words = re.findall(r"\b\w+\b", raw_text)
+    parsed_words = re.findall(r"\b\w+\b", str(parsed_resume))
+
+    raw_word_count = len(raw_words)
+    parsed_word_count = len(parsed_words)
+
+    coverage = (
+        parsed_word_count / raw_word_count
+        if raw_word_count > 0
+        else 0
+    )
+
+    if coverage < MIN_WORD_COVERAGE:
+        logger.info(
+            f"Low parsed word coverage: {coverage:.2%} "
+            f"({parsed_word_count}/{raw_word_count})"
+        )
+        issue = True
+
+    single_letter_words = sum(
+        1
+        for word in parsed_words
+        if len(word) == 1 and word.lower() not in {"a", "i"}
+    )
+
+    single_letter_ratio = (
+        single_letter_words / parsed_word_count
+        if parsed_word_count > 0
+        else 1
+    )
+
+    if single_letter_ratio > MAX_SINGLE_LETTER_RATIO:
+        logger.info(
+            f"High single-letter ratio: {single_letter_ratio:.2%} "
+            f"({single_letter_words}/{parsed_word_count})"
+        )
+        issue = True
 
     return issue
-
 
 
 def parse_resume_bytes(
@@ -183,8 +308,10 @@ def parse_resume_bytes(
 
         if not sections:
             raise RuntimeError(f"{parser_id} returned empty sections")
-
+        #logger.info(sections)
+        logger.info("////////////////////////////////////////////////////////////////")
         structured = _normalize_sections(sections)
+        
         alternative_flow=_should_run_custom_parser(structured)
         #alternative_flow=False
         if alternative_flow==True:
@@ -529,8 +656,9 @@ For Education:
 - institution
 - cgpa
 - graduation_date
+- start_date
 
-If a field cannot be confidently determined, leave it as an empty string.
+If a field cannot be confidently determined, leave it as an empty string. No need to assume starting date in education
 
 The description field should contain ALL remaining text that does not belong to the structured fields.
 
@@ -555,7 +683,8 @@ Always return BOTH keys.
             "degree": "",
             "institution": "",
             "cgpa": "",
-            "graduation_date": ""
+            "graduation_date": "",
+            "start_date":""
         }}
     ]
 }}

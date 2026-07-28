@@ -45,6 +45,7 @@ def extract_lines(pdf_path):
     #for i in all_spans:
      #   print(i["text"])
     #print(all_spans)
+    logger.info(all_lines)
     return all_lines
 
 def extract_lines_from_bbox(page, bbox, page_num):
@@ -302,7 +303,7 @@ def parse_cv2(path):
     #logger.info(raw_text)
     sections,min_font,name = find_headers(path)
     logger.info("***************************************************************")
-    #logger.info(sections)
+    logger.info(sections)
     for section_name, items in sections.items():
         sections[section_name] = group_section(items,min_font)
     logger.info("****************************************************************")
@@ -320,6 +321,8 @@ def parse_cv2(path):
     #print(type(merged_sections))
     #form_json(merged_sections,path)
     #form_json(merged_sections)
+    #logger.info("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]")
+    #logger.info(merged_sections)
     
     return merged_sections
 
