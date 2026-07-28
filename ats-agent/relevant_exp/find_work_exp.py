@@ -20,8 +20,65 @@ from pathlib import Path
 # Configuration
 GAP_THRESHOLD_MONTHS = 3  # Maximum allowed gap in months before flagging
 MIN_TECH_STACK_MATCH_PERCENTAGE = 10  # Minimum percentage of tech stack matches (0-100)
-FUZZY_MATCH_THRESHOLD = 0.85  # Threshold for fuzzy matching (0.0 to 1.0)
-JOB_TITLE_TOKEN_WEIGHT = 0.7  # Minimum token overlap ratio for partial matches
+FUZZY_MATCH_THRESHOLD = 0.95  # Threshold for fuzzy matching (0.0 to 1.0)
+
+# Common title suffixes to remove during normalization
+COMMON_TITLE_SUFFIXES = [
+    # Employment Type
+    "intern",
+    "internee",
+    "internship",
+    "trainee",
+    "apprentice",
+    "contract",
+    "contractor",
+    "freelance",
+    "freelancer",
+    "consultant",
+    "temporary",
+    "temp",
+    "volunteer",
+    
+    # Levels
+    "i",
+    "ii",
+    "iii",
+    "iv",
+    "v",
+    "l1",
+    "l2",
+    "l3",
+    "l4",
+    "l5",
+    "level 1",
+    "level 2",
+    "level 3",
+    "level 4",
+    "level 5",
+    
+    # Work Arrangement
+    "remote",
+    "hybrid",
+    "onsite",
+    "on-site",
+    "wfh",
+    "work from home",
+    
+    # Employment Status
+    "full time",
+    "full-time",
+    "part time",
+    "part-time",
+    "permanent",
+    "fixed term",
+    "fixed-term",
+    "ftc",
+    "fte",
+    "ft",
+    "pt",
+    
+    
+]
 
 # Find tech_aliases_db.py by going up the directory tree
 current = Path(__file__).parent.absolute()
@@ -165,13 +222,54 @@ def is_tech_match(description: str, tech: str) -> bool:
     
     return False
 
+def remove_suffixes(title: str) -> str:
+    """
+    Remove common suffixes from a job title.
+    Handles suffixes at the end of the title after removing prefixes.
+    """
+    if not title:
+        return title
+    
+    words = title.split()
+    if len(words) <= 1:
+        return title
+    
+    # Sort suffixes by length (longest first) to avoid partial matches
+    sorted_suffixes = sorted(COMMON_TITLE_SUFFIXES, key=len, reverse=True)
+    
+    # Check from the end of the title
+    for i in range(len(words), 0, -1):
+        suffix_candidate = ' '.join(words[i-1:])
+        if suffix_candidate in sorted_suffixes:
+            # Remove the suffix
+            words = words[:i-1]
+            break
+        
+        # Check if any suffix is a substring at the end
+        for suffix in sorted_suffixes:
+            if suffix in suffix_candidate:
+                # Check if it's at the end (after removing any whitespace)
+                candidate_words = suffix_candidate.split()
+                suffix_words = suffix.split()
+                if len(candidate_words) >= len(suffix_words):
+                    # Check if the last words match the suffix
+                    if ' '.join(candidate_words[-len(suffix_words):]) == suffix:
+                        words = words[:i-1]
+                        break
+            if len(words) < len(' '.join(words[:i-1]).split()):
+                break
+    
+    return ' '.join(words)
+
 def normalize_title(title: str) -> str:
     """
     Normalize a job title by:
     1. Converting to lowercase
     2. Removing common prefixes (senior, junior, lead, etc.)
-    3. Removing special characters
-    4. Stripping extra whitespace
+    3. Removing common suffixes (intern, contract, remote, etc.)
+    4. Replacing separators with spaces
+    5. Removing special characters
+    6. Stripping extra whitespace
     """
     if not title:
         return ""
@@ -183,15 +281,24 @@ def normalize_title(title: str) -> str:
     for prefix in JOB_TITLE_PREFIXES:
         if title.startswith(prefix):
             title = title[len(prefix):]
+            break
     
-    # Preserve both sides of compound titles. "AI/ML Engineer" becomes
-    # "ai ml engineer", not the dangerously broad title "ai".
+    # Replace common separators with spaces
     title = title.replace("/", " ")
-
+    title = title.replace("&", " ")
+    title = title.replace(" and ", " ")
+    title = title.replace("|", " ")
+    
     # Remove special characters except spaces and hyphens
     title = re.sub(r'[^\w\s\-]', '', title)
     
     # Remove extra spaces
+    title = ' '.join(title.split())
+    
+    # Remove suffixes (after prefix removal and cleanup)
+    title = remove_suffixes(title)
+    
+    # Final cleanup - remove multiple spaces and trim
     title = ' '.join(title.split())
     
     return title
@@ -228,70 +335,145 @@ def extract_compound_titles(title: str) -> List[str]:
             else:
                 variations.append(combined)
     
+    # Handle "and" and "&" separators
+    if ' and ' in title or ' & ' in title:
+        separators = [' and ', ' & ']
+        for sep in separators:
+            if sep in title:
+                parts = [p.strip() for p in title.split(sep) if p.strip()]
+                if len(parts) >= 2:
+                    # Add each part as a variation
+                    for part in parts:
+                        variations.append(part)
+                    # Add combined version
+                    combined = ' '.join(parts)
+                    variations.append(combined)
+                    break
+    
     return list(set(variations))
 
-def is_title_match(experience_title: str, job_title: str) -> bool:
+def find_job_title_keys(normalized_job_title: str, verbose: bool = False) -> List[str]:
     """
-    Check if an experience designation matches the job title using fuzzy matching.
+    Find all canonical keys that match a job title by checking all aliases in JOB_TITLE_MAPPINGS.
+    Returns a list of keys if found, empty list otherwise.
+    """
+    matched_keys = []
+    
+    # Check if the job title matches any key or alias
+    for key, aliases in JOB_TITLE_MAPPINGS.items():
+        # Check against the key itself
+        key_normalized = key.replace('_', ' ')
+        if fuzzy_match(normalized_job_title, key_normalized):
+            if verbose:
+                print(f"      Found key directly: '{key}'")
+            matched_keys.append(key)
+            continue
+        
+        # Check against all aliases for this key
+        for alias in aliases:
+            if fuzzy_match(normalized_job_title, alias):
+                if verbose:
+                    print(f"      Found key via alias '{alias}': '{key}'")
+                matched_keys.append(key)
+                break
+    
+    return list(set(matched_keys))  # Remove duplicates
+
+def is_title_match(experience_title: str, job_title: str, verbose: bool = False) -> bool:
+    """
+    Check if an experience designation matches the job title using:
+    1. Normalize both titles
+    2. Check if job title is compound, extract variations
+    3. Fuzzy match experience with each job variation
+    4. Find all job title keys in JOB_TITLE_MAPPINGS
+    5. Fuzzy match experience with all aliases of all matching keys
     """
     if not experience_title or not job_title:
+        if verbose:
+            print(f"   ❌ Title match failed: Empty title(s)")
         return False
     
+    if verbose:
+        print(f"\n   🔍 Checking title match:")
+        print(f"      Experience: '{experience_title}'")
+        print(f"      Job Title:  '{job_title}'")
+    
+    # Step 1: Normalize both titles
     normalized_exp = normalize_title(experience_title)
     normalized_job = normalize_title(job_title)
     
-    if fuzzy_match(normalized_exp, normalized_job):
-        return True
+    if verbose:
+        print(f"      Normalized exp: '{normalized_exp}'")
+        print(f"      Normalized job: '{normalized_job}'")
     
+    # Step 2: Check if job title is compound and extract variations
     job_variations = extract_compound_titles(job_title)
-    exp_variations = extract_compound_titles(experience_title)
     
+    if verbose and len(job_variations) > 1:
+        print(f"      Job variations: {job_variations}")
+    
+    # Step 3: Fuzzy match experience with each job variation
     for job_var in job_variations:
         norm_job_var = normalize_title(job_var)
-        for exp_var in exp_variations:
-            norm_exp_var = normalize_title(exp_var)
-            if fuzzy_match(norm_exp_var, norm_job_var):
-                return True
+        if fuzzy_match(normalized_exp, norm_job_var):
+            if verbose:
+                print(f"      ✅ MATCH: Fuzzy match with job variation '{job_var}'")
+            return True
     
-    canonical_keys = []
-    for key, aliases in JOB_TITLE_MAPPINGS.items():
-        if fuzzy_match(normalized_job, key) or any(fuzzy_match(normalized_job, alias) for alias in aliases):
-            canonical_keys.append(key)
+    if verbose:
+        print(f"      ⏭️  No direct fuzzy match with job variations")
+    
+    # Step 4: Find all canonical keys for the job title
+    job_keys = find_job_title_keys(normalized_job, verbose)
+    
+    if not job_keys:
+        # Also check variations for keys
         for job_var in job_variations:
             norm_job_var = normalize_title(job_var)
-            if fuzzy_match(norm_job_var, key) or any(fuzzy_match(norm_job_var, alias) for alias in aliases):
-                canonical_keys.append(key)
-    
-    if canonical_keys:
-        for key in canonical_keys:
-            aliases = JOB_TITLE_MAPPINGS.get(key, [])
-            for alias in aliases:
-                if fuzzy_match(normalized_exp, alias):
-                    return True
-            for alias in aliases:
-                alias_words = set(normalize_title(alias).split())
-                exp_words = set(normalized_exp.split())
-                if len(alias_words & exp_words) >= min(2, len(alias_words)):
-                    return True
-            if fuzzy_match(normalized_exp, key):
-                return True
-            key_words = set(normalize_title(key).split())
-            exp_words = set(normalized_exp.split())
-            if len(key_words & exp_words) >= min(2, len(key_words)):
-                return True
-    
-    exp_words = set(normalized_exp.split())
-    job_words = set(normalized_job.split())
-    
-    for job_var in job_variations:
-        norm_job_var = normalize_title(job_var)
-        job_var_words = set(norm_job_var.split())
+            variation_keys = find_job_title_keys(norm_job_var, verbose)
+            if variation_keys:
+                job_keys.extend(variation_keys)
         
-        if len(job_var_words) > 0 and len(exp_words) > 0:
-            common_words = exp_words.intersection(job_var_words)
-            overlap_ratio = len(common_words) / max(len(job_var_words), len(exp_words))
-            if overlap_ratio >= JOB_TITLE_TOKEN_WEIGHT:
-                return True
+        # Remove duplicates
+        job_keys = list(set(job_keys))
+    
+    if not job_keys:
+        if verbose:
+            print(f"      ❌ NO MATCH: Job title not found in JOB_TITLE_MAPPINGS")
+        return False
+    
+    if verbose:
+        print(f"      Found job keys: {job_keys}")
+    
+    # Step 5: Get all aliases from all matching keys and fuzzy match with experience
+    all_aliases_to_check = []
+    
+    for key in job_keys:
+        # Get aliases for this key
+        aliases = JOB_TITLE_MAPPINGS.get(key, [])
+        
+        # Add the key itself (without underscores)
+        key_title = key.replace('_', ' ')
+        all_aliases_to_check.append(key_title)
+        
+        # Add all aliases
+        all_aliases_to_check.extend(aliases)
+    
+    # Remove duplicates
+    all_aliases_to_check = list(set(all_aliases_to_check))
+    
+    if verbose:
+        print(f"      Checking all aliases from {len(job_keys)} key(s): {all_aliases_to_check}")
+    
+    # Check experience against all aliases
+    for alias in all_aliases_to_check:
+        if fuzzy_match(normalized_exp, alias):
+            if verbose:
+                print(f"      ✅ MATCH: Fuzzy match with alias '{alias}'")
+            return True
+    
+    if verbose:
+        print(f"      ❌ NO MATCH: No alias matched the experience")
     
     return False
 
@@ -313,7 +495,8 @@ def extract_tech_stack_from_description(description: str, tech_stack: List[str])
 def is_experience_relevant(
     experience: Dict[str, Any], 
     job_title: str, 
-    tech_stack: List[str]
+    tech_stack: List[str],
+    verbose: bool = False
 ) -> Tuple[bool, int]:
     """
     Determine if an experience is relevant based on:
@@ -321,11 +504,12 @@ def is_experience_relevant(
     2. Tech stack matching (percentage-based with aliases)
     """
     exp_designation = experience.get('designation', '')
-    title_match = is_title_match(exp_designation, job_title)
+    title_match = is_title_match(exp_designation, job_title, verbose=verbose)
     
     if not title_match:
+        if verbose:
+            print(f"   ❌ Experience '{exp_designation}' - Title mismatch")
         return False, 0
-    
     
     if not tech_stack:
         print("Warning: No tech stack provided in JD")
@@ -339,6 +523,13 @@ def is_experience_relevant(
     
     match_percentage = (tech_matches / len(tech_stack)) * 100
     is_relevant = match_percentage >= MIN_TECH_STACK_MATCH_PERCENTAGE
+    
+    if verbose:
+        print(f"   Tech matches: {tech_matches}/{len(tech_stack)} ({match_percentage:.1f}%)")
+        if is_relevant:
+            print(f"   ✅ Experience '{exp_designation}' is relevant")
+        else:
+            print(f"   ❌ Experience '{exp_designation}' - Tech matches below threshold")
     
     return is_relevant, tech_matches
 
@@ -501,13 +692,116 @@ def calculate_overlap_adjusted_months(
     
     return max(0, months)
 
-def detect_gaps(experiences: List[Dict[str, Any]]) -> Tuple[bool, List[Dict[str, Any]]]:
+def get_education_duration(degree: str) -> Optional[int]:
+    """
+    Get the duration in years for a given degree.
+    Returns None if degree type is not recognized.
+    """
+    if not degree:
+        return None
+    
+    degree_lower = degree.lower().strip()
+    
+    # Check for Bachelor's degrees
+    bachelor_keywords = ['bachelor', 'bs', 'bsc', 'b.s.', 'b.sc.', 'bachelors']
+    for keyword in bachelor_keywords:
+        if degree_lower.startswith(keyword):
+            return 4
+    
+    # Check for Master's degrees
+    master_keywords = ['master', 'ms', 'msc', 'm.s.', 'm.sc.', 'masters']
+    for keyword in master_keywords:
+        if degree_lower.startswith(keyword):
+            return 2
+    
+    # Check for PhD/Doctorate
+    phd_keywords = ['phd', 'doctor of', 'd.phil', 'd. phil', 'doctorate']
+    for keyword in phd_keywords:
+        if keyword in degree_lower:
+            return 3
+    
+    # Default: return None for unrecognized degrees
+    return None
+
+def get_education_timeline(education: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Calculate start and end dates for each education entry.
+    Returns a list of education entries with start_float and end_float.
+    """
+    education_timelines = []
+    
+    for edu in education:
+        degree = edu.get('degree', '')
+        graduation_date = edu.get('graduation_date', '')
+        
+        if not graduation_date:
+            continue
+        
+        # Parse graduation date
+        end_float = get_date_as_float(graduation_date, is_end_date=True)
+        if end_float is None:
+            continue
+        
+        # Get duration for this degree
+        duration_years = get_education_duration(degree)
+        if duration_years is None:
+            continue
+        
+        # Calculate start date: end_date - duration_years
+        # Convert years to float (assuming 1 year = 1.0)
+        start_float = end_float - duration_years
+        
+        education_timelines.append({
+            'degree': degree,
+            'institution': edu.get('institution', ''),
+            'start_float': start_float,
+            'end_float': end_float,
+            'start_date': None,  # Not needed for comparison
+            'end_date': graduation_date
+        })
+    
+    return education_timelines
+
+def is_gap_during_education(gap_start: float, gap_end: float, education_timelines: List[Dict[str, Any]]) -> bool:
+    """
+    Check if a gap period overlaps with any education timeline.
+    Returns True if the gap is fully covered by education, False otherwise.
+    """
+    if not education_timelines:
+        return False
+    
+    for edu in education_timelines:
+        edu_start = edu['start_float']
+        edu_end = edu['end_float']
+        
+        # Check if the gap overlaps with education timeline
+        overlap_start = max(gap_start, edu_start)
+        overlap_end = min(gap_end, edu_end)
+        
+        if overlap_start < overlap_end:
+            # Calculate how much of the gap is covered by education
+            gap_duration = gap_end - gap_start
+            overlap_duration = overlap_end - overlap_start
+            
+            # If more than 80% of the gap is covered by education, consider it covered
+            if overlap_duration / gap_duration >= 0.8:
+                return True
+    
+    return False
+
+def detect_gaps(experiences: List[Dict[str, Any]], education: List[Dict[str, Any]] = None) -> Tuple[bool, List[Dict[str, Any]]]:
     """
     Detect gaps in work experience that exceed the threshold.
+    Considers education timelines to ignore gaps that occurred during education.
     Returns (gap_found, list_of_gaps)
     """
     if not experiences or len(experiences) < 2:
         return False, []
+    
+    # Get education timelines if available
+    education_timelines = []
+    if education:
+        education_timelines = get_education_timeline(education)
     
     # Get all experiences with valid dates, sorted by start date
     valid_experiences = []
@@ -545,26 +839,42 @@ def detect_gaps(experiences: List[Dict[str, Any]]) -> Tuple[bool, List[Dict[str,
         
         # Check if there's a gap (positive gap means gap, negative means overlap)
         if gap_months > GAP_THRESHOLD_MONTHS:
-            gaps.append({
-                'from_company': valid_experiences[i]['company'],
-                'from_designation': valid_experiences[i]['designation'],
-                'from_end': valid_experiences[i]['end_date'],
-                'to_company': valid_experiences[i + 1]['company'],
-                'to_designation': valid_experiences[i + 1]['designation'],
-                'to_start': valid_experiences[i + 1]['start_date'],
-                'gap_months': gap_months,
-                'gap_years': gap_months / 12
-            })
+            gap_start = current_end
+            gap_end = next_start
+            
+            # Check if this gap occurred during education
+            is_during_education = False
+            if education_timelines:
+                is_during_education = is_gap_during_education(gap_start, gap_end, education_timelines)
+            
+            # Only count as gap if not during education
+            if not is_during_education:
+                gaps.append({
+                    'from_company': valid_experiences[i]['company'],
+                    'from_designation': valid_experiences[i]['designation'],
+                    'from_end': valid_experiences[i]['end_date'],
+                    'to_company': valid_experiences[i + 1]['company'],
+                    'to_designation': valid_experiences[i + 1]['designation'],
+                    'to_start': valid_experiences[i + 1]['start_date'],
+                    'gap_months': gap_months,
+                    'gap_years': gap_months / 12
+                })
     
     return len(gaps) > 0, gaps
 
 def find_relevant_experience(
     job_json: Dict[str, Any], 
-    resume_json: Dict[str, Any]
+    resume_json: Dict[str, Any],
+    verbose: bool = True  # Set to True to see detailed title matching logs
 ) -> Tuple[float, bool, List[Dict[str, Any]], List[Dict[str, Any]]]:
     """
     Main function to calculate total relevant experience in years.
     Handles overlapping date ranges properly and detects gaps.
+    
+    Args:
+        job_json: Job description JSON
+        resume_json: Resume JSON
+        verbose: If True, print detailed title matching logs
     
     Returns:
         Tuple[float, bool, List[Dict], List[Dict]]:
@@ -582,13 +892,14 @@ def find_relevant_experience(
         return 0.0, False, [], []
     
     experiences = resume_json.get('experience', [])
+    education = resume_json.get('education', [])
     
     if not experiences:
         print("No experience entries found in resume")
         return 0.0, False, [], []
     
-    # Check for gaps in complete work experience
-    gap_found, gaps = detect_gaps(experiences)
+    # Check for gaps in complete work experience with education consideration
+    gap_found, gaps = detect_gaps(experiences, education)
     
     # Collect relevant experiences
     relevant_experiences = []
@@ -603,13 +914,14 @@ def find_relevant_experience(
     
     # First, identify all relevant experiences
     for exp in experiences:
-        is_relevant, tech_matches = is_experience_relevant(exp, job_title, tech_stack)
+        # Pass verbose flag to get detailed title matching logs
+        is_relevant, tech_matches = is_experience_relevant(exp, job_title, tech_stack, verbose=verbose)
         
         exp_designation = exp.get('designation', '')
         exp_company = exp.get('company', '')
         start_date = exp.get('start_date', '')
         end_date = exp.get('end_date', '')
-        title_match = is_title_match(exp_designation, job_title)
+        title_match = is_title_match(exp_designation, job_title, verbose=False)  # Don't log again
         match_percentage = (tech_matches / tech_stack_size * 100) if tech_stack_size else 0.0
         reason = "title_mismatch"
         
@@ -784,39 +1096,62 @@ def find_relevant_experience(
 
 
 if __name__ == "__main__":
-    # Test Case 1: Irrelevant 2023-2024, Relevant 2024-2026 (year-only)
+    # Test Case: Multiple gaps with some during education and some not
     test_case_1 = {
         "job": {
-            "job_title": "Agentic AI Engineer",
-            "tech_stack": ["Python", "FastAPI", "PostgreSQL", "Docker","Langchain", "LlamaIndex", "OpenAI API","machine learning"]
+            "job_title": "Junior Full stack Engineer",
+            "tech_stack": ["JavaScript", "React", "Node.js", "MongoDB", "Express"]
         },
         "resume": {
             "experience": [
                 {
-                    "company": "Irrelevant Corp",
-                    "designation": "AI Engineer",
-                    "start_date": "2023",
-                    "end_date": "2024",
-                    "description": "Built voice agents using Flask, Docker , Langgraph, etc"
+                    "company": "Startup Inc",
+                    "designation": "AI Developer",
+                    "start_date": "Aug 2025",
+                    "end_date": "Nov 2025",
+                    "description": "Built React applications"
+                },
+                {
+                    "company": "Startup Inc",
+                    "designation": "AI Developer",
+                    "start_date": "July 2026",
+                    "end_date": "Present",
+                    "description": "Built React applications"
+                }
+            ],
+            "education": [
+                {
+                    "degree": "Bachelor of Science in Computer Science",
+                    "institution": "UC Berkeley",
+                    "cgpa": "3.7",
+                    "graduation_date": "Aug 2026"
                 }
             ]
         }
     }
     
+    print("🧪 Running Test Case\n" + "="*80)
     
+    result, gap_found, gaps, evaluations = find_relevant_experience(
+        test_case_1["job"], 
+        test_case_1["resume"],
+        verbose=True  # Enable detailed title matching logs
+    )
     
-    print("🧪 Running Test Cases\n" + "="*80)
+    print(f"\n{'='*80}")
+    print(f"📊 RESULTS SUMMARY")
+    print(f"{'='*80}")
+    print(f"🎯 Final Result: {result:.2f} years of relevant experience")
+    print(f"🎯 Gap Found: {gap_found}")
+    print(f"🎯 Evaluations: {len(evaluations)}")
+    if gaps:
+        print(f"🎯 Number of gaps: {len(gaps)}")
+        for i, gap in enumerate(gaps, 1):
+            print(f"\n   Gap {i}:")
+            print(f"   - Duration: {gap['gap_months']:.1f} months ({gap['gap_years']:.1f} years)")
+            print(f"   - Between: {gap['from_designation']} at {gap['from_company']} (ended {gap['from_end']})")
+            print(f"   - And: {gap['to_designation']} at {gap['to_company']} (started {gap['to_start']})")
+    else:
+        print("🎯 No gaps detected (gaps during education were ignored)")
     
-    test_cases = [test_case_1]
-    for i, test in enumerate(test_cases, 1):
-        print(f"\n{'='*80}")
-        print(f"📝 Test Case {i}")
-        print(f"{'='*80}")
-        result, gap_found, gaps, evaluations = find_relevant_experience(test["job"], test["resume"])
-        print(f"\n🎯 Final Result: {result:.2f} years of relevant experience")
-        print(f"🎯 Gap Found: {gap_found}")
-        print(f"🎯 Evaluations: {len(evaluations)}")
-        if gaps:
-            print(f"🎯 Number of gaps: {len(gaps)}")
-    
-    print("\n✅ All test cases completed!")
+    print("\n✅ Test case completed!")
