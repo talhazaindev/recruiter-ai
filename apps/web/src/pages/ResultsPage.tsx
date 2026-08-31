@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -21,6 +21,7 @@ export function ResultsPage() {
   const qc = useQueryClient()
   const [view, setView] = useState<(typeof VIEWS)[number]['key']>('best_fit')
   const [offset, setOffset] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const results = useQuery({
     queryKey: ['results', jobId, view, offset],
@@ -57,6 +58,29 @@ export function ResultsPage() {
     enabled: Boolean(jobId),
   })
 
+  // ✅ Updated: Filter based on institutions list (root level)
+  const filteredItems = useMemo(() => {
+    if (!results.data?.items) return []
+    
+    // If no search query, return all items
+    if (!searchQuery.trim()) return results.data.items
+
+    const query = searchQuery.trim().toLowerCase()
+    
+    return results.data.items.filter((row) => {
+      // Get institutions from the row (root level)
+      const institutions = row.institutions || []
+      
+      // If no institutions, don't include in results
+      if (institutions.length === 0) return false
+      
+      // Check if ANY institution matches the search query
+      return institutions.some((institution) => {
+        return institution.toLowerCase().includes(query)
+      })
+    })
+  }, [results.data?.items, searchQuery])
+
   const shortlist = useMutation({
     mutationFn: ({ id, value }: { id: string; value: boolean }) => api.shortlist(id, value),
     onSuccess: () => {
@@ -66,6 +90,7 @@ export function ResultsPage() {
       qc.invalidateQueries({ queryKey: ['job', jobId] })
     },
   })
+  
   const invalidateCandidateLists = () => {
     qc.invalidateQueries({ queryKey: ['results', jobId] })
     qc.invalidateQueries({ queryKey: ['result-counts', jobId] })
@@ -73,14 +98,18 @@ export function ResultsPage() {
     qc.invalidateQueries({ queryKey: ['review', jobId] })
     qc.invalidateQueries({ queryKey: ['job', jobId] })
   }
+  
   const removeCv = useMutation({
     mutationFn: (resumeId: string) => api.deleteResume(resumeId),
     onSuccess: invalidateCandidateLists,
   })
+  
   const removeCandidate = useMutation({
     mutationFn: (candidateId: string) => api.deleteCandidate(jobId!, candidateId),
     onSuccess: invalidateCandidateLists,
   })
+  
+  console.log(results)
 
   return (
     <div className="space-y-6">
@@ -102,23 +131,51 @@ export function ResultsPage() {
         />
       ) : null}
 
-      <div className="sticky top-16 z-20 flex flex-wrap gap-2 bg-[var(--bg)]/90 backdrop-blur py-2">
-        {VIEWS.map((v) => (
-          <button
-            key={v.key}
-            type="button"
-            onClick={() => {
-              setView(v.key)
-              setOffset(0)
+      <div className="sticky top-16 z-20 flex flex-wrap items-center gap-3 bg-[var(--bg)]/90 backdrop-blur py-2">
+        <div className="flex flex-wrap gap-2 flex-1">
+          {VIEWS.map((v) => (
+            <button
+              key={v.key}
+              type="button"
+              onClick={() => {
+                setView(v.key)
+                setOffset(0)
+                setSearchQuery('') // Reset search when changing view
+              }}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+                view === v.key ? 'bg-[var(--signal)] text-white' : 'bg-white/80 border border-[var(--line)]'
+              }`}
+            >
+              {v.label}
+              {counts.data ? ` (${counts.data[v.key]})` : ''}
+            </button>
+          ))}
+        </div>
+        
+        {/* Search Input - searches institutions list */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="🔍 Search by institution..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setOffset(0) // Reset pagination on search
             }}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium ${
-              view === v.key ? 'bg-[var(--signal)] text-white' : 'bg-white/80 border border-[var(--line)]'
-            }`}
-          >
-            {v.label}
-            {counts.data ? ` (${counts.data[v.key]})` : ''}
-          </button>
-        ))}
+            className="w-64 rounded-lg border border-[var(--line)] bg-white/80 px-3 py-1.5 text-sm focus:border-[var(--signal)] focus:outline-none focus:ring-1 focus:ring-[var(--signal)]"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery('')
+                setOffset(0)
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ink-muted)] hover:text-[var(--ink)]"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {results.isLoading ? <p className="text-[var(--ink-muted)]">Loading rankings…</p> : null}
@@ -134,7 +191,19 @@ export function ResultsPage() {
             'Unable to delete this record.'}
         </p>
       ) : null}
-      {!results.isLoading && !results.isError && (results.data?.items.length ?? 0) === 0 ? (
+      
+      {/* No search results */}
+      {!results.isLoading && !results.isError && searchQuery && filteredItems.length === 0 ? (
+        <EmptyState
+          title="No candidates found"
+          description={`No candidates found with institution matching "${searchQuery}". Try a different search term.`}
+          action={
+            <Button variant="ghost" onClick={() => setSearchQuery('')}>
+              Clear search
+            </Button>
+          }
+        />
+      ) : !results.isLoading && !results.isError && (results.data?.items.length ?? 0) === 0 ? (
         <EmptyState
           title="No candidates in this view"
           description="Ingest CVs first, or switch tabs. Best fit only shows must-have passers — try All or Failed filters."
@@ -161,7 +230,7 @@ export function ResultsPage() {
                 </tr>
               </thead>
               <tbody>
-                {results.data?.items.map((row, i) => (
+                {filteredItems.map((row, i) => (
                   <motion.tr
                     key={row.id}
                     initial={{ opacity: 0 }}
@@ -172,6 +241,12 @@ export function ResultsPage() {
                     <td className="px-3 py-3">
                       <span className="font-medium">{row.candidate.name || 'Unknown'}</span>
                       <p className="text-xs text-[var(--ink-muted)]">{row.candidate.emails[0]}</p>
+                      {/* ✅ Updated: Show institutions from root level */}
+                      {row.institutions && row.institutions.length > 0 && (
+                        <p className="text-xs text-[var(--ink-muted)] mt-1 truncate max-w-[200px]">
+                          🏫 {row.institutions.join(', ')}
+                        </p>
+                      )}
                       {row.stale ? <Tag tone="warn">Outdated</Tag> : null}
                     </td>
                     <td className="px-3 py-3 font-medium tabular-nums">{Math.round(row.score)}</td>
@@ -245,7 +320,8 @@ export function ResultsPage() {
               </tbody>
             </table>
           </div>
-          {results.data && results.data.total > PAGE_SIZE ? (
+          {/* Pagination - disabled during search */}
+          {filteredItems.length > 0 && results.data && results.data.total > PAGE_SIZE && !searchQuery ? (
             <div className="flex items-center justify-between border-t border-[var(--line)] p-3">
               <span className="text-xs text-[var(--ink-muted)]">
                 {pageRange(results.data.total, offset, PAGE_SIZE)[0]}–
@@ -269,6 +345,11 @@ export function ResultsPage() {
                   Next
                 </Button>
               </div>
+            </div>
+          ) : searchQuery && filteredItems.length > 0 ? (
+            // Show count when searching
+            <div className="border-t border-[var(--line)] p-3 text-xs text-[var(--ink-muted)]">
+              Showing {filteredItems.length} candidate{filteredItems.length > 1 ? 's' : ''} matching "{searchQuery}"
             </div>
           ) : null}
         </Panel>

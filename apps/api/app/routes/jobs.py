@@ -16,6 +16,11 @@ from app.models.schemas import JobCreate, JobPublic, JobRematchResponse, JobUpda
 from app.services.audit import write_audit
 from app.services.deletion import delete_job as delete_job_data
 from app.services.rematch import enqueue_rematch_for_job, iter_latest_parsed_resumes
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
+
 
 router = APIRouter(prefix="/v1/jobs", tags=["jobs"])
 
@@ -161,8 +166,10 @@ async def list_jobs(user: UserPublic = Depends(get_current_user)) -> list[JobPub
     """List jobs for the current org."""
     db = get_db()
     cursor = db.jobs.find({"org_id": user.org_id}).sort("updated_at", -1)
+    
     jobs: list[JobPublic] = []
     async for doc in cursor:
+        #logger.info(doc)
         counts = await _counts_for_job(
             user.org_id,
             str(doc["_id"]),
@@ -188,6 +195,7 @@ async def create_job(body: JobCreate, user: UserPublic = Depends(get_current_use
         "created_at": now,
         "updated_at": now,
     }
+    
     result = await db.jobs.insert_one(doc)
     doc["_id"] = result.inserted_id
     await write_audit(user.org_id, user.id, "job.create", "job", str(result.inserted_id))

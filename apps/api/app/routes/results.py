@@ -13,6 +13,11 @@ from app.db import get_db
 from app.models.schemas import ReviewUpdate, ShortlistRequest, UserPublic
 from app.services.audit import write_audit
 from app.services.deletion import delete_candidate_from_job, delete_resume
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
+
 
 router = APIRouter(tags=["results"])
 
@@ -37,6 +42,9 @@ async def _hydrate_row(db, org_id: str, mr: dict, reveal_contact: bool) -> dict[
     """Join match_result with candidate + resume summary fields."""
     cand = await db.candidates.find_one({"_id": ObjectId(mr["candidate_id"]), "org_id": org_id})
     resume = await db.resumes.find_one({"_id": ObjectId(mr["resume_id"]), "org_id": org_id})
+    # Extract all institutions from education
+    institutions = [edu.get('institution', '') for edu in resume['parse']['resume']['education']]
+    #logger.info(institutions)     
     snapshot = (
         mr.get("identity_snapshot")
         or (resume or {}).get("parse", {}).get("identity")
@@ -57,6 +65,7 @@ async def _hydrate_row(db, org_id: str, mr: dict, reveal_contact: bool) -> dict[
         "hard_filters": mr.get("hard_filters", {}),
         "rank_signals": mr.get("rank_signals", {}),
         "explanation": mr.get("explanation", {}),
+        "institutions": institutions,
         "shortlisted": shortlisted,
         "review_status": mr.get("review_status", "none"),
         "matcher_version": mr.get("matcher_version"),
@@ -141,6 +150,7 @@ async def list_results(
     async for mr in db.match_results.aggregate(pipeline):
         mr["stale"] = int(mr.get("jd_revision") or 0) != int(job.get("jd_revision") or 1)
         rows.append(await _hydrate_row(db, user.org_id, mr, reveal_contact=False))
+    #logger.info(rows)
     return {"items": rows, "total": total, "limit": limit, "offset": offset}
 
 

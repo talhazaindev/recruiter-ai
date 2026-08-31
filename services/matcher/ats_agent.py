@@ -255,6 +255,7 @@ def match_jd_resume(jd: Any, resume: Any) -> dict[str, Any]:
                 "experience": (details.get("experience") or {}).get("message"),
             },
             "details": assessment_details,
+            
         },
         "matcher_version": "ats-agent.v3",
     }

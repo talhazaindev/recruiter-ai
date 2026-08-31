@@ -346,7 +346,6 @@ async def process_match_task(payload: dict[str, Any]) -> None:
         jd = JobDescriptionSchema.model_validate(job["jd"])
         resume = MatchingResumeSchema.model_validate(resume_doc["parse"]["resume"])
         output = match_jd_resume(jd, resume)
-
         review_status = "needs_review" if needs_review else "none"
         jd_revision = int(job.get("jd_revision") or 1)
         now = datetime.now(timezone.utc)

@@ -11,6 +11,10 @@ import { ShortlistPage } from './pages/ShortlistPage'
 import { ReviewPage } from './pages/ReviewPage'
 import { CandidateDetailPage } from './pages/CandidateDetailPage'
 import { DriveSettingsPage } from './pages/DriveSettingsPage'
+import { CandidateViewJob } from './pages/CandidateViewJob'
+import {Applyjob} from './pages/Applyjob'
+import { CandidateShell } from './components/CandidateShell'
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,25 +29,36 @@ function Protected() {
 }
 
 export default function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route element={<Protected />}>
-          <Route element={<AppShell />}>
-            <Route path="/" element={<JobsPage />} />
-            <Route path="/jobs/:jobId" element={<JobOverviewPage />} />
-            <Route path="/jobs/:jobId/jd" element={<JdEditorPage />} />
-            <Route path="/jobs/:jobId/ingest" element={<IngestPage />} />
-            <Route path="/jobs/:jobId/results" element={<ResultsPage />} />
-            <Route path="/jobs/:jobId/shortlist" element={<ShortlistPage />} />
-            <Route path="/jobs/:jobId/review" element={<ReviewPage />} />
-            <Route path="/jobs/:jobId/candidates/:resultId" element={<CandidateDetailPage />} />
-            <Route path="/settings/drive" element={<DriveSettingsPage />} />
-          </Route>
+  // App.tsx
+
+return (
+  <QueryClientProvider client={queryClient}>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      
+      <Route element={<Protected />}>
+        {/* Admin routes with AppShell */}
+        <Route element={<AppShell />}>
+          <Route path="/" element={<JobsPage />} />
+          <Route path="/jobs/:jobId" element={<JobOverviewPage />} />
+          <Route path="/jobs/:jobId/jd" element={<JdEditorPage />} />
+          <Route path="/jobs/:jobId/ingest" element={<IngestPage />} />
+          <Route path="/jobs/:jobId/results" element={<ResultsPage />} />
+          <Route path="/jobs/:jobId/shortlist" element={<ShortlistPage />} />
+          <Route path="/jobs/:jobId/review" element={<ReviewPage />} />
+          <Route path="/jobs/:jobId/candidates/:resultId" element={<CandidateDetailPage />} />
+          <Route path="/settings/drive" element={<DriveSettingsPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </QueryClientProvider>
-  )
+        
+        {/* ✅ Candidate routes with CandidateShell */}
+        <Route element={<CandidateShell />}>
+          <Route path="/candidate/viewjobs" element={<CandidateViewJob />} />
+          <Route path="/candidate/apply/:jobId" element={<Applyjob />} />
+        </Route>
+      </Route>
+      
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  </QueryClientProvider>
+)
 }
