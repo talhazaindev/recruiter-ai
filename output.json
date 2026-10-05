@@ -1,0 +1,52 @@
+{
+    "summary": {
+        "content": [
+            "I have worked on AI, machine learning, computer vision, and automation projects, along with hands-on experience in web scraping and full-stack web development.. I enjoy working with new tools and technologies, actively learning through practical experience. Over time, I’ve developed a strong interest in Artificial Intelligence, Machine Learning, and Data Science, and continuously working to enhance my skills in these areas."
+        ]
+    },
+    "education": {
+        "content": [
+            "GOVERNMENT COLLEGE UNIVERSITY (GCU) - FSC PRE ENGINEERING FAST NUCES LAHORE - BACHELORS IN COMPUTER SCIENCE (BSCS)"
+        ],
+        "2022 - 2026 2020 - 2022 CGPA : 3.38 Grade :  A+ CGPA : 3.38_2 Grade :  A+_2": [
+            "( ) GOVERNMENT COLLEGE UNIVERSITY (GCU) - FSC PRE ENGINEERING"
+        ]
+    },
+    "experience": {
+        "DevNuts - Software Developer August - November  2025": [
+            "Built automation bots and web scrapers using Playwright, Selenium, and BeautifulSoup, automating manual workflows for clients. Developed JavaScript-based Chrome extensions to streamline and automate repetitive browser tasks. Also contributed to a full-stack web application using React, Flask, and MongoDB, working on features and API integration."
+        ],
+        "FAST NUCES Lahore - Lab Demonstrator January - May  2025": [
+            "Worked as Lab Demonstrator for the course Database Systems. Assisted students in understanding SQL concepts, database design, and query optimization through hands-on lab sessions"
+        ]
+    },
+    "projects": {
+        "Final Year Project - VisionGuard AI (Smart Surveillance System) -": [
+            "AI-based surveillance system that uses deep learning models for computer vision and audio analysis to perform real-time anomaly detection. Trained and tested models to detect fights, human falls, gunshots, abnormal sounds, and unusual crowd activity, generating alerts during suspicious events. Built a React-based frontend dashboard for live monitoring and alerts, with a backend developed using FastAPI to handle model inference and system integration."
+        ],
+        "Real Estate Market Intelligence using Machine Learning -": [
+            "Developed an end-to-end ML pipeline on the Ames Housing dataset (2,900+ records, 80+ features), including data cleaning, feature engineering, and feature selection and applied multiple classification and clustering techniques to derive predictive and segmentation insights."
+        ],
+        "Life Expectancy Prediction (WHO Dataset) -": [
+            "Worked on a regression problem using World Health Organization (WHO) survey data to predict average life expectancy of different regions. Performed data cleaning, handling missing values, encoding categorical features, exploratory data analysis, and feature selection, followed by training and tuning regression models. Evaluated model performance using Mean Absolute Error (MAE) and applied cross-validation and hyperparameter tuning to avoid overfitting."
+        ],
+        "AirSlide – Gesture Controlled Presentation System -": [
+            "Allow users to control presentation slides using hand gestures through a camera. It works on real-time video input and uses a YOLO-based hand detection model to understand gestures for moving slides forward or backward, entering full-screen mode, and exiting full-screen mode. The system is built for smooth and fast response and removes the need for a keyboard or mouse during presentations."
+        ],
+        "Image Classification -": [
+            "Performed image classification on MNIST-Hand written digits data  using neural networks (MLP and LeNet-5) and compared their classification performance."
+        ],
+        "CSIRO – Image2Biomass Prediction -": [
+            "Participated in Kaggle competition which involved predicting multiple pasture biomass values using vegetation images and related metadata. I worked on a ResNet-based deep learning model in PyTorch, combined image features with tabular data, and trained it using cross-validation. Image augmentations and test- time augmentation were used to improve model stability and prediction accuracy."
+        ]
+    },
+    "skills": {
+        "Libraries and Frameworks: ACHIEVEMENTS": [
+            "Python, PyTorch, TensorFlow, Scikit-learn, OpenCV, YOLO, NumPy, Pandas, SciPy, Matplotlib, Albumentations, K-Fold Cross Validation, Playwright, Selenium, BeautifulSoup"
+        ]
+    },
+    "email": "anwaar.subhani16@gmail.com",
+    "phone": "+92 308 4472754",
+    "name": "Software Engineer",
+    "raw_text": "ANWAAR SUBHANI\nSoftware Engineer\nABOUT ME\nI have worked on AI, machine learning, computer vision, and automation projects, along with hands-on experience in web\nscraping and full-stack web development.. I enjoy working with new tools and technologies, actively learning through\npractical experience. Over time, I’ve developed a strong interest in Artificial Intelligence, Machine Learning, and Data Science,\nand continuously working to enhance my skills in these areas.\n+92 308 4472754\nhttps://www.linkedin.com/in/anwaar-subhani-1591ba22b/\nanwaar.subhani16@gmail.com\nGOVERNMENT COLLEGE UNIVERSITY (GCU) - FSC PRE ENGINEERING\nEDUCATION\nFAST NUCES LAHORE - BACHELORS IN COMPUTER SCIENCE (BSCS)\n2022 - 2026\n2020 - 2022\nWORK EXPERIENCE\nWorked as Lab Demonstrator for the course Database Systems. Assisted students in understanding SQL concepts, database\ndesign, and query optimization through hands-on lab sessions\nFAST NUCES Lahore - Lab Demonstrator\nJanuary - May  2025\nDevNuts - Software Developer\nBuilt automation bots and web scrapers using Playwright, Selenium, and BeautifulSoup, automating manual workflows for\nclients. Developed JavaScript-based Chrome extensions to streamline and automate repetitive browser tasks. Also\ncontributed to a full-stack web application using React, Flask, and MongoDB, working on features and API integration.\nAugust - November  2025\nPROJECTS\nFinal Year Project - VisionGuard AI (Smart Surveillance System) - AI-based surveillance system that uses deep learning\nmodels for computer vision and audio analysis to perform real-time anomaly detection. Trained and tested models to\ndetect fights, human falls, gunshots, abnormal sounds, and unusual crowd activity, generating alerts during suspicious\nevents. Built a React-based frontend dashboard for live monitoring and alerts, with a backend developed using FastAPI to\nhandle model inference and system integration.\nCSIRO – Image2Biomass Prediction - Participated in Kaggle competition which involved predicting multiple pasture\nbiomass values using vegetation images and related metadata. I worked on a ResNet-based deep learning model in\nPyTorch, combined image features with tabular data, and trained it using cross-validation. Image augmentations and test-\ntime augmentation were used to improve model stability and prediction accuracy.\nAirSlide – Gesture Controlled Presentation System - Allow users to control presentation slides using hand gestures through\na camera. It works on real-time video input and uses a YOLO-based hand detection model to understand gestures for\nmoving slides forward or backward, entering full-screen mode, and exiting full-screen mode. The system is built for smooth\nand fast response and removes the need for a keyboard or mouse during presentations.\nLife Expectancy Prediction (WHO Dataset) - Worked on a regression problem using World Health Organization (WHO)\nsurvey data to predict average life expectancy of different regions. Performed data cleaning, handling missing values,\nencoding categorical features, exploratory data analysis, and feature selection, followed by training and tuning regression\nmodels. Evaluated model performance using Mean Absolute Error (MAE) and applied cross-validation and hyperparameter\ntuning to avoid overfitting.\nImage Classification - Performed image classification on MNIST-Hand written digits data  using neural networks (MLP and\nLeNet-5) and compared their classification performance.\nReal Estate Market Intelligence using Machine Learning - Developed an end-to-end ML pipeline on the Ames Housing\ndataset (2,900+ records, 80+ features), including data cleaning, feature engineering, and feature selection and applied\nmultiple classification and clustering techniques to derive predictive and segmentation insights.\nSKILLS\nLibraries and Frameworks: Python, PyTorch, TensorFlow, Scikit-learn, OpenCV, YOLO, NumPy, Pandas, SciPy, Matplotlib,\nAlbumentations, K-Fold Cross Validation, Playwright, Selenium, BeautifulSoup\nACHIEVEMENTS\nDEANS LIST OF HONORS (Fall 2024, 2025, Spring 2026) - Included in Deans list of honors for outstanding academic\nperformance scoring SGPA over 3.5 each semester\nCGPA : 3.38\nGrade :  A+\n"
+}

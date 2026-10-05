@@ -1,0 +1,4 @@
+# Prefer the repo-root compose file:
+#   docker compose up --build
+include:
+  - path: ../docker-compose.yml

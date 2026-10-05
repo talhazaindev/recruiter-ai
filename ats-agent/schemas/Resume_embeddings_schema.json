@@ -1,0 +1,29 @@
+{
+  "professional_summary": {
+    "text": "",
+    "embedding": []
+  },
+
+  "experience": [
+    {
+      "designation": "",
+      "designation_embedding": [],
+      "description": "",
+      "description_embedding": []
+    }
+  ],
+
+  "projects": [
+    {
+      "text": "",
+      "embedding": []
+    }
+  ],
+
+  "certifications": [
+    {
+      "text": "",
+      "embedding": []
+    }
+  ]
+}

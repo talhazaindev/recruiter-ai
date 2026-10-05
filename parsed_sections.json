@@ -1,0 +1,40 @@
+{
+    "experience": [
+        {
+            "company": "Tech Cog",
+            "designation": "Head of Business Development",
+            "start_date": "2024",
+            "end_date": "Present",
+            "description": "Remote. Led business development strategies for B2B website design services, driving 35% year-over-year revenue growth through targeted sales initiatives. Managed social media and content calendars, optimizing LinkedIn campaigns to increase engagement by 30% and generate qualified leads. Analyzed social and email campaign performance, improving LinkedIn ad ROI by 22% through data-driven optimization. Developed thought leadership content, using AI tools to refine blogs and posts, achieving 12k+ monthly impressions. Researched digital marketing trends, implementing tests that increased campaign performance by 7%."
+        },
+        {
+            "company": "Digital Dost",
+            "designation": "Head of Sales & Marketing",
+            "start_date": "2023",
+            "end_date": "2025",
+            "description": "Hybrid. Grew social media engagement by 5x and added 50K+ followers organically in under a year. Reduced churn by 28% while increasing upsell revenue by 60% via client success and retention initiatives. Managed and mentor the business development team, setting clear objectives and performance standards. Maintained project documentation, including requirements, progress reports, and issue logs."
+        },
+        {
+            "company": "Purelogics",
+            "designation": "Business Development Executive",
+            "start_date": "2023",
+            "end_date": "2024",
+            "description": "Onsite. Conducted market research to identify potential clients, competitors, and industry trends. Developed and implemented business development strategies and plans to achieve growth targets. Created and presented proposals to clients, outlining the benefits, features, and costs of the organization's offerings."
+        },
+        {
+            "company": "BitcraftX",
+            "designation": "Business Development Representative",
+            "start_date": "2021",
+            "end_date": "2023",
+            "description": "Onsite. Used LinkedIn Sales Navigator to identify and engage 1,200+ qualified leads, resulting in a 15% meeting booking rate. Increased Upwork proposal-to-close ratio by 40% through personalized messaging and optimized profiles."
+        }
+    ],
+    "education": [
+        {
+            "degree": "Bachelor of Computer Sciences",
+            "institution": "Forman Christian College (A Chartered University)",
+            "cgpa": "",
+            "graduation_date": ""
+        }
+    ]
+}

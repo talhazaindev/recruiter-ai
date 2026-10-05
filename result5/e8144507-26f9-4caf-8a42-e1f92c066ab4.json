@@ -1,0 +1,68 @@
+{
+    "education": [
+        {
+            "degree": "Bachelor of Science in Computer Science",
+            "institution": "FAST National University of Computer and Emerging Sciences",
+            "cgpa": "",
+            "graduation_date": "Jun. 2026",
+            "description": "Lahore, Pakistan"
+        },
+        {
+            "degree": "FSc Pre-Engineering",
+            "institution": "Forman Christian College",
+            "cgpa": "",
+            "graduation_date": "May 2021",
+            "description": "Lahore, Pakistan"
+        }
+    ],
+    "experience": [
+        {
+            "company": "Core Edge Solutions",
+            "designation": "Full Stack AI Intern",
+            "start_date": "Jun. 2025",
+            "end_date": "Aug. 2025",
+            "description": "Lahore, Pakistan • Developed production-level web applications using React.js, FastAPI, Node.js, and PostgreSQL. • Built an AI-powered querying platform for PDFs and databases using Retrieval-Augmented Generation (RAG) and semantic search. • Engineered a multi-agent AI routing system that dynamically selected LLMs based on persona-driven context, reducing response latency by 35%. • Developed features for an AI-driven accounting platform that automated invoice processing and email workflows using natural language commands."
+        }
+    ],
+    "projects": {
+        "ZeroQ – Smart Retail Checkout System": [
+            "|"
+        ],
+        "Computer Vision": [
+            "• Built a “Just Walk Out” retail checkout prototype using hybrid sensor fusion (Computer Vision, RFID, and Weight Sensors) to automate customer tracking and eliminate manual checkout. • Developed a React Native mobile application with real-time virtual cart synchronization and automated payment workflows. • Designed scalable backend services to support real-time user activity tracking and sensor communication under concurrent user load."
+        ],
+        "Dynamic Agentic Systems": [
+            "|"
+        ],
+        "FastAPI, LangGraph, React.js, Pinecone, PostgreSQL": [
+            "• Built an AI-powered platform for intelligent querying across documents and databases using FastAPI, LangGraph, Pinecone, and PostgreSQL. • Implemented dynamic AI persona routing with specialized assistants including Financial Analyst, Legal Advisor, and General Assistant using multi-agent workflows. • Developed Retrieval-Augmented Generation (RAG) pipelines with semantic vector search, metadata tracing, and real-time query suggestions. • Designed a modern three-panel React interface with document upload, conversational querying, metadata visualization, and query trace monitoring."
+        ],
+        "BookSphere –_2 E-Library Platform": [
+            "|"
+        ],
+        "PostgreSQL, Express.js, React.js,_2 Node.js": [
+            "• Built a PERN stack e-library platform with advanced search, filtering, and personalized bookshelves. • Developed secure RESTful APIs with JWT authentication and role-based access control. • Designed PostgreSQL relational database schemas for scalable content and user management."
+        ],
+        "AI Workout Planner Web App": [
+            "|"
+        ],
+        "React.js,_3 Node.js, Express.js,_2 MongoDB": [
+            "• Developed a full-stack workout planning and tracking platform with community-driven features. • Designed scalable MongoDB schemas and built RESTful APIs for workout scheduling and progress tracking. • Implemented reusable frontend components and responsive UI architecture using React.js. Technical"
+        ]
+    },
+    "skills": {
+        "Languages & Frameworks:": [
+            "C++, Python,SQL, Node.js, FastAPI, Flask, React, Next.js, Express, MERN, Supabase"
+        ],
+        "AI &_2 Infrastructure:": [
+            "LangChain, LangGraph, OpenAI APIs, Pinecone, RAG, Multi-Agent Systems"
+        ],
+        "Developer Tools:": [
+            "Git, GitHub, VS Code, PyCharm, Jupyter Notebook"
+        ]
+    },
+    "email": "abdullahbhatti6511@gmail.com",
+    "phone": "+92301 8906387",
+    "name": "MUHAMMAD  ABDULLAH",
+    "raw_text": "MUHAMMAD ABDULLAH\n+92301 8906387\nabdullahbhatti6511@gmail.com\nlinkedin.com/in/Abdullah\ngithub.com/abdullah\nEducation\nFAST National University of Computer and Emerging Sciences\nLahore, Pakistan\nBachelor of Science in Computer Science\nAug. 2022 – Jun. 2026\nForman Christian College\nLahore, Pakistan\nFSc Pre-Engineering\nAug. 2019 – May 2021\nExperience\nCore Edge Solutions\nJun. 2025 – Aug. 2025\nFull Stack AI Intern\nLahore, Pakistan\n• Developed production-level web applications using React.js, FastAPI, Node.js, and PostgreSQL.\n• Built an AI-powered querying platform for PDFs and databases using Retrieval-Augmented Generation (RAG) and\nsemantic search.\n• Engineered a multi-agent AI routing system that dynamically selected LLMs based on persona-driven context,\nreducing response latency by 35%.\n• Developed features for an AI-driven accounting platform that automated invoice processing and email workflows using\nnatural language commands.\nProjects\nZeroQ – Smart Retail Checkout System | Computer Vision\n• Built a “Just Walk Out” retail checkout prototype using hybrid sensor fusion (Computer Vision, RFID, and Weight\nSensors) to automate customer tracking and eliminate manual checkout.\n• Developed a React Native mobile application with real-time virtual cart synchronization and automated payment\nworkflows.\n• Designed scalable backend services to support real-time user activity tracking and sensor communication under\nconcurrent user load.\nDynamic Agentic Systems | FastAPI, LangGraph, React.js, Pinecone, PostgreSQL\n• Built an AI-powered platform for intelligent querying across documents and databases using FastAPI, LangGraph,\nPinecone, and PostgreSQL.\n• Implemented dynamic AI persona routing with specialized assistants including Financial Analyst, Legal Advisor, and\nGeneral Assistant using multi-agent workflows.\n• Developed Retrieval-Augmented Generation (RAG) pipelines with semantic vector search, metadata tracing, and\nreal-time query suggestions.\n• Designed a modern three-panel React interface with document upload, conversational querying, metadata\nvisualization, and query trace monitoring.\nBookSphere – E-Library Platform | PostgreSQL, Express.js, React.js, Node.js\n• Built a PERN stack e-library platform with advanced search, filtering, and personalized bookshelves.\n• Developed secure RESTful APIs with JWT authentication and role-based access control.\n• Designed PostgreSQL relational database schemas for scalable content and user management.\nAI Workout Planner Web App | React.js, Node.js, Express.js, MongoDB\n• Developed a full-stack workout planning and tracking platform with community-driven features.\n• Designed scalable MongoDB schemas and built RESTful APIs for workout scheduling and progress tracking.\n• Implemented reusable frontend components and responsive UI architecture using React.js.\nTechnical Skills\nLanguages & Frameworks: C++, Python,SQL, Node.js, FastAPI, Flask, React, Next.js, Express, MERN, Supabase\nAI & Infrastructure: LangChain, LangGraph, OpenAI APIs, Pinecone, RAG, Multi-Agent Systems\nDeveloper Tools: Git, GitHub, VS Code, PyCharm, Jupyter Notebook\n"
+}

@@ -1,0 +1,53 @@
+{
+    "summary": {
+        "content": [
+            "AI and Data professional with 3+ years of hands-on experience building data-driven and machine learning systems. Strong background in data ingestion, data preprocessing, ETL/ELT pipelines, SQL, and Python, with experience designing reliable datasets for analytics and machine learning. Worked extensively on large language models (LLMs) such as GPT-3 and Llama, including data preparation, fine-tuning, and deployment for NLP and generative AI use cases. Experienced in data cleaning, transformation, validation, and analytical data modeling using medallion architecture. Comfortable working with cloud platforms, APIs, and batch processing pipelines, and collaborating with analytics and business teams to deliver scalable, production-ready AI and data solutions ."
+        ]
+    },
+    "experience": [
+        {
+            "company": "BoolMind",
+            "designation": "ML Engineer",
+            "start_date": "July 2025",
+            "end_date": "Present",
+            "description": "Lahore  Machine Learning Model Development : Designed, trained, and optimized supervised and unsupervised ML models (Regression, Classification, Clustering, Recommendation Systems) to solve business-critical problems.  Deep Learning Applications : Built an AI-powered advertising recommendation engine that uses LLMs to parse natural language queries, validates locations through semantic mapping, and ranks advertising spots using a weighted algorithm (footfall 30%, traffic 30%, POI density 20%, proximity 20%) with geospatial search across 290+ UAE categories, delivering optimized results within 5 seconds.  Optimization & Hyperparameter Tuning : Leveraged Grid Search, Random Search, and Bayesian Optimization to enhance model generalization and performance.  MLOps & Deployment : Deployed machine learning models into production using Docker, FastAPI, Flask, and cloud platforms (AWS, GCP, Azure) with CI/CD pipelines."
+        },
+        {
+            "company": "IT Genics",
+            "designation": "Associate AI Engineer",
+            "start_date": "Jan 2024",
+            "end_date": "June 2025",
+            "description": "Lahore  Developing AI Models: Design, train, and deploy machine learning models to solve real-world challenges, including predictive analytics, natural language processing, and computer vision.  Chatbot Development: Build and implement intelligent chatbots for customer support, automation, and enhanced user experiences.  No-Code Chatbot Platform: Built a platform enabling companies to create custom chatbots without writing any code. Users input key details, and the system auto-generates fully functional chatbots, reducing deployment time and technical barriers.  AI- VoiceBot: Developed intelligent voicebot using twillio and Llama with NLP to perform desired functions."
+        },
+        {
+            "company": "IT Solutions World Wide",
+            "designation": "Junior AI Engineer",
+            "start_date": "Jul 2023",
+            "end_date": "Dec 2023",
+            "description": "Islamabad  Developed and deployed advanced LLMs, including GPT-3, Llama, BERT, and Falcon, using transfer learning and fine-tuning to address complex NLP challenges, enhancing the company’s AI capabilities and enabling the development of customized chatbots for various use cases.  Collaborated with cross-functional teams to gather requirements and design end-to-end AI pipelines, implementing algorithms by leveraging neural networks, deep learning frameworks (TensorFlow, PyTorch), and reinforcement learning to drive efficiency and innovation."
+        }
+    ],
+    "education": [
+        {
+            "degree": "Bachelor of Computer Science",
+            "institution": "NUCES, FAST",
+            "cgpa": "",
+            "graduation_date": "Jun 2023",
+            "description": "Islamabad Aug 2019"
+        }
+    ],
+    "projects": {
+        "content": [
+            "AITRAX – Pulmonary Fibrosis Progression Using Deep Learning  Using TensorFlow and Keras, the model predicts and tracks disease progression with 72.56% accuracy by leveraging medical imaging data like CT scans for training deep learning models. The project’s results have contributed to developing more effective treatment strategies for pulmonary fibrosis and enhancing patient outcomes. Cardiovascular Risk Prognostication and Classification System  The model achieved a 96.82% accuracy rate in predicting heart disease likelihood, as assessed through cross-validation and comparison with actual medical outcomes. This success underscores the potential of machine learning in healthcare, suggesting that similar models could be developed for other diseases to enhance global health outcomes."
+        ]
+    },
+    "certifications": {
+        "content": [
+            "IBM: Tools for Data Science Microsoft : Microsoft Azure Fundamentals (AZ-900) IBM: Data Science Methodology IBM: Machine Learning with Python IBM: Databases and SQL for Data Science (Python) IBM: Data Analysis With Python ADDITIONAL SKILLS Skills : Python, Deep Learning, Neural Networks, Machine Learning, TensorFlow, Keras, PyTorch, Scikit-learn, Data Visualization, Data Analysis, SQL, NLP, Finetuning, CUDA, Text Generation, Transformer Models, Language Modeling, Azure, Database Management, Data Modeling, Fast APIs, VectorDBs."
+        ]
+    },
+    "email": "talha.10.zain@gmail.com",
+    "phone": "+92 340 5555550",
+    "name": "Talha Zain ",
+    "raw_text": "Talha Zain \nIslamabad, Pakistan | P: +92 340 5555550 | talha.10.zain@gmail.com | linkedin.com/in/talhazain10/ \n \nSUMMARY \n \nAI and Data professional with 3+ years of hands-on experience building data-driven and machine learning systems. \nStrong background in data ingestion, data preprocessing, ETL/ELT pipelines, SQL, and Python, with experience \ndesigning reliable datasets for analytics and machine learning. Worked extensively on large language models (LLMs) \nsuch as GPT-3 and Llama, including data preparation, fine-tuning, and deployment for NLP and generative AI use \ncases. Experienced in data cleaning, transformation, validation, and analytical data modeling using medallion \narchitecture. Comfortable working with cloud platforms, APIs, and batch processing pipelines, and collaborating with \nanalytics and business teams to deliver scalable, production-ready AI and data solutions. \nEXPERIENCE \n \nBoolMind — Lahore \nJuly 2025 – Present \nML Engineer \n \nMachine Learning Model Development: Designed, trained, and optimized supervised and unsupervised ML \nmodels (Regression, Classification, Clustering, Recommendation Systems) to solve business-critical problems. \n \nDeep Learning Applications: Built an AI-powered advertising recommendation engine that uses LLMs to parse \nnatural language queries, validates locations through semantic mapping, and ranks advertising spots using a \nweighted algorithm (footfall 30%, traffic 30%, POI density 20%, proximity 20%) with geospatial search across \n290+ UAE categories, delivering optimized results within 5 seconds. \n \nOptimization & Hyperparameter Tuning: Leveraged Grid Search, Random Search, and Bayesian Optimization \nto enhance model generalization and performance. \n \nMLOps & Deployment: Deployed machine learning models into production using Docker, FastAPI, Flask, and \ncloud platforms (AWS, GCP, Azure) with CI/CD pipelines. \nIT Genics – Lahore \nJan 2024 – June 2025 \nAssociate AI Engineer \n \nDeveloping AI Models: Design, train, and deploy machine learning models to solve real-world challenges, \nincluding predictive analytics, natural language processing, and computer vision. \n \nChatbot Development: Build and implement intelligent chatbots for customer support, automation, and \nenhanced user experiences. \n \nNo-Code Chatbot Platform: Built a platform enabling companies to create custom chatbots without writing \nany code. Users input key details, and the system auto-generates fully functional chatbots, reducing \ndeployment time and technical barriers. \n \nAI-VoiceBot: Developed intelligent voicebot using twillio and Llama with NLP to perform desired functions. \nIT Solutions World Wide – Islamabad \nJul 2023 – Dec 2023 \nJunior AI Engineer \n \nDeveloped and deployed advanced LLMs, including GPT-3, Llama, BERT, and Falcon, using transfer learning \nand fine-tuning to address complex NLP challenges, enhancing the company’s AI capabilities and enabling the \ndevelopment of customized chatbots for various use cases. \n \nCollaborated with cross-functional teams to gather requirements and design end-to-end AI pipelines, \nimplementing algorithms by leveraging neural networks, deep learning frameworks (TensorFlow, PyTorch), \nand reinforcement learning to drive efficiency and innovation. \nEDUCATION \n \nNUCES, FAST – Islamabad \nAug 2019 – Jun 2023 \nBachelor of Computer Science \nPROJECTS \n \nAITRAX – Pulmonary Fibrosis Progression Using Deep Learning \n \nUsing TensorFlow and Keras, the model predicts and tracks disease progression with 72.56% accuracy by \nleveraging medical imaging data like CT scans for training deep learning models. The project’s results have \ncontributed to developing more effective treatment strategies for pulmonary fibrosis and enhancing patient \noutcomes. \nCardiovascular Risk Prognostication and Classification System \n \nThe model achieved a 96.82% accuracy rate in predicting heart disease likelihood, as assessed through \ncross-validation and comparison with actual medical outcomes. This success underscores the potential of \nmachine learning in healthcare, suggesting that similar models could be developed for other diseases to \nenhance global health outcomes. \nCERTIFICATIONS \n \nIBM: Tools for Data Science \nMicrosoft: Microsoft Azure Fundamentals (AZ-900) \nIBM: Data Science Methodology \nIBM: Machine Learning with Python \nIBM: Databases and SQL for Data Science (Python) \nIBM: Data Analysis With Python \n \nADDITIONAL SKILLS \n \nSkills: Python, Deep Learning, Neural Networks, Machine Learning, TensorFlow, Keras, PyTorch, Scikit-learn, Data \nVisualization, Data Analysis, SQL, NLP, Finetuning, CUDA, Text Generation, Transformer Models, Language \nModeling, Azure, Database Management, Data Modeling, Fast APIs, VectorDBs. \n"
+}

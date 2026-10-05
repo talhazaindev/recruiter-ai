@@ -1,0 +1,126 @@
+# Full stack: redis, api, workers, web
+# MongoDB: Atlas only (no local mongo service).
+# CV file storage: MongoDB GridFS in the same shared Atlas DB (no S3/MinIO).
+# From repo root:
+#   docker compose up --build
+#   docker compose up --build -d
+#
+# Required in .env:
+#   MONGODB_URI=mongodb+srv://...@recruit....mongodb.net/?appName=recruit
+#   MONGODB_DB=RecruiterAI
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    env_file:
+      - path: .env.example
+        required: false
+      - path: .env
+        required: true
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
+      REDIS_URL: redis://redis:6379/0
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+      # Baked into the image at build time — do not override from .env.
+      DOCLING_ARTIFACTS_PATH: /opt/docling/models
+      DOCLING_DO_OCR: "false"
+      DOCLING_DO_TABLE_STRUCTURE: "false"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  parse_worker:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    command: python workers/parse_worker.py
+    env_file:
+      - path: .env.example
+        required: false
+      - path: .env
+        required: true
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
+      REDIS_URL: redis://redis:6379/0
+      # Baked into the image at build time — do not override from .env.
+      DOCLING_ARTIFACTS_PATH: /opt/docling/models
+      DOCLING_DO_OCR: "false"
+      DOCLING_DO_TABLE_STRUCTURE: "false"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  match_worker:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    command: python workers/match_worker.py
+    env_file:
+      - path: .env.example
+        required: false
+      - path: .env
+        required: true
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  ingest_worker:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    command: python workers/ingest_worker.py
+    env_file:
+      - path: .env.example
+        required: false
+      - path: .env
+        required: true
+    environment:
+      MONGODB_URI: ${MONGODB_URI:?Set MONGODB_URI to your Atlas mongodb+srv:// URI}
+      MONGODB_DB: ${MONGODB_DB:-RecruiterAI}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+    environment:
+      # Browser calls the API on the host, not the Docker network name
+      VITE_API_BASE_URL: http://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      api:
+        condition: service_started
